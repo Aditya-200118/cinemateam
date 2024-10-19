@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow-sm" style="width: 60%;">
+        <div class="card-body">
+            <h5 class="card-title text-center text-primary">Register</h5>
+            <form method="post">
+                {% csrf_token %}
+                {{ user_form.non_field_errors }}
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            {{ user_form.first_name.label_tag }}
+                            {{ user_form.first_name }}
+                        </div>
+                        <div class="mb-3">
+                            {{ user_form.middle_name.label_tag }}
+                            {{ user_form.middle_name }}
+                        </div>
+                        <div class="mb-3">
+                            {{ user_form.last_name.label_tag }}
+                            {{ user_form.last_name }}
+                        </div>
+                        <div class="mb-3">
+                            {{ user_form.contact_no.label_tag }}
+                            {{ user_form.contact_no }}
+                        </div>
+                        <div class="mb-3">
+                            {{ user_form.email.label_tag }}
+                            {{ user_form.email }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            {{ user_form.billing_address.label_tag }}
+                            {{ user_form.billing_address }}
+                        </div>
+                        <div class="mb-3">
+                            {{ user_form.city.label_tag }}
+                            {{ user_form.city }}
+                        </div>
+                        <div class="mb-3">
+                            {{ user_form.state.label_tag }}
+                            {{ user_form.state }}
+                        </div>
+                        <div class="mb-3">
+                            {{ user_form.zip_code.label_tag }}
+                            {{ user_form.zip_code }}
+                        </div>
+                        <div class="mb-3">
+                            {{ user_form.password.label_tag }}
+                            {{ user_form.password }}
+                        </div>
+                        <div class="mb-3">
+                            {{ user_form.password2.label_tag }}
+                            {{ user_form.password2 }}
+                        </div>
+                    </div>
+                </div>
+                <h5 class="card-title text-center text-primary">Card Information</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            {{ card_form.card_number.label_tag }}
+                            {{ card_form.card_number }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            {{ card_form.expiry_date.label_tag }}
+                            {{ card_form.expiry_date }}
+                        </div>
+                        <div class="mb-3">
+                            {{ card_form.cvv.label_tag }}
+                            {{ card_form.cvv }}
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Register</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

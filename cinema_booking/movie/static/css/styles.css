@@ -1,0 +1,234 @@
+html{
+	/* font-size: 62.5%; */
+	height: 100%;
+	margin: 0%;
+
+}
+
+html:focus-within{
+	scroll-behavior: smooth;
+}
+
+body {
+	min-height: 100%;
+	/* margin: 0px 1px 0px 1px; */
+}
+
+nav .navbar-brand {
+	/* size for brand */
+	font-size: xx-large;
+}
+
+/* Colors for brand */
+nav .navbar-brand .blue {
+	color: #537fbe;
+}
+
+nav .navbar-brand .red {
+	color: #ea433b;
+}
+
+nav .navbar-brand .yellow {
+	color: #f5b82e;
+}
+
+nav .navbar-brand .green {
+	color: #2e944b;
+}
+
+main .form-control {
+	/* Center form controls */
+	display: inline-block;
+	/* margin: auto; */
+	/* Override Bootstrap's 100% width for form controls */
+	width: auto;
+}
+
+
+main {
+	/* Scroll horizontally as needed */
+	/* overflow-x: auto; */
+
+	/* Center contents */
+	text-align: center;
+}
+
+main img {
+	/* Constrain images on small screens */
+	max-width: 100%;
+}
+
+/* .form-control{
+    margin-top: 1vh;
+} */
+
+
+body {
+	/* background: #fafafa; */
+	/* default background color if not mentioned */
+	background: none;
+	background-color: none;
+	color: #333333;
+	/* margin-top: 5rem; */
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	color: #444444;
+}
+
+.bg-steel {
+	background-color: #5f788a;
+}
+
+.site-header .navbar-nav .nav-link {
+	color: #cbd5db;
+}
+
+.site-header .navbar-nav .nav-link:hover {
+	color: #ffffff;
+}
+
+/* .site-header .navbar-nav .nav-link.active {
+  font-weight: 500;
+} */
+
+/* .content-section{
+  background: #ffffff;
+  padding: 10px 20px;
+  border: 1px solid #dddddd;
+  border-radius: 3px;
+  margin-bottom: 20px;
+} */
+
+/* .login{
+    border: none;
+    background: none;
+}
+
+.register{
+    border: none;
+    background: none;
+} */
+
+.article-title {
+	color: #444444;
+}
+
+a.article-title:hover {
+	color: #428bca;
+	text-decoration: none;
+}
+
+.article-content {
+	white-space: pre-line;
+}
+
+/* .article-img {
+	height: 65px;
+  	width: 65px;
+  	margin-right: 16px;
+} */
+
+.article-metadata {
+	padding-bottom: 1px;
+	margin-bottom: 4px;
+	border-bottom: 1px solid #e3e3e3
+}
+
+.article-metadata a:hover {
+	color: #333;
+	text-decoration: none;
+}
+
+.article-svg {
+	width: 25px;
+	height: 25px;
+	vertical-align: middle;
+}
+
+.account-img {
+	height: 250px;
+	width: 250px;
+	/* margin-right: 20px; */
+	margin-bottom: 16px;
+}
+
+.account-heading {
+	font-size: 2.5rem;
+	color: #032336
+		/* color: #202124af */
+}
+
+/* card(s) css for buy, quote, sell */
+
+/* div.card:hover{
+  box-shadow: 0px 3px 2px 1px #91bdd6;
+} */
+
+div.card:hover {
+	transition: 2.75s;
+	/* animation: animate 5s ease-in infinite; */
+	/* animation: animate 3s ease-in slidein; */
+}
+
+/* navbar css for layout */
+
+button.navbar-toggler:focus {
+	color: aliceblue;
+}
+
+/* @keyframes animate{
+  0%
+   {
+      transform: translateY(10px);
+   } 
+} */
+
+/* div.card{
+  border-radius: 3rem !important;
+  background-color: transparent;
+} */
+
+div.card-header {
+	background-color: transparent;
+	border: none;
+	font-family: monospace !important;
+	font-size: 1.5rem;
+}
+
+div.card {
+	background-color: #ffffff;
+	border-radius: 1.175rem !important;
+	border: .125rem solid #dfdfdf;
+	border: none;
+}
+
+
+div.card-body {
+	background-color: #2564ebd5;
+	border-radius: 1.175rem;
+}
+
+.form-group .btn{
+	color:#DEE6F3; 
+	background-color: #2866EC;
+	border-width:2px;
+	border-radius:100px;
+	border-color:#D3E6FE25; 
+	width: 20%;
+	
+}
+
+/* .body .homepage{
+	background-color: ;
+} */
+
+.nav-item .nav-link{
+	color: #D3E6FE;
+}
+
