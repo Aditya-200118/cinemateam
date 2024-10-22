@@ -15,7 +15,7 @@
                             <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%;"
                                 aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
-                        <form id="registrationForm" method="post" class="was-validated" novalidate>
+                        <form id="registrationForm" method="post" class="needs-validation" novalidate>
                             {% csrf_token %}
                             {{ user_form.non_field_errors }}
 
@@ -39,9 +39,9 @@
                                 <div class="mb-3">
                                     {{ user_form.contact_no }}
                                 </div>
-                                <div class="mb-3">
+                                <div class="mb-3" class="was-validated">
                                     {{ user_form.email }}
-                                    <div class="invalid-feedback">
+                                    <div class="invalid-feedback" id="emailInvalidFeedback">
                                         Please enter a vailid email-id.
                                     </div>
                                 </div>
@@ -58,7 +58,7 @@
                                     </div>
                                 </div>
                                 <button type="button" class="btn btn-primary w-100 mt-3" id="nextButton"
-                                    onclick="nextStep(2)">Next</button>
+                                    onclick="nextStep(2)" disabled>Next</button>
                             </div>
 
                             <!-- Step 2: Address -->
@@ -144,11 +144,14 @@
     }
 
     // Add this part for live password validation and button enable/disable
+
     document.addEventListener("DOMContentLoaded", function () {
         const password = document.getElementById("password");
         const password2 = document.getElementById("password2");
         const nextButton = document.getElementById("nextButton");
         const passwordMismatchFeedback = document.getElementById("passwordMismatchFeedback");
+        const email = document.getElementById("email");
+        const emailInvalidFeedback = document.getElementById("emailInvalidFeedback");
 
         function validatePasswords() {
             if (password.value !== password2.value) {
@@ -158,12 +161,35 @@
             } else {
                 password2.classList.remove("is-invalid");
                 passwordMismatchFeedback.style.display = "none";
+                validateForm();
+            }
+        }
+
+        function validateEmail() {
+            const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            if (!emailPattern.test(email.value)) {
+                email.classList.add("is-invalid");
+                emailInvalidFeedback.style.display = "block";
+                nextButton.disabled = true;
+            } else {
+                email.classList.remove("is-invalid");
+                emailInvalidFeedback.style.display = "none";
+                validateForm();
+            }
+        }
+
+        function validateForm() {
+            if (password.value === password2.value && email.validity.valid) {
                 nextButton.disabled = false;
+            } else {
+                nextButton.disabled = true;
             }
         }
 
         password.addEventListener("input", validatePasswords);
         password2.addEventListener("input", validatePasswords);
+        email.addEventListener("input", validateEmail);
     });
+
 </script>
 {% endblock %}

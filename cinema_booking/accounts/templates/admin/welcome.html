@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin View{% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">
+    <img src="#" width="30" height="30" alt="Icon">
+  </a>
+  <div class="collapse navbar-collapse">
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'admin:logout' %}">Logout Admin</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container mt-4">
+  <div class="card mb-4 card-white">
+    <div class="card-body">
+      <h5 class="card-title">Welcome Admin</h5>
+      <p class="card-text">Choose an option to manage your content.</p>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="card text-center card-custom bg-primary text-white">
+            <div class="card-body">
+              <h5 class="card-title">Movie Management</h5>
+              <p class="card-text">Manage movie listings, trailers, and schedules.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <a href="{% url 'admin_accounts' %}" class="card text-center card-custom bg-primary text-white">
+            <div class="card-body">
+              <h5 class="card-title">User Management</h5>
+              <p class="card-text">Manage user accounts and roles.</p>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-4">
+          <div class="card text-center card-custom bg-primary text-white" onclick="location.href='#'">
+            <div class="card-body">
+              <h5 class="card-title">Promotion Management</h5>
+              <p class="card-text">Manage ongoing promotions and offers.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-white">
+    <div class="card-body">
+      <h5 class="card-title">Summary</h5>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Metric</th>
+            <th scope="col">Count</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Number of Screens</td>
+            <td>...</td>
+          </tr>
+          <tr>
+            <td>Currently Playing Movies</td>
+            <td>...</td>
+          </tr>
+          <tr>
+            <td>Coming Soon Movies</td>
+            <td>...</td>
+          </tr>
+          <tr>
+            <td>Number of Users</td>
+            <td>...</td>
+          </tr>
+          <tr>
+            <td>Number of Admins</td>
+            <td>...</td>
+          </tr>
+          <tr>
+            <td>Active Promo Codes</td>
+            <td>...</td>
+          </tr>
+          <tr>
+            <td>Last Sign In</td>
+            <td>...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -17,7 +17,6 @@ urlpatterns = [
     path('reset/done/', views.password_reset_complete, name='password_reset_complete'),
     path('edit_profile/', views.edit_profile, name='edit_profile'),
     path('change_password/', CustomPasswordChangeView.as_view(), name='change_password'),
-
 ]
 #<a href="{% url 'logout' %}">Logout</a>
 # path('register/step1/', views.register_step1, name='register_step1'),
