@@ -18,17 +18,17 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
 
         # Create a default address for the superuser
         default_address = Address.objects.create(
-            billing_address='Default Address',
-            city='Default City',
-            state='Default State',
-            zip_code='00000'
+            billing_address="Default Address",
+            city="Default City",
+            state="Default State",
+            zip_code="00000",
         )
-        extra_fields['address'] = default_address
+        extra_fields["address"] = default_address
 
         return self.create_user(email, password, **extra_fields)
 
@@ -75,7 +75,7 @@ class Address(models.Model):
     zip_code = models.CharField(max_length=10, default="N/A")
 
     def clean(self):
-        if self.pk and hasattr(self, 'customer'):
+        if self.pk and hasattr(self, "customer"):
             if self.customer and self.customer.pk != self.pk:
                 raise ValidationError("A customer can only have one address.")
 

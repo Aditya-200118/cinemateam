@@ -8,15 +8,23 @@ from django.http import HttpResponse
 from django.contrib.auth import get_user_model
 from django.shortcuts import render, redirect
 from .models import Customer, Card, Address
-from .forms import LoginForm, UserRegistrationForm, CardForm, AddressForm, EditProfileForm
+from .forms import (
+    LoginForm,
+    UserRegistrationForm,
+    CardForm,
+    AddressForm,
+    EditProfileForm,
+)
 
 from django.db import transaction
 import logging
 
 from django.contrib.auth.views import LogoutView
 
+
 class CustomLogoutView(LogoutView):
-    next_page = 'home'
+    next_page = "home"
+
     def dispatch(self, request, *args, **kwargs):
         # Clear the session
         request.session.flush()
@@ -26,7 +34,7 @@ class CustomLogoutView(LogoutView):
 
 def user_login(request):
     if request.user.is_authenticated:
-        return redirect('home')
+        return redirect("home")
     if request.method == "POST":
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -40,9 +48,9 @@ def user_login(request):
                 if user.is_active:
                     login(request, user)
                     # Store user ID in session
-                    request.session['user_id'] = user.user_id
+                    request.session["user_id"] = user.user_id
                     # Redirect to home page
-                    return redirect('home')
+                    return redirect("home")
                 else:
                     return HttpResponse("Disabled account")
             else:
@@ -52,9 +60,6 @@ def user_login(request):
     return render(request, "accounts/login.html", {"form": form})
 
 
-
-
-
 logger = logging.getLogger(__name__)
 
 
@@ -62,7 +67,7 @@ def register(request):
     if request.method == "POST":
         user_form = UserRegistrationForm(request.POST)
         address_form = AddressForm(request.POST)
-        card_form = CardForm(request.POST)
+        card_form = CardForm(request.POST, is_registration=True)
         if user_form.is_valid() and address_form.is_valid() and card_form.is_valid():
             email = user_form.cleaned_data["email"]
             if get_user_model().objects.filter(email=email).exists():
@@ -122,7 +127,7 @@ def register(request):
     else:
         user_form = UserRegistrationForm()
         address_form = AddressForm()
-        card_form = CardForm()
+        card_form = CardForm(is_registration=True)
     return render(
         request,
         "accounts/register.html",
@@ -142,6 +147,7 @@ def check_session(request):
     value = request.session.get("test_key", "No session data found.")
     return HttpResponse(f"Session data: {value}")
 
+
 from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
 from django.contrib.auth.forms import SetPasswordForm
@@ -149,51 +155,54 @@ from .forms import PasswordResetRequestForm
 
 User = get_user_model()
 
+
 def password_reset_request(request):
     if request.method == "POST":
         form = PasswordResetRequestForm(request.POST)
         if form.is_valid():
-            email = form.cleaned_data['email']
+            email = form.cleaned_data["email"]
             user = User.objects.get(email=email)
             token = get_random_string(20)
             user.reset_token = token
             user.save()
-            reset_url = request.build_absolute_uri(f'/reset/{token}/')
+            reset_url = request.build_absolute_uri(f"/reset/{token}/")
             send_mail(
-                'Password Reset Request',
-                f'Click the link to reset your password: {reset_url}',
-                'your-email@example.com',
+                "Password Reset Request",
+                f"Click the link to reset your password: {reset_url}",
+                "your-email@example.com",
                 [email],
                 fail_silently=False,
             )
-            return redirect('password_reset_done')
+            return redirect("password_reset_done")
     else:
         form = PasswordResetRequestForm()
-    return render(request, 'registration/password_reset_form.html', {'form': form})
+    return render(request, "registration/password_reset_form.html", {"form": form})
+
 
 def password_reset_confirm(request, token):
     try:
         user = User.objects.get(reset_token=token)
     except User.DoesNotExist:
-        return redirect('password_reset_invalid')
-    
+        return redirect("password_reset_invalid")
+
     if request.method == "POST":
         form = SetPasswordForm(user, request.POST)
         if form.is_valid():
             form.save()
-            user.reset_token = ''
+            user.reset_token = ""
             user.save()
-            return redirect('password_reset_complete')
+            return redirect("password_reset_complete")
     else:
         form = SetPasswordForm(user)
-    return render(request, 'registration/password_reset_confirm.html', {'form': form})
+    return render(request, "registration/password_reset_confirm.html", {"form": form})
+
 
 def password_reset_done(request):
-    return render(request, 'registration/password_reset_done.html')
+    return render(request, "registration/password_reset_done.html")
+
 
 def password_reset_complete(request):
-    return render(request, 'registration/password_reset_complete.html')
-
+    return render(request, "registration/password_reset_complete.html")
 
 
 @login_required
@@ -203,17 +212,24 @@ def edit_profile(request):
     address = customer.address
     cards = customer.cards.all()
 
-    if request.method == 'POST':
+    if request.method == "POST":
         profile_form = EditProfileForm(request.POST, instance=customer)
         address_form = AddressForm(request.POST, instance=address)
-        card_forms = [CardForm(request.POST, instance=card, is_registration=False) for card in cards]
+        card_forms = [
+            CardForm(request.POST, instance=card, is_registration=False)
+            for card in cards
+        ]
 
-        if profile_form.is_valid() and address_form.is_valid() and all([cf.is_valid() for cf in card_forms]):
+        if (
+            profile_form.is_valid()
+            and address_form.is_valid()
+            and all([cf.is_valid() for cf in card_forms])
+        ):
             profile_form.save()
             address_form.save()
             for cf in card_forms:
                 cf.save()
-            return redirect('home')
+            return redirect("home")
 
     else:
         profile_form = EditProfileForm(instance=customer)
@@ -221,16 +237,17 @@ def edit_profile(request):
         card_forms = [CardForm(instance=card, is_registration=False) for card in cards]
 
     context = {
-        'profile_form': profile_form,
-        'address_form': address_form,
-        'card_forms': card_forms,
+        "profile_form": profile_form,
+        "address_form": address_form,
+        "card_forms": card_forms,
     }
-    return render(request, 'accounts/edit_profile.html', context)
+    return render(request, "accounts/edit_profile.html", context)
 
 
 from django.contrib.auth.views import PasswordChangeView
 from django.urls import reverse_lazy
 
+
 class CustomPasswordChangeView(PasswordChangeView):
-    template_name = 'accounts/change_password.html'
-    success_url = reverse_lazy('home')
+    template_name = "accounts/change_password.html"
+    success_url = reverse_lazy("home")
