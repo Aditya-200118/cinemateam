@@ -1,85 +1,133 @@
 {% extends "base.html" %}
 
+{% block title %}Register{% endblock %}
+
 {% block content %}
-<div class="d-flex justify-content-center align-items-center vh-100">
-    <div class="card shadow-sm" style="width: 60%;">
-        <div class="card-body">
-            <h5 class="card-title text-center text-primary">Register</h5>
-            <form method="post">
-                {% csrf_token %}
-                {{ user_form.non_field_errors }}
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            {{ user_form.first_name.label_tag }}
-                            {{ user_form.first_name }}
+<div class="container d-flex align-items-center justify-content-center min-vh-100">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card-group">
+                <div class="card p-4" style="width: 70%; height: auto;">
+                    <div class="card-body">
+                        <h2 class="text-center">Sign-Up</h2>
+                        <p class="text-center">Please, use the following form to register:</p>
+                        <div class="progress mb-4">
+                            <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
-                        <div class="mb-3">
-                            {{ user_form.middle_name.label_tag }}
-                            {{ user_form.middle_name }}
-                        </div>
-                        <div class="mb-3">
-                            {{ user_form.last_name.label_tag }}
-                            {{ user_form.last_name }}
-                        </div>
-                        <div class="mb-3">
-                            {{ user_form.contact_no.label_tag }}
-                            {{ user_form.contact_no }}
-                        </div>
-                        <div class="mb-3">
-                            {{ user_form.email.label_tag }}
-                            {{ user_form.email }}
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            {{ user_form.billing_address.label_tag }}
-                            {{ user_form.billing_address }}
-                        </div>
-                        <div class="mb-3">
-                            {{ user_form.city.label_tag }}
-                            {{ user_form.city }}
-                        </div>
-                        <div class="mb-3">
-                            {{ user_form.state.label_tag }}
-                            {{ user_form.state }}
-                        </div>
-                        <div class="mb-3">
-                            {{ user_form.zip_code.label_tag }}
-                            {{ user_form.zip_code }}
-                        </div>
-                        <div class="mb-3">
-                            {{ user_form.password.label_tag }}
-                            {{ user_form.password }}
-                        </div>
-                        <div class="mb-3">
-                            {{ user_form.password2.label_tag }}
-                            {{ user_form.password2 }}
-                        </div>
+                        <form id="registrationForm" method="post">
+                            {% csrf_token %}
+                            {{ user_form.non_field_errors }}
+                            
+                            <!-- Step 1: User Details -->
+                            <div id="step1" class="step">
+                                <div class="mb-3">
+                                    {{ user_form.first_name }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ user_form.middle_name }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ user_form.last_name }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ user_form.contact_no }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ user_form.email }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ user_form.password }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ user_form.password2 }}
+                                </div>
+                                <button type="button" class="btn btn-primary w-100 mt-3" onclick="nextStep(2)">Next</button>
+                            </div>
+                            
+                            <!-- Step 2: Address -->
+                            <div id="step2" class="step d-none">
+                                <div class="mb-3">
+                                    {{ address_form.billing_address }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ address_form.city }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ address_form.state }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ address_form.zip_code }}
+                                </div>
+                                <button type="button" class="btn btn-secondary w-100 mt-3" onclick="prevStep(1)">Back</button>
+                                <button type="button" class="btn btn-primary w-100 mt-3" onclick="nextStep(3)">Next</button>
+                            </div>
+                            
+                            <!-- Step 3: Card Information -->
+                            <div id="step3" class="step d-none">
+                                <div class="mb-3">
+                                    {{ card_form.card_number }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ card_form.expiry_date }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ card_form.cvv }}
+                                </div>
+                                <button type="button" class="btn btn-secondary w-100 mt-3" onclick="prevStep(2)">Back</button>
+                                <button type="submit" class="btn btn-primary w-100 mt-3">Register</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-                <h5 class="card-title text-center text-primary">Card Information</h5>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            {{ card_form.card_number.label_tag }}
-                            {{ card_form.card_number }}
+                <div class="card text-white bg-primary py-5 d-md-down-none" style="width:30%">
+                    <div class="card-body text-center d-flex flex-column justify-content-center">
+                        <div>
+                            <h2>Welcome Back!</h2>
+                            <p>To keep connected with us please login with your personal info</p>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            {{ card_form.expiry_date.label_tag }}
-                            {{ card_form.expiry_date }}
-                        </div>
-                        <div class="mb-3">
-                            {{ card_form.cvv.label_tag }}
-                            {{ card_form.cvv }}
-                        </div>
+                        <a href="{% url 'user_login' %}" class="btn btn-outline-light">Login</a>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary w-100">Register</button>
-            </form>
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+    function nextStep(step) {
+        if (validateStep(step - 1)) {
+            document.getElementById('step' + (step - 1)).classList.add('d-none');
+            document.getElementById('step' + step).classList.remove('d-none');
+            updateProgressBar(step);
+        }
+    }
+
+    function prevStep(step) {
+        document.getElementById('step' + (step + 1)).classList.add('d-none');
+        document.getElementById('step' + step).classList.remove('d-none');
+        updateProgressBar(step);
+    }
+
+    function validateStep(step) {
+        let valid = true;
+        const stepDiv = document.getElementById('step' + step);
+        const inputs = stepDiv.querySelectorAll('input[required]');
+        inputs.forEach(input => {
+            if (!input.value) {
+                input.classList.add('is-invalid');
+                valid = false;
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        });
+        return valid;
+    }
+
+    function updateProgressBar(step) {
+        const progressBar = document.getElementById('progressBar');
+        const progress = (step / 3) * 100;
+        progressBar.style.width = progress + '%';
+        progressBar.setAttribute('aria-valuenow', progress);
+    }
+</script>
 {% endblock %}

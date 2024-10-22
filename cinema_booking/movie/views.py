@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 # Create your views here.
-def movie(request):
+def home(request):
     if request.method == 'POST':
         pass
     else:

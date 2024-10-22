@@ -13,7 +13,7 @@
                         <p class="text-center">Please, use the following form to register:</p>
                         <form method="post" action="{% url 'register_step2' %}">
                             {% csrf_token %}
-                            {{ user_form.non_field_errors }}
+                            <!-- {{ user_form.non_field_errors }} -->
                             <div class="mb-3">
                                 {{ user_form.first_name }}
                             </div>
@@ -28,6 +28,12 @@
                             </div>
                             <div class="mb-3">
                                 {{ user_form.email }}
+                            </div>
+                            <div class="mb-3">
+                                {{ user_form.password }}
+                            </div>
+                            <div class="mb-3">
+                                {{ user_form.password2 }}
                             </div>
                             <button type="submit" class="btn btn-primary w-100">Next</button>
                         </form>

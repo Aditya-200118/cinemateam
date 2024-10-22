@@ -1,40 +1,47 @@
 {% extends "base.html" %}
 
+{% block title %}
+    Book My Ticket
+{% endblock %}
+
 {% block content %}
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">Navbar</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Link</a>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Dropdown
-            </a>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="#">Action</a></li>
-              <li><a class="dropdown-item" href="#">Another action</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="#">Something else here</a></li>
-            </ul>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-          </li>
-        </ul>
-        <form class="d-flex" role="search">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success" type="submit">Search</button>
-        </form>
-      </div>
-    </div>
-  </nav>
+    <!-- Navigation Bar -->
+    <header class="py-3 bg-white border-bottom">
+        <div class="container-fluid ps-3 pe-3 d-flex justify-content-between align-items-center">
+            <!-- BOOK MY TICKET logo and text -->
+            <div class="d-flex gap-2 align-items-center">
+                <div>
+                    <!-- icon comes here -->
+                </div>
+                <a href="{% url 'home' %}" class="text-decoration-none">
+                    <h1 class="h4 text-primary mb-0 fw-bold">BOOK MY TICKET</h1>
+                </a>
+            </div>
+            <!-- Search Box, Log In and Sign Up Buttons -->
+            <div class="d-flex gap-3">
+                <input type="text" class="form-control rounded" placeholder="Search for Movies">
+                <a href="{% url 'user_login' %}" class="btn btn-primary rounded" style="min-width: 90px;">Log In</a>
+                <a href="{% url 'register' %}" class="btn btn-primary rounded" style="min-width: 90px;">Sign Up</a>
+                <a href="{% url 'logout' %}" class="btn btn-primary rounded" style="min-width: 90px;">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Movie Section -->
+    <section class="my-5 container">
+        <div class="mb-4">
+            <h2 class="h5 fw-bold">Now Playing</h2>
+            <!-- Movie Cards -->
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4" id="playing-carousel">
+                <!-- Movie cards will be dynamically inserted here -->
+            </div>
+        </div>
+        <div class="mb-4">
+            <h2 class="h5 fw-bold">Coming Soon</h2>
+            <!-- Movie Cards -->
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4" id="upcoming-carousel">
+                <!-- Movie cards will be dynamically inserted here -->
+            </div>
+        </div>
+    </section>
 {% endblock %}
