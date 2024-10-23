@@ -1,7 +1,11 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import Customer, Address
+from .models import Customer, Address, Card
+from .admin_views import admin_site
 
+class CardInline(admin.TabularInline):
+    model = Card
+    extra = 1
 
 class CustomerAdmin(BaseUserAdmin):
     list_display = ("email", "first_name", "last_name", "is_staff")
@@ -13,7 +17,7 @@ class CustomerAdmin(BaseUserAdmin):
             "Personal info",
             {"fields": ("first_name", "middle_name", "last_name", "contact_no")},
         ),
-        ("Address", {"fields": ("address",)}),  # Updated to use the address field
+        ("Address", {"fields": ("address",)}),
         ("Permissions", {"fields": ("is_staff", "is_superuser", "is_active")}),
         ("Important dates", {"fields": ("last_login",)}),
     )
@@ -28,7 +32,7 @@ class CustomerAdmin(BaseUserAdmin):
                     "middle_name",
                     "last_name",
                     "contact_no",
-                    "address",  # Updated to use the address field
+                    "address",
                     "password1",
                     "password2",
                     "is_staff",
@@ -38,7 +42,18 @@ class CustomerAdmin(BaseUserAdmin):
             },
         ),
     )
+    inlines = [CardInline]
 
+class AddressAdmin(admin.ModelAdmin):
+    list_display = ('billing_address', 'city', 'state', 'zip_code')
+    search_fields = ('billing_address', 'city', 'state', 'zip_code')
+    list_filter = ('city', 'state')
 
-admin.site.register(Customer, CustomerAdmin)
-admin.site.register(Address)  # Register the Address model
+class CardAdmin(admin.ModelAdmin):
+    list_display = ('customer', 'card_number', 'expiry_date')
+    search_fields = ('customer__email', 'card_number')
+
+# Register models with the custom admin site
+admin_site.register(Customer, CustomerAdmin)
+admin_site.register(Address, AddressAdmin)
+admin_site.register(Card, CardAdmin)

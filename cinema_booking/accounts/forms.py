@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from .models import Card, Address
 from django.core.exceptions import ValidationError
 
+
 class LoginForm(forms.Form):
     email = forms.EmailField(
         label="",
@@ -22,14 +23,18 @@ class UserRegistrationForm(forms.ModelForm):
     password = forms.CharField(
         label="Password",
         widget=forms.PasswordInput(
-            attrs={"placeholder": "Password", "class": "form-control"}
+            attrs={"placeholder": "Password", "class": "form-control", "id": "password"}
         ),
     )
 
     password2 = forms.CharField(
         label="Repeat password",
         widget=forms.PasswordInput(
-            attrs={"placeholder": "Repeat password", "class": "form-control"}
+            attrs={
+                "placeholder": "Repeat password",
+                "class": "form-control",
+                "id": "password2",
+            }
         ),
     )
 
@@ -38,19 +43,38 @@ class UserRegistrationForm(forms.ModelForm):
         fields = ["first_name", "middle_name", "last_name", "contact_no", "email"]
         widgets = {
             "first_name": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "First Name"}
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "First Name",
+                    "required": True,
+                }
             ),
             "middle_name": forms.TextInput(
                 attrs={"class": "form-control", "placeholder": "Middle Name"}
             ),
             "last_name": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Last Name"}
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Last Name",
+                    "required": True,
+                }
             ),
             "contact_no": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Contact Number"}
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Contact Number",
+                    "required": True,
+                }
             ),
             "email": forms.EmailInput(
-                attrs={"class": "form-control", "placeholder": "Email"}
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Email",
+                    "id": "email",
+                    "required": True,
+                    "pattern": "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+                    "title": "Please enter a valid email address.",
+                }
             ),
         }
 
@@ -95,34 +119,45 @@ class AddressForm(forms.ModelForm):
 class CardForm(forms.ModelForm):
     class Meta:
         model = Card
-        fields = ['card_number', 'expiry_date', 'cvv']
+        fields = ["card_number", "expiry_date", "cvv"]
 
     def __init__(self, *args, **kwargs):
-        self.is_registration = kwargs.pop('is_registration', False)
+        self.is_registration = kwargs.pop("is_registration", False)
         super().__init__(*args, **kwargs)
 
     def clean(self):
         cleaned_data = super().clean()
         if not self.is_registration:
             customer = self.instance.customer
+            if not customer:
+                raise ValidationError("The card must be associated with a customer.")
             if customer.cards.count() >= 4:
                 raise ValidationError("You cannot store more than 4 payment cards.")
         return cleaned_data
+
 
 # from .models import Customer
 class EditProfileForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
-        fields = ['first_name', 'last_name', 'contact_no', 'promotions']
+        fields = ["first_name", "last_name", "contact_no", "promotions"]
         widgets = {
-            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Last Name'}),
-            'contact_no': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Contact Number'}),
-            'promotions': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            "first_name": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "First Name"}
+            ),
+            "last_name": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Last Name"}
+            ),
+            "contact_no": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Contact Number"}
+            ),
+            "promotions": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
 
 
 User = get_user_model()
+
+
 class PasswordResetRequestForm(forms.Form):
     email = forms.EmailField()
 
