@@ -23,12 +23,6 @@ import logging
 from django.contrib.auth.views import LogoutView
 
 
-<<<<<<< HEAD
-class CustomLogoutView(LogoutView):
-    next_page = "home"
-
-    def dispatch(self, request, *args, **kwargs):
-=======
 from django.contrib.auth.views import LogoutView
 from django.shortcuts import redirect, render
 from django.views import View
@@ -40,7 +34,6 @@ class CustomLogoutView(View):
         return render(request, self.template_name)
 
     def post(self, request, *args, **kwargs):
->>>>>>> 34753366547cb490da32fec25d38354c3827bc88
         # Clear the session
         request.session.flush()
         return redirect('home')
@@ -85,48 +78,66 @@ logger = logging.getLogger(__name__)
 
 
 from django.core.mail import send_mail
+from django.utils.encoding import force_bytes
+
 from django.conf import settings
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode
+
+def activate_account(request, uidb64, token):
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user_model = get_user_model()  
+        user = user_model.objects.get(pk=uid)  
+    except (TypeError, ValueError, OverflowError, user_model.DoesNotExist):
+        user = None
+    if user is not None and default_token_generator.check_token(user, token):
+        user.is_active = True  
+        user.save()
+        return redirect('user_login') 
+    else:
+        return render(request, 'accounts/activation_invalid.html')
+
 
 def register(request):
     if request.method == "POST":
         user_form = UserRegistrationForm(request.POST)
         address_form = AddressForm(request.POST)
         card_form = CardForm(request.POST, is_registration=True)
+
         if user_form.is_valid() and address_form.is_valid() and card_form.is_valid():
             email = user_form.cleaned_data["email"]
-            if get_user_model().objects.filter(email=email).exists():
+            if Customer.objects.filter(email=email).exists():
                 user_form.add_error("email", "Email already in use.")
-                logger.warning("Email already in use: %s", email)
+                logger.warning(f"Email already in use: {email}")
             else:
                 try:
                     with transaction.atomic():
-                        # Create Address instance
+
                         address = Address(
-                            billing_address=address_form.cleaned_data[
-                                "billing_address"
-                            ],
+                            billing_address=address_form.cleaned_data["billing_address"],
                             city=address_form.cleaned_data["city"],
                             state=address_form.cleaned_data["state"],
                             zip_code=address_form.cleaned_data["zip_code"],
                         )
                         address.save()
-                        logger.info("New address created: %s", address.billing_address)
+                        logger.info(f"New address created: {address.billing_address}")
 
-                        # Create Customer instance and link to Address
                         customer = Customer(
                             first_name=user_form.cleaned_data["first_name"],
-                            middle_name=user_form.cleaned_data["middle_name"],
+                            middle_name=user_form.cleaned_data.get("middle_name", ""),
                             last_name=user_form.cleaned_data["last_name"],
                             contact_no=user_form.cleaned_data["contact_no"],
-                            email=user_form.cleaned_data["email"],
-                            address=address,  # Link the address here
-                            promotions=user_form.cleaned_data.get("promotions", False),  # Handle promotions opt-in
+                            email=email,
+                            address=address,
                         )
                         customer.set_password(user_form.cleaned_data["password"])
+                        customer.is_active = False 
                         customer.save()
-                        logger.info("New customer created: %s", customer.email)
+                        logger.info(f"New customer created: {customer.email}")
 
-                        # Create Card instance and link to Customer
+   
                         card = Card(
                             customer=customer,
                             card_number=card_form.cleaned_data["card_number"],
@@ -136,39 +147,50 @@ def register(request):
                         card.save()
                         logger.info("Customer and card created successfully.")
 
-                        # Send confirmation email
-                        send_mail(
-                            'Registration Confirmation',
-                            'Thank you for registering!',
-                            settings.DEFAULT_FROM_EMAIL,
-                            [customer.email],
-                            fail_silently=False,
-                        )
-                        logger.info("Confirmation email sent to: %s", customer.email)
 
-                        return render(
-                            request,
-                            "accounts/register_done.html",
-                            {"new_user": user_form},
-                        )  # Render a success page. Will change to redirect later once things are fixed
+                        token = default_token_generator.make_token(customer)
+                        uid = urlsafe_base64_encode(force_bytes(customer.pk))
+                        activation_link = f"http://{request.get_host()}/accounts/activate/{uid}/{token}/"
+
+                        subject = "Activate your BookMyTicket account"
+                        message = (
+                            f"Hello {customer.first_name},\n\n"
+                            f"Thank you for registering at BookMyTicket.\n"
+                            f"Please click the link below to activate your account:\n"
+                            f"{activation_link}\n\n"
+                            "If you did not register, please ignore this email.\n"
+                        )
+
+                        try:
+                            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
+                            logger.info(f"Activation email sent to {email}")
+                        except Exception as e:
+                            user_form.add_error(None, f"Error sending email: {str(e)}")
+                            logger.error(f"Email sending failed: {str(e)}")
+
+                        return render(request, "accounts/register_done.html")
+
                 except Exception as e:
-                    logger.error("Error during registration: %s", str(e))
-                    user_form.add_error(
-                        None, "An error occurred during registration. Please try again."
-                    )
+                    logger.error(f"Error during registration: {str(e)}")
+                    user_form.add_error(None, "An error occurred during registration. Please try again.")
+
         else:
-            logger.warning("User form errors: %s", user_form.errors)
-            logger.warning("Address form errors: %s", address_form.errors)
-            logger.warning("Card form errors: %s", card_form.errors)
+            logger.warning(f"User form errors: {user_form.errors}")
+            logger.warning(f"Address form errors: {address_form.errors}")
+            logger.warning(f"Card form errors: {card_form.errors}")
+
     else:
         user_form = UserRegistrationForm()
         address_form = AddressForm()
         card_form = CardForm(is_registration=True)
+
     return render(
         request,
         "accounts/register.html",
         {"user_form": user_form, "address_form": address_form, "card_form": card_form},
     )
+
+from django.http import HttpResponse
 
 
 from django.http import HttpResponse
@@ -188,56 +210,61 @@ from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
 from django.contrib.auth.forms import SetPasswordForm
 from .forms import PasswordResetRequestForm
-
+from django.contrib.auth.hashers import make_password
 User = get_user_model()
 
 
-<<<<<<< HEAD
-=======
 from django.contrib.auth.forms import PasswordResetForm
 from django.utils.crypto import get_random_string
 from django.core.mail import send_mail
 from django.conf import settings
 from django.shortcuts import render, redirect
 from .models import User
+from django.core.mail import send_mail, BadHeaderError
 
->>>>>>> 34753366547cb490da32fec25d38354c3827bc88
+User = get_user_model()
+def generate_temp_password(length=12):
+    #random temparary passowrd
+    return get_random_string(length)
+
+from django.contrib.auth import get_user_model
+
 def password_reset_request(request):
     if request.method == "POST":
         form = PasswordResetForm(request.POST)
         if form.is_valid():
-            email = form.cleaned_data["email"]
-            user = User.objects.get(email=email)
-            token = get_random_string(20)
-            user.reset_token = token
-            user.save()
-            reset_url = request.build_absolute_uri(f"/reset/{token}/")
-            send_mail(
-                "Password Reset Request",
-                f"Click the link to reset your password: {reset_url}",
-                "your-email@example.com",
-<<<<<<< HEAD
-                [email],
-=======
-                settings.DEFAULT_FROM_EMAIL,
-                [user.email],
->>>>>>> 34753366547cb490da32fec25d38354c3827bc88
-                fail_silently=False,
-            )
-            return redirect("password_reset_done")
+            email = form.cleaned_data['email']
+            try:
+
+                user_model = get_user_model()
+                user = user_model.objects.get(email=email)
+
+                temp_password = generate_temp_password()
+                hashed_password = make_password(temp_password)
+
+                user.password = hashed_password
+                user.save()
+                subject = 'Temporary Password for Your Account'
+                message = (
+                    f'Hello {user.first_name},\n\n'
+                    f'Your temporary password is: {temp_password}\n'
+                    'Please log in and change your password immediately.\n\n'
+                    'Thank you!'
+                )
+                try:
+                    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
+                except BadHeaderError:
+                    return HttpResponse("Invalid header found.")
+
+                return redirect('password_reset_done')
+
+            except user_model.DoesNotExist: 
+                form.add_error('email', 'No user with this email address exists.')
     else:
-<<<<<<< HEAD
-        form = PasswordResetRequestForm()
-    return render(request, "registration/password_reset_form.html", {"form": form})
-
-=======
         form = PasswordResetForm()
-    return render(request, "registration/password_reset_form.html", {"form": form})
 
+    return render(request, 'registration/password_reset_form.html', {'form': form})
 
-from django.contrib.auth.forms import SetPasswordForm
-from django.utils.crypto import get_random_string
->>>>>>> 34753366547cb490da32fec25d38354c3827bc88
 
 def password_reset_confirm(request, token):
     try:
@@ -256,10 +283,6 @@ def password_reset_confirm(request, token):
         form = SetPasswordForm(user)
     return render(request, "registration/password_reset_confirm.html", {"form": form})
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 34753366547cb490da32fec25d38354c3827bc88
 
 def password_reset_done(request):
     return render(request, "registration/password_reset_done.html")
@@ -267,10 +290,6 @@ def password_reset_done(request):
 
 def password_reset_complete(request):
     return render(request, "registration/password_reset_complete.html")
-<<<<<<< HEAD
-=======
-
->>>>>>> 34753366547cb490da32fec25d38354c3827bc88
 
 from django.contrib import messages
 from django.db import transaction
@@ -285,26 +304,6 @@ def edit_profile(request):
     address = customer.address
     cards = customer.cards.all()
 
-<<<<<<< HEAD
-    if request.method == "POST":
-        profile_form = EditProfileForm(request.POST, instance=customer)
-        address_form = AddressForm(request.POST, instance=address)
-        card_forms = [
-            CardForm(request.POST, instance=card, is_registration=False)
-            for card in cards
-        ]
-
-        if (
-            profile_form.is_valid()
-            and address_form.is_valid()
-            and all([cf.is_valid() for cf in card_forms])
-        ):
-            profile_form.save()
-            address_form.save()
-            for cf in card_forms:
-                cf.save()
-            return redirect("home")
-=======
     # Decrypt card numbers
     fernet = Fernet(settings.ENCRYPTION_KEY)
     for card in cards:
@@ -317,7 +316,6 @@ def edit_profile(request):
     if request.method == "POST":
         profile_form = EditProfileForm(request.POST, instance=customer)
         address_form = AddressForm(request.POST, instance=address)
->>>>>>> 34753366547cb490da32fec25d38354c3827bc88
 
         if profile_form.is_valid() and address_form.is_valid():
             try:
@@ -345,28 +343,16 @@ def edit_profile(request):
     context = {
         "profile_form": profile_form,
         "address_form": address_form,
-<<<<<<< HEAD
-        "card_forms": card_forms,
-    }
-    return render(request, "accounts/edit_profile.html", context)
-=======
     }
     return render(request, "accounts/edit_profile.html", context)
 
 
->>>>>>> 34753366547cb490da32fec25d38354c3827bc88
 
 
 from django.contrib.auth.views import PasswordChangeView
 # from django.urls import reverse_lazy
 from django.contrib.auth import update_session_auth_hash
 
-<<<<<<< HEAD
-
-class CustomPasswordChangeView(PasswordChangeView):
-    template_name = "accounts/change_password.html"
-    success_url = reverse_lazy("home")
-=======
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import update_session_auth_hash
@@ -493,4 +479,3 @@ def change_payment_method(request):
         "new_card_form": new_card_form,
     }
     return render(request, "accounts/change_payment_method.html", context)
->>>>>>> 34753366547cb490da32fec25d38354c3827bc88

@@ -42,22 +42,13 @@
                                 <div class="mb-3" class="was-validated">
                                     {{ user_form.email }}
                                     <div class="invalid-feedback" id="emailInvalidFeedback">
-<<<<<<< HEAD
-                                        Please enter a vailid email-id.
-=======
                                         Please enter a valid email-id.
->>>>>>> 34753366547cb490da32fec25d38354c3827bc88
                                     </div>
                                 </div>
                                 <div class="mb-3">
                                     {{ user_form.password }}
-<<<<<<< HEAD
-                                    <div class="invalid-feedback">
-                                        Please enter a password.
-=======
                                     <div class="invalid-feedback" id="passwordInvalidFeedback" style="width: 300px;">
                                         Password must be at least 8 characters long, contain letters, numbers, and at least one special character.
->>>>>>> 34753366547cb490da32fec25d38354c3827bc88
                                     </div>
                                 </div>
                                 <div class="mb-3">
@@ -66,13 +57,10 @@
                                         Passwords don't match.
                                     </div>
                                 </div>
-<<<<<<< HEAD
-=======
                                 <div class="mb-3">
                                     <input type="checkbox" id="promotions" name="promotions">
                                     <label for="promotions">I want to receive promotions and updates</label>
                                 </div>
->>>>>>> 34753366547cb490da32fec25d38354c3827bc88
                                 <button type="button" class="btn btn-primary w-100 mt-3" id="nextButton"
                                     onclick="nextStep(2)" disabled>Next</button>
                             </div>
@@ -165,34 +153,16 @@
         return valid;
     }
 
-<<<<<<< HEAD
-    // Add this part for live password validation and button enable/disable
-
-=======
->>>>>>> 34753366547cb490da32fec25d38354c3827bc88
     document.addEventListener("DOMContentLoaded", function () {
         const password = document.getElementById("password");
         const password2 = document.getElementById("password2");
         const nextButton = document.getElementById("nextButton");
         const passwordMismatchFeedback = document.getElementById("passwordMismatchFeedback");
-<<<<<<< HEAD
-=======
         const passwordInvalidFeedback = document.getElementById("passwordInvalidFeedback");
->>>>>>> 34753366547cb490da32fec25d38354c3827bc88
         const email = document.getElementById("email");
         const emailInvalidFeedback = document.getElementById("emailInvalidFeedback");
 
         function validatePasswords() {
-<<<<<<< HEAD
-            if (password.value !== password2.value) {
-                password2.classList.add("is-invalid");
-                passwordMismatchFeedback.style.display = "block";
-                nextButton.disabled = true;
-            } else {
-                password2.classList.remove("is-invalid");
-                passwordMismatchFeedback.style.display = "none";
-                validateForm();
-=======
             const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
             if (!passwordPattern.test(password.value)) {
                 password.classList.add("is-invalid");
@@ -210,7 +180,6 @@
                     passwordMismatchFeedback.style.display = "none";
                     validateForm();
                 }
->>>>>>> 34753366547cb490da32fec25d38354c3827bc88
             }
         }
 
@@ -228,9 +197,6 @@
         }
 
         function validateForm() {
-<<<<<<< HEAD
-            if (password.value === password2.value && email.validity.valid) {
-=======
             const requiredFields = document.querySelectorAll('#step1 input[required]');
             let allFilled = true;
             requiredFields.forEach(field => {
@@ -243,7 +209,6 @@
             const passwordValid = passwordPattern.test(password.value);
 
             if (password.value === password2.value && email.validity.valid && allFilled && passwordValid) {
->>>>>>> 34753366547cb490da32fec25d38354c3827bc88
                 nextButton.disabled = false;
             } else {
                 nextButton.disabled = true;
@@ -253,12 +218,6 @@
         password.addEventListener("input", validatePasswords);
         password2.addEventListener("input", validatePasswords);
         email.addEventListener("input", validateEmail);
-<<<<<<< HEAD
-    });
-
-</script>
-{% endblock %}
-=======
         document.querySelectorAll('#step1 input[required]').forEach(field => {
             field.addEventListener('input', validateForm);
         });
@@ -277,4 +236,3 @@
 To fix this, we need to move the nextStep function definition above the
  DOMContentLoaded event listener. Here’s the corrected script:
  -->
->>>>>>> 34753366547cb490da32fec25d38354c3827bc88
