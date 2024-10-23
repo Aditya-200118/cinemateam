@@ -21,14 +21,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # settings.py
 LOGIN_URL = '/admin/login/'
 LOGIN_REDIRECT_URL = '/admin/welcome'
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'your-gmail.com'
-EMAIL_HOST_PASSWORD = 'password'
+EMAIL_HOST_USER = 'qkddlfkdrp@gmail.com'
+EMAIL_HOST_PASSWORD = 'ecdpksvqwmfgiqod'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-ACCOUNT_EMAIL_VERIFICATION = 'none'
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
