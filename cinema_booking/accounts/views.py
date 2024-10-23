@@ -32,6 +32,7 @@ from .forms import (
 
 from django.db import transaction
 import logging
+
 User = get_user_model()
 
 from django.contrib.auth.views import LogoutView
@@ -76,6 +77,8 @@ def user_login(request):
 
 
 logger = logging.getLogger(__name__)
+
+
 def activate_account(request, uidb64, token):
     try:
         # UID decode
@@ -85,11 +88,13 @@ def activate_account(request, uidb64, token):
         user = None
 
     if user and default_token_generator.check_token(user, token):
-        user.is_active = True  
+        user.is_active = True
         user.save()
-        return redirect('user_login')
+        return redirect("user_login")
     else:
-        return render(request, 'accounts/activation_invalid.html')
+        return render(request, "accounts/activation_invalid.html")
+
+
 def register(request):
     if request.method == "POST":
         user_form = UserRegistrationForm(request.POST)
@@ -114,15 +119,15 @@ def register(request):
                         address=address,
                     )
                     customer.set_password(user_form.cleaned_data["password"])
-                    customer.is_active = False  
+                    customer.is_active = False
                     customer.save()
 
                     # email link
                     token = default_token_generator.make_token(customer)
                     uid = urlsafe_base64_encode(force_bytes(customer.pk))
-                    activation_link = f"http://{request.get_host()}/accounts/activate/{uid}/{token}/"
-
-
+                    activation_link = (
+                        f"http://{request.get_host()}/accounts/activate/{uid}/{token}/"
+                    )
 
                     subject = "Activate your BookMyTicket account"
                     message = (
@@ -133,9 +138,10 @@ def register(request):
                         "If you did not register, please ignore this email.\n"
                     )
 
-
                     try:
-                        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
+                        send_mail(
+                            subject, message, settings.DEFAULT_FROM_EMAIL, [email]
+                        )
                     except Exception as e:
                         user_form.add_error(None, f"Error sending email: {str(e)}")
 
@@ -147,7 +153,8 @@ def register(request):
         card_form = CardForm(is_registration=True)
 
     return render(
-        request, "accounts/register.html",
+        request,
+        "accounts/register.html",
         {"user_form": user_form, "address_form": address_form, "card_form": card_form},
     )
 
@@ -171,15 +178,18 @@ from django.contrib.auth.forms import SetPasswordForm
 from .forms import PasswordResetRequestForm
 
 User = get_user_model()
+
+
 def generate_temp_password(length=12):
-    #random temparary passowrd
+    # random temparary passowrd
     return get_random_string(length)
+
 
 def password_reset_request(request):
     if request.method == "POST":
         form = PasswordResetForm(request.POST)
         if form.is_valid():
-            email = form.cleaned_data['email']
+            email = form.cleaned_data["email"]
             try:
                 # find user
                 user = User.objects.get(email=email)
@@ -193,26 +203,27 @@ def password_reset_request(request):
                 user.save()
 
                 # sebd mail
-                subject = 'Temporary Password for Your Account'
+                subject = "Temporary Password for Your Account"
                 message = (
-                    f'Hello {user.first_name},\n\n'
-                    f'Your temporary password is: {temp_password}\n'
-                    'Please log in and change your password immediately.\n\n'
-                    'Thank you!'
+                    f"Hello {user.first_name},\n\n"
+                    f"Your temporary password is: {temp_password}\n"
+                    "Please log in and change your password immediately.\n\n"
+                    "Thank you!"
                 )
                 try:
                     send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
                 except BadHeaderError:
                     return HttpResponse("Invalid header found.")
 
-                return redirect('password_reset_done')
+                return redirect("password_reset_done")
 
             except User.DoesNotExist:
-                form.add_error('email', 'No user with this email address exists.')
+                form.add_error("email", "No user with this email address exists.")
     else:
         form = PasswordResetForm()
 
-    return render(request, 'registration/password_reset_form.html', {'form': form})
+    return render(request, "registration/password_reset_form.html", {"form": form})
+
 
 def password_reset_confirm(request, token):
     try:
@@ -240,7 +251,6 @@ def password_reset_complete(request):
     return render(request, "registration/password_reset_complete.html")
 
 
-
 @login_required
 def edit_profile(request):
     user = request.user
@@ -248,12 +258,19 @@ def edit_profile(request):
     address = customer.address
     cards = customer.cards.all()
 
-    if request.method == 'POST':
+    if request.method == "POST":
         profile_form = EditProfileForm(request.POST, instance=customer)
         address_form = AddressForm(request.POST, instance=address)
-        card_forms = [CardForm(request.POST, instance=card, is_registration=False) for card in cards]
+        card_forms = [
+            CardForm(request.POST, instance=card, is_registration=False)
+            for card in cards
+        ]
 
-        if profile_form.is_valid() and address_form.is_valid() and all([cf.is_valid() for cf in card_forms]):
+        if (
+            profile_form.is_valid()
+            and address_form.is_valid()
+            and all([cf.is_valid() for cf in card_forms])
+        ):
             profile_form.save()
             address_form.save()
             for cf in card_forms:
@@ -261,14 +278,14 @@ def edit_profile(request):
 
             # email send
             send_mail(
-                'Profile Updated Successfully',
-                f'Hello {user.first_name}, your profile has been updated successfully.',
-                'qkddlfkdrp@gmail.com',  # sender
+                "Profile Updated Successfully",
+                f"Hello {user.first_name}, your profile has been updated successfully.",
+                "qkddlfkdrp@gmail.com",  # sender
                 [user.email],  # reciever
                 fail_silently=False,
             )
 
-            return redirect('home')
+            return redirect("home")
 
     else:
         profile_form = EditProfileForm(instance=customer)
@@ -276,11 +293,12 @@ def edit_profile(request):
         card_forms = [CardForm(instance=card, is_registration=False) for card in cards]
 
     context = {
-        'profile_form': profile_form,
-        'address_form': address_form,
-        'card_forms': card_forms,
+        "profile_form": profile_form,
+        "address_form": address_form,
+        "card_forms": card_forms,
     }
-    return render(request, 'accounts/edit_profile.html', context)
+    return render(request, "accounts/edit_profile.html", context)
+
 
 from django.contrib.auth.views import PasswordChangeView
 from django.urls import reverse_lazy
