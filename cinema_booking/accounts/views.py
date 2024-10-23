@@ -1,7 +1,8 @@
 from django.shortcuts import render
-
+from django.contrib import messages
 # Create your views here.
-
+from django.core.mail import send_mail
+from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
@@ -22,12 +23,32 @@ import logging
 from django.contrib.auth.views import LogoutView
 
 
+<<<<<<< HEAD
 class CustomLogoutView(LogoutView):
     next_page = "home"
 
     def dispatch(self, request, *args, **kwargs):
+=======
+from django.contrib.auth.views import LogoutView
+from django.shortcuts import redirect, render
+from django.views import View
+
+class CustomLogoutView(View):
+    template_name = "accounts/logout_confirm.html"
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
+
+    def post(self, request, *args, **kwargs):
+>>>>>>> 34753366547cb490da32fec25d38354c3827bc88
         # Clear the session
         request.session.flush()
+        return redirect('home')
+
+class ConfirmLogoutView(LogoutView):
+    next_page = "home"
+
+    def dispatch(self, request, *args, **kwargs):
         response = super().dispatch(request, *args, **kwargs)
         return redirect(self.next_page)
 
@@ -52,9 +73,9 @@ def user_login(request):
                     # Redirect to home page
                     return redirect("home")
                 else:
-                    return HttpResponse("Disabled account")
+                    messages.error(request, "Disabled account")
             else:
-                return HttpResponse("Invalid login")
+                messages.error(request, "Invalid login")
     else:
         form = LoginForm()
     return render(request, "accounts/login.html", {"form": form})
@@ -62,6 +83,9 @@ def user_login(request):
 
 logger = logging.getLogger(__name__)
 
+
+from django.core.mail import send_mail
+from django.conf import settings
 
 def register(request):
     if request.method == "POST":
@@ -96,6 +120,7 @@ def register(request):
                             contact_no=user_form.cleaned_data["contact_no"],
                             email=user_form.cleaned_data["email"],
                             address=address,  # Link the address here
+                            promotions=user_form.cleaned_data.get("promotions", False),  # Handle promotions opt-in
                         )
                         customer.set_password(user_form.cleaned_data["password"])
                         customer.save()
@@ -110,6 +135,17 @@ def register(request):
                         )
                         card.save()
                         logger.info("Customer and card created successfully.")
+
+                        # Send confirmation email
+                        send_mail(
+                            'Registration Confirmation',
+                            'Thank you for registering!',
+                            settings.DEFAULT_FROM_EMAIL,
+                            [customer.email],
+                            fail_silently=False,
+                        )
+                        logger.info("Confirmation email sent to: %s", customer.email)
+
                         return render(
                             request,
                             "accounts/register_done.html",
@@ -156,9 +192,19 @@ from .forms import PasswordResetRequestForm
 User = get_user_model()
 
 
+<<<<<<< HEAD
+=======
+from django.contrib.auth.forms import PasswordResetForm
+from django.utils.crypto import get_random_string
+from django.core.mail import send_mail
+from django.conf import settings
+from django.shortcuts import render, redirect
+from .models import User
+
+>>>>>>> 34753366547cb490da32fec25d38354c3827bc88
 def password_reset_request(request):
     if request.method == "POST":
-        form = PasswordResetRequestForm(request.POST)
+        form = PasswordResetForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data["email"]
             user = User.objects.get(email=email)
@@ -170,14 +216,28 @@ def password_reset_request(request):
                 "Password Reset Request",
                 f"Click the link to reset your password: {reset_url}",
                 "your-email@example.com",
+<<<<<<< HEAD
                 [email],
+=======
+                settings.DEFAULT_FROM_EMAIL,
+                [user.email],
+>>>>>>> 34753366547cb490da32fec25d38354c3827bc88
                 fail_silently=False,
             )
             return redirect("password_reset_done")
     else:
+<<<<<<< HEAD
         form = PasswordResetRequestForm()
     return render(request, "registration/password_reset_form.html", {"form": form})
 
+=======
+        form = PasswordResetForm()
+    return render(request, "registration/password_reset_form.html", {"form": form})
+
+
+from django.contrib.auth.forms import SetPasswordForm
+from django.utils.crypto import get_random_string
+>>>>>>> 34753366547cb490da32fec25d38354c3827bc88
 
 def password_reset_confirm(request, token):
     try:
@@ -196,6 +256,10 @@ def password_reset_confirm(request, token):
         form = SetPasswordForm(user)
     return render(request, "registration/password_reset_confirm.html", {"form": form})
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 34753366547cb490da32fec25d38354c3827bc88
 
 def password_reset_done(request):
     return render(request, "registration/password_reset_done.html")
@@ -203,7 +267,16 @@ def password_reset_done(request):
 
 def password_reset_complete(request):
     return render(request, "registration/password_reset_complete.html")
+<<<<<<< HEAD
+=======
 
+>>>>>>> 34753366547cb490da32fec25d38354c3827bc88
+
+from django.contrib import messages
+from django.db import transaction
+from django.core.mail import send_mail
+from django.conf import settings
+from cryptography.fernet import InvalidToken, Fernet
 
 @login_required
 def edit_profile(request):
@@ -212,6 +285,7 @@ def edit_profile(request):
     address = customer.address
     cards = customer.cards.all()
 
+<<<<<<< HEAD
     if request.method == "POST":
         profile_form = EditProfileForm(request.POST, instance=customer)
         address_form = AddressForm(request.POST, instance=address)
@@ -230,24 +304,193 @@ def edit_profile(request):
             for cf in card_forms:
                 cf.save()
             return redirect("home")
+=======
+    # Decrypt card numbers
+    fernet = Fernet(settings.ENCRYPTION_KEY)
+    for card in cards:
+        try:
+            card.card_number = fernet.decrypt(card.card_number.encode()).decode()
+        except InvalidToken:
+            messages.error(request, "Failed to decrypt card information. Please contact support.")
+            card.card_number = "Invalid"
 
+    if request.method == "POST":
+        profile_form = EditProfileForm(request.POST, instance=customer)
+        address_form = AddressForm(request.POST, instance=address)
+>>>>>>> 34753366547cb490da32fec25d38354c3827bc88
+
+        if profile_form.is_valid() and address_form.is_valid():
+            try:
+                with transaction.atomic():
+                    profile_form.save()
+                    address_form.save()
+                    # Send email notification (optional)
+                    send_mail(
+                        "Profile Updated",
+                        "Your profile information has been updated.",
+                        settings.DEFAULT_FROM_EMAIL,
+                        [user.email],
+                        fail_silently=False,
+                    )
+                    return redirect("profile")
+            except Exception as e:
+                logger.exception("Error during profile update: %s", str(e))
+                messages.error(request, "An error occurred while updating your profile. Please try again.")
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
         profile_form = EditProfileForm(instance=customer)
         address_form = AddressForm(instance=address)
-        card_forms = [CardForm(instance=card, is_registration=False) for card in cards]
 
     context = {
         "profile_form": profile_form,
         "address_form": address_form,
+<<<<<<< HEAD
         "card_forms": card_forms,
+    }
+    return render(request, "accounts/edit_profile.html", context)
+=======
     }
     return render(request, "accounts/edit_profile.html", context)
 
 
-from django.contrib.auth.views import PasswordChangeView
-from django.urls import reverse_lazy
+>>>>>>> 34753366547cb490da32fec25d38354c3827bc88
 
+
+from django.contrib.auth.views import PasswordChangeView
+# from django.urls import reverse_lazy
+from django.contrib.auth import update_session_auth_hash
+
+<<<<<<< HEAD
 
 class CustomPasswordChangeView(PasswordChangeView):
     template_name = "accounts/change_password.html"
     success_url = reverse_lazy("home")
+=======
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import update_session_auth_hash
+from .forms import CustomPasswordChangeForm
+from django.shortcuts import render, get_object_or_404, redirect
+
+@login_required
+def change_password_view(request):
+    if request.method == 'POST':
+        form = CustomPasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            form.save()
+            update_session_auth_hash(request, form.user)
+            
+            # Send email notification
+            send_mail(
+                'Password Changed Successfully',
+                'Your password has been changed successfully. If you did not make this change, please contact support immediately.',
+                settings.DEFAULT_FROM_EMAIL,
+                [request.user.email],
+                fail_silently=False,
+            )
+            
+            return redirect('home')
+    else:
+        form = CustomPasswordChangeForm(request.user)
+    return render(request, 'accounts/change_password.html', {'form': form})
+
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Customer, Address, Card
+from .forms import AddressForm, CardForm
+
+@login_required
+def profile_view(request):
+    user = get_object_or_404(Customer, pk=request.user.pk)
+    address_form = AddressForm(instance=user.address)
+    card_form = CardForm()
+
+    if request.method == 'POST':
+        if 'address_form' in request.POST:
+            address_form = AddressForm(request.POST, instance=user.address)
+            if address_form.is_valid():
+                address_form.save()
+                return redirect('profile_view')
+        elif 'card_form' in request.POST:
+            card_form = CardForm(request.POST)
+            if card_form.is_valid():
+                card = card_form.save(commit=False)
+                card.customer = user
+                card.save()
+                return redirect('profile_view')
+
+    context = {
+        'user': user,
+        'address_form': address_form,
+        'card_form': card_form,
+    }
+    return render(request, 'accounts/profile.html', context)
+
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from .models import Card, Customer
+from .forms import CardForm
+from cryptography.fernet import InvalidToken, Fernet
+from django.conf import settings
+
+@login_required
+def change_payment_method(request):
+    user = request.user
+    customer = Customer.objects.get(email=user.email)  # Ensure correct customer is fetched
+    cards = customer.cards.all()  # Get all cards related to the customer
+
+    # Decrypt card numbers for display
+    fernet = Fernet(settings.ENCRYPTION_KEY)
+    for card in cards:
+        try:
+            card.card_number = fernet.decrypt(card.card_number.encode()).decode()
+        except InvalidToken:
+            messages.error(request, "Failed to decrypt card information. Please contact support.")
+            card.card_number = "Invalid"  # Set to Invalid if decryption fails
+
+    if request.method == "POST":
+        # Create forms for existing cards and the new card
+        card_forms = [CardForm(request.POST, instance=card, prefix=f'card_{card.pk}') for card in cards]
+        new_card_form = CardForm(request.POST, prefix='new_card')
+
+        # Check if all card forms and the new card form are valid
+        if all([cf.is_valid() for cf in card_forms]) and new_card_form.is_valid():
+            try:
+                with transaction.atomic():  # Ensure atomic transaction
+                    # Save existing card forms
+                    for cf in card_forms:
+                        card = cf.save(commit=False)
+                        card.customer = customer  # Explicitly assign the customer to the card
+                        card.save()
+
+                    # Handle new card creation if provided
+                    if new_card_form.cleaned_data.get('card_number'):
+                        new_card = new_card_form.save(commit=False)
+                        new_card.customer = customer  # Assign customer to the new card
+                        new_card.save()
+
+                    # Success message and redirect
+                    messages.success(request, "Payment methods updated successfully.")
+                    return redirect("change_payment_method")
+            except Exception as e:
+                # Handle any error that occurred during saving
+                messages.error(request, f"An error occurred while updating your payment methods: {str(e)}. Please try again.")
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        # Instantiate forms for GET requests
+        card_forms = [CardForm(instance=card, prefix=f'card_{card.pk}') for card in cards]
+        new_card_form = CardForm(prefix='new_card')
+
+    # Render the template with forms for existing cards and new card
+    context = {
+        "card_forms": card_forms,
+        "new_card_form": new_card_form,
+    }
+    return render(request, "accounts/change_payment_method.html", context)
+>>>>>>> 34753366547cb490da32fec25d38354c3827bc88

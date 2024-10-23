@@ -41,7 +41,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=50)
     middle_name = models.CharField(max_length=50, blank=True, null=True)
     last_name = models.CharField(max_length=50)
-    contact_no = models.CharField(max_length=15, default="N/A")
+    contact_no = models.CharField(max_length=15, default="")
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=100)
     is_staff = models.BooleanField(default=False)
@@ -69,16 +69,20 @@ class Customer(User):
 
 
 class Address(models.Model):
-    billing_address = models.CharField(max_length=255, default="N/A")
-    city = models.CharField(max_length=100, default="N/A")
-    state = models.CharField(max_length=100, default="N/A")
-    zip_code = models.CharField(max_length=10, default="N/A")
+    billing_address = models.CharField(max_length=255, default="")
+    city = models.CharField(max_length=100, default="")
+    state = models.CharField(max_length=100, default="")
+    zip_code = models.CharField(max_length=10, default="")
 
     def clean(self):
         if self.pk and hasattr(self, "customer"):
             if self.customer and self.customer.pk != self.pk:
                 raise ValidationError("A customer can only have one address.")
 
+
+# from django.db import models
+from cryptography.fernet import Fernet
+from django.conf import settings
 
 class Card(models.Model):
     customer = models.ForeignKey(
@@ -88,6 +92,35 @@ class Card(models.Model):
     expiry_date = models.CharField(max_length=5)
     cvv = models.CharField(max_length=4)
 
+    def save(self, *args, **kwargs):
+        if self.customer.cards.count() >= 4:
+            raise ValidationError('A customer can only have up to four payment methods.')
+        fernet = Fernet(settings.ENCRYPTION_KEY)
+        self.card_number = fernet.encrypt(self.card_number.encode()).decode()
+        self.cvv = fernet.encrypt(self.cvv.encode()).decode()
+        super().save(*args, **kwargs)
+
+    def get_card_number(self):
+        fernet = Fernet(settings.ENCRYPTION_KEY)
+        return fernet.decrypt(self.card_number.encode()).decode()
+
+    def get_cvv_number(self):
+        fernet = Fernet(settings.ENCRYPTION_KEY)
+        return fernet.decrypt(self.cvv.encode()).decode()
+
     # def clean(self):
     #     if self.customer.cards.count() >= 4:
     #         raise ValidationError('A customer can only have up to four payment methods.')
+
+
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import Customer
+
+@login_required
+def profile_view(request):
+    user = get_object_or_404(Customer, pk=request.user.pk)
+    context = {
+        'user': user,
+    }
+    return render(request, 'profile.html', context)
