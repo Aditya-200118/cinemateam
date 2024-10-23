@@ -42,13 +42,13 @@
                                 <div class="mb-3" class="was-validated">
                                     {{ user_form.email }}
                                     <div class="invalid-feedback" id="emailInvalidFeedback">
-                                        Please enter a vailid email-id.
+                                        Please enter a valid email-id.
                                     </div>
                                 </div>
                                 <div class="mb-3">
                                     {{ user_form.password }}
-                                    <div class="invalid-feedback">
-                                        Please enter a password.
+                                    <div class="invalid-feedback" id="passwordInvalidFeedback" style="width: 300px;">
+                                        Password must be at least 8 characters long, contain letters, numbers, and at least one special character.
                                     </div>
                                 </div>
                                 <div class="mb-3">
@@ -56,6 +56,10 @@
                                     <div class="invalid-feedback" id="passwordMismatchFeedback">
                                         Passwords don't match.
                                     </div>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="checkbox" id="promotions" name="promotions">
+                                    <label for="promotions">I want to receive promotions and updates</label>
                                 </div>
                                 <button type="button" class="btn btn-primary w-100 mt-3" id="nextButton"
                                     onclick="nextStep(2)" disabled>Next</button>
@@ -114,6 +118,12 @@
 </div>
 
 <script>
+        function updateProgressBar(step) {
+        const progressBar = document.getElementById('progressBar');
+        const stepPercentage = (step / 3) * 100; // Assuming 3 steps
+        progressBar.style.width = stepPercentage + '%';
+    }
+
     function nextStep(step) {
         if (validateStep(step - 1)) {
             document.getElementById('step' + (step - 1)).classList.add('d-none');
@@ -143,25 +153,33 @@
         return valid;
     }
 
-    // Add this part for live password validation and button enable/disable
-
     document.addEventListener("DOMContentLoaded", function () {
         const password = document.getElementById("password");
         const password2 = document.getElementById("password2");
         const nextButton = document.getElementById("nextButton");
         const passwordMismatchFeedback = document.getElementById("passwordMismatchFeedback");
+        const passwordInvalidFeedback = document.getElementById("passwordInvalidFeedback");
         const email = document.getElementById("email");
         const emailInvalidFeedback = document.getElementById("emailInvalidFeedback");
 
         function validatePasswords() {
-            if (password.value !== password2.value) {
-                password2.classList.add("is-invalid");
-                passwordMismatchFeedback.style.display = "block";
+            const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+            if (!passwordPattern.test(password.value)) {
+                password.classList.add("is-invalid");
+                passwordInvalidFeedback.style.display = "block";
                 nextButton.disabled = true;
             } else {
-                password2.classList.remove("is-invalid");
-                passwordMismatchFeedback.style.display = "none";
-                validateForm();
+                password.classList.remove("is-invalid");
+                passwordInvalidFeedback.style.display = "none";
+                if (password.value !== password2.value) {
+                    password2.classList.add("is-invalid");
+                    passwordMismatchFeedback.style.display = "block";
+                    nextButton.disabled = true;
+                } else {
+                    password2.classList.remove("is-invalid");
+                    passwordMismatchFeedback.style.display = "none";
+                    validateForm();
+                }
             }
         }
 
@@ -179,7 +197,18 @@
         }
 
         function validateForm() {
-            if (password.value === password2.value && email.validity.valid) {
+            const requiredFields = document.querySelectorAll('#step1 input[required]');
+            let allFilled = true;
+            requiredFields.forEach(field => {
+                if (!field.value) {
+                    allFilled = false;
+                }
+            });
+
+            const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+            const passwordValid = passwordPattern.test(password.value);
+
+            if (password.value === password2.value && email.validity.valid && allFilled && passwordValid) {
                 nextButton.disabled = false;
             } else {
                 nextButton.disabled = true;
@@ -189,7 +218,21 @@
         password.addEventListener("input", validatePasswords);
         password2.addEventListener("input", validatePasswords);
         email.addEventListener("input", validateEmail);
+        document.querySelectorAll('#step1 input[required]').forEach(field => {
+            field.addEventListener('input', validateForm);
+        });
     });
-
 </script>
+
 {% endblock %}
+
+
+
+
+<!-- The issue is with the nextStep function not being defined before it is called. 
+ Specifically, the nextStep function is called in the onclick attribute of the “Next” button, 
+ but it was defined after the DOMContentLoaded event listener.
+
+To fix this, we need to move the nextStep function definition above the
+ DOMContentLoaded event listener. Here’s the corrected script:
+ -->

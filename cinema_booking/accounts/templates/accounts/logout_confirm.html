@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Log-in{% endblock %}
+{% block title %}Log-out{% endblock %}
 
 {% block content %}
 <div class="container d-flex align-items-center justify-content-center min-vh-100">
@@ -9,29 +9,25 @@
             <div class="card-group">
                 <div class="card p-4">
                     <div class="card-body">
-                        <h2 class="text-center">Log-in</h2>
-                        <p class="text-center">Please, use the following form to log-in:</p>
-                        <form method="post">
-                            {{ form.as_p }}
+                        <h2 class="text-center">Log-out</h2>
+                        <p class="text-center">Are you sure you want to log out?</p>
+                        <form method="post" action="{% url 'confirm_logout' %}">
                             {% csrf_token %}
                             <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">Log in</button>
+                                <button type="submit" class="btn btn-primary">Log out</button>
                             </div>
                         </form>
                         <div class="text-center mt-3">
-                            <a href="{% url 'password_reset' %}" class="text-primary">Forgot password?</a>
-                        </div>
-                        <div class="text-center mt-2">
-                            <p>New to BookMyTicket? <a href="{% url 'register' %}" class="text-primary">Sign Up Now</a></p>
+                            <a href="{% url 'home' %}" class="text-primary">Cancel</a>
                         </div>
                     </div>
                 </div>
                 <div class="card text-white bg-primary py-5 d-md-down-none" style="width:44%">
                     <div class="card-body text-center d-flex flex-column justify-content-center">
                         <div>
-                            <h2>Hello, Cinephile!</h2>
-                            <p>Create your personalized movie experience and start your journey with us.</p>
-                            <a href="{% url 'register' %}" class="btn btn-outline-light">Sign Up</a>
+                            <h2>Goodbye, Cinephile!</h2>
+                            <p>We hope to see you again soon. Have a great day!</p>
+                            <a href="{% url 'home' %}" class="btn btn-outline-light">Go to Home</a>
                         </div>
                     </div>
                 </div>

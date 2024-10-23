@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load static %}
+
 {% block title %}
     Book My Ticket
 {% endblock %}
@@ -11,7 +13,7 @@
             <!-- BOOK MY TICKET logo and text -->
             <div class="d-flex gap-2 align-items-center">
                 <div>
-                    <!-- icon comes here -->
+                    <img src="{% static 'icon.png' %}" alt="Logo" width="40" height="40">  <!-- Add your icon here -->
                 </div>
                 <a href="{% url 'home' %}" class="text-decoration-none">
                     <h1 class="h4 text-primary mb-0 fw-bold">BOOK MY TICKET</h1>
@@ -19,10 +21,16 @@
             </div>
             <!-- Search Box, Log In and Sign Up Buttons -->
             <div class="d-flex gap-3">
-                <input type="text" class="form-control rounded" placeholder="Search for Movies">
-                <a href="{% url 'user_login' %}" class="btn btn-primary rounded" style="min-width: 90px;">Log In</a>
-                <a href="{% url 'register' %}" class="btn btn-primary rounded" style="min-width: 90px;">Sign Up</a>
-                <a href="{% url 'logout' %}" class="btn btn-primary rounded" style="min-width: 90px;">Logout</a>
+                <form method="GET" action="{% url 'home' %}">
+                    <input type="text" name="search" class="form-control rounded" placeholder="Search for Movies">
+                </form>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'user_logout' %}" class="btn btn-primary rounded" style="min-width: 90px;">Logout</a>
+                    <a href="{% url 'profile' %}" class="btn btn-primary rounded" style="min-width: 90px;">Profile</a>
+                {% else %}
+                    <a href="{% url 'user_login' %}" class="btn btn-primary rounded" style="min-width: 90px;">Log In</a>
+                    <a href="{% url 'register' %}" class="btn btn-primary rounded" style="min-width: 90px;">Sign Up</a>
+                {% endif %}
             </div>
         </div>
     </header>
@@ -32,15 +40,21 @@
         <div class="mb-4">
             <h2 class="h5 fw-bold">Now Playing</h2>
             <!-- Movie Cards -->
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4" id="playing-carousel">
-                <!-- Movie cards will be dynamically inserted here -->
-            </div>
-        </div>
-        <div class="mb-4">
-            <h2 class="h5 fw-bold">Coming Soon</h2>
-            <!-- Movie Cards -->
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4" id="upcoming-carousel">
-                <!-- Movie cards will be dynamically inserted here -->
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+                {% for movie in movies %}
+                    <div class="col">
+                        <div class="card h-100 shadow-sm">
+                            <iframe class="card-img-top" src="{{ movie.trailer_url }}" frameborder="0" allowfullscreen></iframe>
+                            <div class="card-body">
+                                <h5 class="card-title">{{ movie.title }}</h5>
+                                <p class="card-text">{{ movie.synopsis|truncatewords:20 }}</p>
+                            </div>
+                            <div class="card-footer text-muted">
+                                <small>Rating: {{ movie.rating }}</small>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </section>
