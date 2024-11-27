@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+{% block title %}Modify Payment Method{% endblock %}
+
+{% block content %}
+<section class="p-3 p-md-4 p-xl-5">
+  <div class="container">
+    <h2 class="mb-4">{% if card.id %}Modify{% else %}Add{% endif %} Payment Method</h2>
+    <form method="post">
+      {% csrf_token %}
+      <div class="row gy-3 gy-md-4">
+        <div class="col-12">
+          {{ form.card_name|add_class:"form-control" }}
+        </div>
+        <div class="col-12">
+          {{ form.card_number|add_class:"form-control" }}
+          <!-- <p>Initial card number: {{ form.card_number.initial }}</p> Debug statement -->
+        </div>
+        <div class="col-12">
+          {{ form.expiry_date|add_class:"form-control" }}
+        </div>
+        <div class="col-12">
+          {{ form.cvv|add_class:"form-control" }}
+        </div>
+        <div class="col-12">
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <a href="{% url 'show_payment_methods' %}" class="btn btn-secondary">Go Back</a>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            {% if card.id %}
+            <button type="submit" class="btn btn-danger" name="delete" value="true">Delete</button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

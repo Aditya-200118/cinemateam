@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+      <a class="navbar-brand" href="{% url 'home' %}">
+          <img src="{% static 'icon.png' %}" width="40" height="40" alt="Logo">
+          <span class="h4 text-primary mb-0 fw-bold">BOOK MY TICKET</span>
+      </a>
+      <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+              {% if user.is_authenticated %}
+              <li class="nav-item"><a class="btn btn-primary me-3" href="{% url 'user_logout' %}">Logout</a></li>
+              <li class="nav-item"><a class="btn btn-primary me-3" href="{% url 'profile' %}">Profile</a></li>
+              {% else %}
+              <li class="nav-item"><a class="btn btn-primary me-3" href="{% url 'user_login' %}">Log In</a></li>
+              <li class="nav-item"><a class="btn btn-primary me-3" href="{% url 'register' %}">Sign Up</a></li>
+              {% endif %}
+          </ul>
+      </div>
+  </div>
+</nav>
+
+{% for message in messages %}
+<div class="alert {{ message.tags }} alert-dismissible shadow fade show" role="alert">
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    {{ message | safe }}
+</div>
+{% endfor %}
+
+<div class="container mt-4">
+    <h2>Review Your Booking</h2>
+    <p>Movie: {{ movie.title }}</p>
+    <p>Showtime: {{ screening.show_time }}</p>
+    <p>Selected Seats: {{ selected_seats|join:", " }}</p>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Ticket Type</th>
+                <th>Count</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Adult</td>
+                <td>{{ adult_count }}</td>
+                <td>{{ adult_price }}</td>
+                <td id="adult-total">{{ adult_count|floatformat:2|add:"*"|add:adult_price }}</td>
+            </tr>
+            <tr>
+                <td>Senior</td>
+                <td>{{ senior_count }}</td>
+                <td>{{ senior_price }}</td>
+                <td id="senior-total">{{ senior_count|floatformat:2|add:"*"|add:senior_price }}</td>
+            </tr>
+            <tr>
+                <td>Child</td>
+                <td>{{ child_count }}</td>
+                <td>{{ child_price }}</td>
+                <td id="child-total">{{ child_count|floatformat:2|add:"*"|add:child_price }}</td>
+            </tr>            
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="3">Total Cost</th>
+                <th id="total-cost">{{ total_cost }}</th>
+            </tr>
+            <tr>
+                <th colspan="3">Discount Applied</th>
+                <th id="discount-amount">0</th>
+            </tr>
+            <tr>
+                <th colspan="3">New Total</th>
+                <th id="new-total">{{ total_cost }}</th>
+            </tr>
+        </tfoot>
+    </table>
+
+    <form id="apply-coupon-form" method="post" action="{% url 'apply_coupon' %}">
+        {% csrf_token %}
+        <div class="input-group mb-3">
+            <input type="text" name="coupon_code" class="form-control" placeholder="Enter Coupon Code">
+            <button type="submit" class="btn btn-success">Apply</button>
+        </div>
+    </form>
+
+    <div class="form-group">
+        <label for="saved_cards">Select a saved card</label>
+        <select id="saved_cards" name="saved_card" class="form-control">
+            <option value="">-- Select a card --</option>
+            <!-- Options will be populated dynamically using AJAX -->
+        </select>
+    </div>    
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Confirm Booking</button>
+    </form>
+</div>
+
+<script>
+// Function to load saved cards via AJAX
+document.addEventListener('DOMContentLoaded', function () {
+    // Load saved cards via AJAX
+    fetch("{% url 'get_saved_cards' %}")
+        .then(response => response.json())
+        .then(data => {
+            const select = document.getElementById('saved_cards');
+            select.innerHTML = '';
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = '-- Select a card --';
+            select.appendChild(defaultOption);
+
+            if (data.cards && data.cards.length > 0) {
+                data.cards.forEach(card => {
+                    const option = document.createElement('option');
+                    option.value = card.id;
+                    option.textContent = `${card.card_name} - ${card.decrypted_card_number}`;
+                    select.appendChild(option);
+                });
+            } else {
+                const noCardsOption = document.createElement('option');
+                noCardsOption.value = '';
+                noCardsOption.textContent = 'No saved cards available';
+                select.appendChild(noCardsOption);
+            }
+        });
+
+    // Listen for changes in the card dropdown
+    document.getElementById('saved_cards').addEventListener('change', function (event) {
+        const selectedCardId = event.target.value;
+
+        // Send the selected card ID to the server
+        fetch("{% url 'select_saved_cards' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            },
+            body: JSON.stringify({ card_id: selectedCardId }),
+        }).then(response => response.json())
+          .then(data => {
+              if (!data.success) {
+                  alert(data.error);
+              }
+          });
+    });
+});
+// Function to handle coupon application
+document.getElementById('apply-coupon-form').addEventListener('submit', async function (event) {
+    event.preventDefault(); // Prevent the form from submitting normally
+
+    const form = event.target;
+    const formData = new FormData(form); // Serialize the form data
+
+    try {
+        const response = await fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value, // CSRF token for Django
+            },
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to apply the coupon. Please try again.');
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+            // Update the discount and total cost dynamically
+            document.getElementById('discount-amount').textContent = result.discount_amount.toFixed(2);
+            document.getElementById('new-total').textContent = result.new_total.toFixed(2);
+        } else {
+            alert(result.error); // Show an error message if the coupon is invalid
+        }
+    } catch (error) {
+        alert(error.message);
+    }
+});
+
+</script>
+{% endblock %}

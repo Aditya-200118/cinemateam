@@ -14,19 +14,20 @@ from pathlib import Path
 import os
 from cryptography.fernet import Fernet
 
-ENCRYPTION_KEY = Fernet.generate_key()
+# ENCRYPTION_KEY = Fernet.generate_key()
+ENCRYPTION_KEY = b"vJ8-lpEAbwxCEvhBorgOoRveVixRvATyKGcVO1-s5EU="
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 # settings.py
-LOGIN_URL = '/admin/login/'
-LOGIN_REDIRECT_URL = '/admin/welcome'
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/movie/home'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'your-gmail.com'
-EMAIL_HOST_PASSWORD = 'password'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 # Quick-start development settings - unsuitable for production
@@ -47,16 +48,20 @@ SESSION_SAVE_EVERY_REQUEST = True
 # settings.py
 SESSION_COOKIE_AGE = 1209600  # 2 weeks
 
+# settings.py
+TIME_ZONE = 'America/New_York'  # Atlanta time zone (Eastern Time)
+USE_TZ = True  # Enable timezone support in Django
 AUTH_USER_MODEL = 'accounts.Customer'
 
 AUTHENTICATION_BACKENDS = [
-    'accounts.authentication.EmailAuthBackend',
+    'accounts.authentication.EmailAuthBackend', # order is very important i want to override the backend hence on top of list
     'django.contrib.auth.backends.ModelBackend',
 ]
 # Application definition
 
 INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
+    'booking.apps.BookingConfig',
     'movie.apps.MovieConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -69,6 +74,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # 'django.middleware.timezone.TimezoneMiddleware',  # Add this line
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -144,11 +150,26 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 # STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / "static", 
+]
 
+"""This is only for development environment."""
+MEDIA_URL = '/media/'  # URL prefix for media files
+MEDIA_ROOT = BASE_DIR / "media"  # Directory where media files are stored
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+from django.contrib.messages import constants as messages
+MESSAGE_TAGS = {
+    messages.DEBUG: 'alert-info',
+    messages.INFO: 'alert-info',
+    messages.SUCCESS: 'alert-success',
+    messages.WARNING: 'alert-warning',
+    messages.ERROR: 'alert-danger',
+}

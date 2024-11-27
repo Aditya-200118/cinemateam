@@ -1,0 +1,58 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8f9fa !important;
+}
+
+.card-custom {
+    background-color: #007bff !important;
+    color: white !important;
+    cursor: pointer !important;
+    transition: transform 0.3s, box-shadow 0.3s !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-custom:hover, .card-custom:active {
+    background-color: #0056b3 !important;
+    transform: translateY(-5px) !important;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card-white {
+    background-color: white !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+}
+
+a {
+    text-decoration: none !important;
+}
+
+.row {
+    margin: 0 !important;
+}
+
+h5.card-title {
+    font-weight: bold !important;
+}
+
+h5.text-primary {
+    font-weight: 700 !important;
+    color: #007bff !important;
+}
+
+.table {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    width: 100% !important;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f1f1f1 !important;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .card-custom {
+        margin-bottom: 1rem !important;
+    }
+}

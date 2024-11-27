@@ -1,14 +1,56 @@
 /* base.css */
 body {
     font-family: 'Inter', sans-serif;
-    background-color: #f8f9fa;
+    background-color: #f8f9fa  !important;
 }
 
 .invalid-feedback {
-    max-height: 50px; /* Adjust the height as needed */
-    overflow-y: auto;
+    max-height: 50px  !important; /* Adjust the height as needed */
+    overflow-y: auto  !important;
 }
 
+.payment-card {
+    background: linear-gradient(135deg, #b8b8b8, #e0e0e0) !important;
+    color: #333 !important;
+    border-radius: 15px !important;
+    padding: 20px !important;
+    position: relative !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+  }
+  
+  .payment-card::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: linear-gradient(135deg, rgba(156, 155, 155, 0.2), rgba(6, 4, 4, 0)) !important;
+    border-radius: 15px !important;
+    pointer-events: none !important;
+  }
+  
+  /* .payment-card:hover {
+    transform: rotate(2deg) !important;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2) !important;
+  } */
+  
+  .card-logo {
+    width: 50px !important;
+    position: absolute !important;
+    top: 20px !important;
+    left: 20px !important;
+  }
+  
+  .card-text {
+    margin: 10px 0 !important;
+  }
+  
+  .card-number, .card-name, .card-cvv {
+    font-size: 1.2em !important;
+    font-weight: bold !important;
+  }  
 /* .container {
     min-height: 100vh;
 }

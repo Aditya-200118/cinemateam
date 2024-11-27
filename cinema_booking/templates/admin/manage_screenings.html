@@ -1,0 +1,182 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div class="container my-4">
+    <h2 class="text-center">Manage Screenings</h2>
+
+    {% for message in messages %}
+    <div class="alert {{ message.tags }} alert-dismissible shadow fade show" role="alert">
+        <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        {{ message | safe }}
+    </div>
+    {% endfor %}
+
+    <!-- Theatre Dropdown -->
+    <label for="theatreSelector">Select Theatre:</label>
+    <select id="theatreSelector" class="form-control">
+        <option value="">-- Select a Theatre --</option>
+        {% for theatre in theatres %}
+        <option value="{{ theatre.theatre_id }}">{{ theatre.name }}</option>
+        {% endfor %}
+    </select>
+
+    <!-- Showroom Dropdown -->
+    <label for="showroomSelector">Select Showroom:</label>
+    <select id="showroomSelector" class="form-control" disabled>
+        <option value="">-- Select a Showroom --</option>
+    </select>
+
+    <!-- Movie Dropdown -->
+    <label for="movieSelector">Select Movie:</label>
+    <select id="movieSelector" class="form-control">
+        <option value="">-- Select a Movie --</option>
+        {% for movie in movies %}
+        <option value="{{ movie.movie_id }}">{{ movie.title }}</option>
+        {% endfor %}
+    </select>
+
+    <!-- Add Screening Form -->
+    <h3 class="mt-4">Add Screening</h3>
+    <form method="post" action="{% url 'manage_screenings' %}" id="screeningForm">
+        {% csrf_token %}
+        <input type="hidden" name="showroom_id" id="showroomIdInput">
+        <input type="hidden" name="movie_id" id="movieIdInput">
+        
+        <label for="show_time">Screening Time:</label>
+        <input type="datetime-local" id="show_time" name="show_time" class="form-control" required>
+        <button type="submit" class="btn btn-primary mt-2">Add Screening</button>
+    </form>
+
+    <!-- Gantt Chart -->
+    <div id="ganttChart" style="height: 400px; border: 1px solid #ccc; overflow-x: auto;"></div>
+</div>
+
+<script type="text/javascript" src="https://unpkg.com/vis-timeline@latest/standalone/umd/vis-timeline-graph2d.min.js"></script>
+<link href="https://unpkg.com/vis-timeline@latest/styles/vis-timeline-graph2d.min.css" rel="stylesheet" type="text/css" />
+
+<script>
+
+    document.getElementById('theatreSelector').addEventListener('change', function () {
+        const theatreId = this.value;
+        const showroomSelect = document.getElementById('showroomSelector');
+        showroomSelect.disabled = true;
+
+        if (theatreId) {
+            fetch(`/admin/get-showrooms/${theatreId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    showroomSelect.innerHTML = '<option value="">-- Select a Showroom --</option>';
+                    data.showrooms.forEach(showroom => {
+                        const option = document.createElement('option');
+                        option.value = showroom.showroom_id;
+                        option.text = showroom.name;
+                        showroomSelect.appendChild(option);
+                    });
+                    showroomSelect.disabled = false;
+                })
+                .catch(error => console.error('Error fetching showrooms:', error));
+        } else {
+            showroomSelect.innerHTML = '<option value="">-- Select a Showroom --</option>';
+        }
+    });
+
+    document.getElementById('showroomSelector').addEventListener('change', function () {
+        const showroomId = this.value;
+        document.getElementById('showroomIdInput').value = showroomId;
+        updateGanttChart();
+    });
+
+    document.getElementById('movieSelector').addEventListener('change', function () {
+        const movieId = this.value;
+        document.getElementById('movieIdInput').value = movieId;
+        updateGanttChart();
+    });
+
+    let existingScreenings = [];
+
+    function updateGanttChart() {
+        const movieId = document.getElementById('movieSelector').value;
+        const theatreId = document.getElementById('theatreSelector').value;
+        const showroomId = document.getElementById('showroomSelector').value;
+
+        if (movieId && theatreId && showroomId) {
+            fetch(`/admin/get_screenings/${movieId}/${theatreId}/${showroomId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    existingScreenings = data.screenings.map(screening => new Date(screening.show_time)); // Store show_times
+                    renderGanttChart(data.screenings);
+                })
+                .catch(error => console.error('Error fetching screenings:', error));
+        } else {
+            renderGanttChart([]); // Clear the chart if filters are incomplete
+            existingScreenings = [];
+        }
+    }
+
+    // document.getElementById('screeningForm').addEventListener('submit', function (event) {
+    //     const selectedTime = new Date(document.getElementById('show_time').value);
+
+    //     // Check for conflicts
+    //     const conflict = existingScreenings.some(screeningTime => {
+    //         // Allow a buffer of 15 minutes before or after an existing screening
+    //         const buffer = 15 * 60 * 1000; // 15 minutes in milliseconds
+    //         return Math.abs(screeningTime - selectedTime) < buffer;
+    //     });
+
+    //     if (conflict) {
+    //         event.preventDefault(); // Prevent form submission
+    //         alert("A conflict exists: There's already a screening scheduled near this time in the selected showroom.");
+    //     }
+    // });
+
+
+    function renderGanttChart(screenings) {
+        const container = document.getElementById('ganttChart');
+        container.innerHTML = ""; // Clear the chart
+
+        if (screenings.length === 0) {
+            container.innerHTML = "<p class='text-center'>No screenings available for the selected options.</p>";
+            return;
+        }
+
+        const items = screenings.map(screening => {
+            // Convert show_time to Date object
+            const showDate = new Date(screening.show_time);
+
+            // Format the date to display day of the week, month, date, and year
+            // const formattedDate = showDate.toLocaleDateString('en-US', {
+            //     weekday: 'short', // 'short' gives 3-letter day abbreviation
+            //     month: 'short',   // 'short' gives abbreviated month (e.g., 'Nov')
+            //     day: 'numeric',   // Day as a number
+            //     year: 'numeric'   // Full year
+            // });
+
+            // // Format the time (using 24-hour format)
+            // const formattedTime = showDate.toLocaleTimeString('en-US', {
+            //     hour: '2-digit', // 2-digit hour
+            //     minute: '2-digit' // 2-digit minute
+            // });
+
+            // Combine both formatted date and time
+            // const formattedDateTime = `${formattedDate} - ${formattedTime}`;
+            return {
+                id: screening.screening_id,
+                content: screening.show_time, // Customize how it displays
+                start: screening.show_time,
+            };
+        });
+
+        const options = {
+            height: '400px',
+            width: '100%',
+            stack: false,
+            start: new Date().toISOString(),
+            end: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString(),
+        };
+
+        new vis.Timeline(container, items, options);
+    }
+</script>
+{% endblock %}

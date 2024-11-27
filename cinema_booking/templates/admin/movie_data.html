@@ -1,0 +1,37 @@
+{% extends 'admin/base_site.html' %}
+
+{% block title %}Theatre Data{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Theatre Data</h2>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Theatre Name</th>
+        <th>Showrooms</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for theatre in theatres %}
+      <tr>
+        <td>{{ theatre.name }}</td>
+        <td>
+          {% for showroom in theatre.showroom_set.all %}
+		  <a href="{% url 'showroom_schedule' showroom.showroom_id %}" class="btn btn-info btn-sm">
+			{{ showroom.name }} (ID: {{ showroom.showroom_id }})
+		  </a>
+          {% empty %}
+            <span>No showrooms available</span>
+          {% endfor %}
+        </td>
+        <td>
+          <!-- Actions for Modify and Delete Theatre -->
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

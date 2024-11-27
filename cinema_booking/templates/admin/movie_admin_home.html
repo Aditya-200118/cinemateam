@@ -1,0 +1,18 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4 text-center">Movie Administration</h1>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Manage Movies</h5>
+                    <button onclick="location.href='{% url 'add_movie' %}'" class="btn btn-primary me-2 mb-2">Add Movies</button>
+                    <button onclick="location.href='{% url 'manage_screenings' %}'" class="btn btn-primary me-2 mb-2">Manage Screenings</button>
+                    <button onclick="location.href='{% url 'movie_data' %}'" class="btn btn-secondary mb-2">Movie Data</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

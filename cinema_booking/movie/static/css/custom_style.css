@@ -2,12 +2,12 @@
     border: none;
     border-radius: 10px;
     overflow: hidden;
-    transition: transform 0.2s ease-in-out;
+    /* transition: transform 0.2s ease-in-out; */
 }
 
-.card:hover {
+/* .card:hover {
     transform: scale(1.05);
-}
+} */
 
 .card-img-top {
     border-top-left-radius: 10px;

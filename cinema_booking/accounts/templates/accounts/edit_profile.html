@@ -35,19 +35,19 @@
                   {{ profile_form.last_name }}
                 </div>
                 <div class="col-12">
+                  {{ profile_form.middle_name }}
+                </div>
+                <div class="col-12">
                   <input type="email" class="form-control" value="{{ user.email }}" readonly>
                 </div>
                 <div class="col-12">
                   {{ profile_form.contact_no }}
                 </div>
                 <div class="col-12">
-<<<<<<< HEAD
-=======
                   {{ profile_form.promotions }}
-                  <P>Sign up for promotions!</P>
+                  <p>Sign up for promotions!</p>
                 </div>
                 <div class="col-12">
->>>>>>> 34753366547cb490da32fec25d38354c3827bc88
                   {{ address_form.billing_address }}
                 </div>
                 <div class="col-12">
@@ -59,25 +59,9 @@
                 <div class="col-12">
                   {{ address_form.zip_code }}
                 </div>
-<<<<<<< HEAD
-                {% for card_form in card_forms %}
-                <div class="col-12">
-                  {{ card_form.card_number }}
-                </div>
-                <div class="col-12">
-                  {{ card_form.expiry_date }}
-                </div>
-                <div class="col-12">
-                  {{ card_form.cvv }}
-                </div>
-                {% endfor %}
-                <div class="col-12">
-                  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-=======
                 <div class="col-12">
                   <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                     <a href="{% url 'profile' %}" class="btn btn-secondary">Go Back!</a>
->>>>>>> 34753366547cb490da32fec25d38354c3827bc88
                     <button type="submit" class="btn btn-primary">Save Changes</button>
                     <a href="{% url 'change_password' %}" class="btn btn-secondary">Change Password</a>
                   </div>
@@ -97,8 +81,4 @@
     </div>
   </div>
 </section>
-<<<<<<< HEAD
 {% endblock %}
-=======
-{% endblock %}
->>>>>>> 34753366547cb490da32fec25d38354c3827bc88

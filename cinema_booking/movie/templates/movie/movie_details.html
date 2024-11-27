@@ -1,0 +1,75 @@
+{% extends "movie_base.html" %}
+{% load static %}
+{% load movie_url_filter %}
+{% block title %}{{ movie.title }} - Movie Details{% endblock %}
+
+{% block extra_styles %}
+    <link href="{% static 'css/movie_details.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'home' %}">
+            <img src="{% static 'icon.png' %}" width="40" height="40" alt="Logo">
+            <span class="h4 text-primary mb-0 fw-bold">BOOK MY TICKET</span>
+        </a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                {% if user.is_authenticated %}
+                <li class="nav-item"><a class="btn btn-primary me-3" href="{% url 'user_logout' %}">Logout</a></li>
+                <li class="nav-item"><a class="btn btn-primary me-3" href="{% url 'profile' %}">Profile</a></li>
+                {% else %}
+                <li class="nav-item"><a class="btn btn-primary me-3" href="{% url 'user_login' %}">Log In</a></li>
+                <li class="nav-item"><a class="btn btn-primary me-3" href="{% url 'register' %}">Sign Up</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Movie Details Section -->
+<section class="my-5 container">
+    <div class="row">
+        <!-- Movie Poster (Glassmorphism Card - 3 columns) -->
+        <div class="col-md-3">
+            <div class="card glass-card">
+                <img src="{% if movie.poster %}{{ movie.poster.url }}{% else %}{% static 'movie/default_poster.png' %}{% endif %}" alt="{{ movie.title }}" class="img-fluid rounded">
+            </div>
+        </div>
+
+        <!-- Movie Video Embed (Glassmorphism Card - Remaining space, maintaining 16:9 ratio) -->
+        <div class="col-md-9">
+            <div class="card glass-card">
+                <div class="ratio ratio-16x9">
+                    <iframe src="{{ movie.trailer_url|youtube_embed_url }}" title="{{ movie.title }} Trailer" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Movie Details Card (Glassmorphism Style) -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card glass-card shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title fw-bold">{{ movie.title }}</h2>
+                    <p class="card-text"><strong>Category:</strong> {{ movie.category }}</p>
+                    <p class="card-text"><strong>Cast:</strong> {{ movie.cast }}</p>
+                    <p class="card-text"><strong>Director:</strong> {{ movie.director }}</p>
+                    <p class="card-text"><strong>Producer:</strong> {{ movie.producer }}</p>
+                    <p class="card-text"><strong>Release Date:</strong> {{ movie.release_date }}</p>
+                    <p class="card-text"><strong>Duration:</strong> {{ movie.duration }} minutes</p>
+                    <p class="card-text"><strong>Rating:</strong> {{ movie.rating }}</p>
+                    <p class="card-text"><strong>Price:</strong> ${{ movie.price }}</p>
+                    <p class="card-text"><strong>Synopsis:</strong> {{ movie.synopsis }}</p>
+                    <p class="card-text"><strong>Reviews:</strong> {{ movie.reviews }}</p>
+                    <p class="card-text"><strong>Trailer:</strong> <a href="{{ movie.trailer_url }}" target="_blank" class="text-decoration-none">Watch on YouTube</a></p>
+                    <a href="{% url 'select_showtime' movie.movie_id %}" class="btn btn-primary mt-3">Book Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    </section>
+    
+{% endblock %}

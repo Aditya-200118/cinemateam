@@ -1,61 +1,105 @@
-{% extends "base.html" %}
-
+{% extends "movie_base.html" %}
 {% load static %}
 
-{% block title %}
-    Book My Ticket
+{% block title %}Book My Ticket{% endblock %}
+
+{% block extra_styles %}
+<link href="{% static 'css/home.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
-    <!-- Navigation Bar -->
-    <header class="py-3 bg-white border-bottom">
-        <div class="container-fluid ps-3 pe-3 d-flex justify-content-between align-items-center">
-            <!-- BOOK MY TICKET logo and text -->
-            <div class="d-flex gap-2 align-items-center">
-                <div>
-                    <img src="{% static 'icon.png' %}" alt="Logo" width="40" height="40">  <!-- Add your icon here -->
-                </div>
-                <a href="{% url 'home' %}" class="text-decoration-none">
-                    <h1 class="h4 text-primary mb-0 fw-bold">BOOK MY TICKET</h1>
-                </a>
-            </div>
-            <!-- Search Box, Log In and Sign Up Buttons -->
-            <div class="d-flex gap-3">
-                <form method="GET" action="{% url 'home' %}">
-                    <input type="text" name="search" class="form-control rounded" placeholder="Search for Movies">
-                </form>
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'home' %}">
+            <img src="{% static 'icon.png' %}" width="40" height="40" alt="Logo">
+            <span class="h4 text-primary mb-0 fw-bold">BOOK MY TICKET</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item mb-2 mb-lg-0">
+                    <form class="d-flex" method="GET" action="{% url 'home' %}">
+                        <input class="form-control me-3" type="search" placeholder="Search for Movies" aria-label="Search" name="search" value="{{ search_query }}">
+                        <select name="search_type" class="form-control me-3">
+                            <option value="title" {% if search_type == 'title' %}selected{% endif %}>By Title</option>
+                            <option value="category" {% if search_type == 'category' %}selected{% endif %}>By Category</option>
+                        </select>
+                        <button class="btn btn-primary me-3" type="submit">Search</button>
+                    </form>
+                </li>
                 {% if user.is_authenticated %}
-                    <a href="{% url 'user_logout' %}" class="btn btn-primary rounded" style="min-width: 90px;">Logout</a>
-                    <a href="{% url 'profile' %}" class="btn btn-primary rounded" style="min-width: 90px;">Profile</a>
+                <li class="nav-item mb-2 mb-lg-0">
+                    <a class="btn btn-primary me-3" href="{% url 'user_logout' %}">Logout</a>
+                </li>
+                <li class="nav-item mb-2 mb-lg-0">
+                    <a class="btn btn-primary me-3" href="{% url 'profile' %}">Profile</a>
+                </li>
                 {% else %}
-                    <a href="{% url 'user_login' %}" class="btn btn-primary rounded" style="min-width: 90px;">Log In</a>
-                    <a href="{% url 'register' %}" class="btn btn-primary rounded" style="min-width: 90px;">Sign Up</a>
+                <li class="nav-item mb-2 mb-lg-0">
+                    <a class="btn btn-primary me-3" href="{% url 'user_login' %}">Log In</a>
+                </li>
+                <li class="nav-item mb-2 mb-lg-0">
+                    <a class="btn btn-primary me-3" href="{% url 'register' %}">Sign Up</a>
+                </li>
                 {% endif %}
-            </div>
+            </ul>
         </div>
-    </header>
+    </div>
+</nav>
 
-    <!-- Movie Section -->
-    <section class="my-5 container">
-        <div class="mb-4">
-            <h2 class="h5 fw-bold">Now Playing</h2>
-            <!-- Movie Cards -->
+<!-- Movie Sections -->
+<section class="my-5 container">
+    {% if search_query %}
+        <h2 class="h5 fw-bold">Search Results for "{{ search_query }}"</h2>
+    {% endif %}
+
+    <div class="mb-4">
+        <h2 class="h5 fw-bold">Now Playing</h2>
+        {% if now_playing %}
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-                {% for movie in movies %}
+                {% for movie in now_playing %}
                     <div class="col">
-                        <div class="card h-100 shadow-sm">
-                            <iframe class="card-img-top" src="{{ movie.trailer_url }}" frameborder="0" allowfullscreen></iframe>
-                            <div class="card-body">
-                                <h5 class="card-title">{{ movie.title }}</h5>
-                                <p class="card-text">{{ movie.synopsis|truncatewords:20 }}</p>
-                            </div>
-                            <div class="card-footer text-muted">
-                                <small>Rating: {{ movie.rating }}</small>
+                        <div class="movie-card">
+                            <img src="{% if movie.poster %}{{ movie.poster.url }}{% else %}{% static 'movie/default_poster.png' %}{% endif %}" alt="{{ movie.title }}" class="movie-poster">
+                            <div class="movie-info">
+                                <h5 class="movie-title">{{ movie.title }}</h5>
+                                <p class="movie-synopsis">{{ movie.synopsis|truncatewords:20 }}</p>
+                                <small class="movie-rating">Rating: {{ movie.rating }}</small>
+                                <a href="{% url 'movie_details' movie.movie_id %}" class="btn btn-primary btn-view-details">View Details</a>
+                                <a href="{% url 'select_showtime' movie.movie_id %}" class="btn btn-primary mt-2">Book Now</a>
                             </div>
                         </div>
                     </div>
                 {% endfor %}
             </div>
+        {% else %}
+            <p>No movies found in this section.</p>
+        {% endif %}
+    </div>
+
+    <h2 class="h5 fw-bold">Coming Soon</h2>
+    {% if coming_soon %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            {% for movie in coming_soon %}
+                <div class="col">
+                    <div class="movie-card">
+                        <img src="{% if movie.poster %}{{ movie.poster.url }}{% else %}{% static 'movie/default_poster.png' %}{% endif %}" alt="{{ movie.title }}" class="movie-poster">
+                        <div class="movie-info">
+                            <h5 class="movie-title">{{ movie.title }}</h5>
+                            <p class="movie-synopsis">{{ movie.synopsis|truncatewords:20 }}</p>
+                            <small class="movie-rating">Rating: {{ movie.rating }}</small>
+                            <a href="{% url 'movie_details' movie.movie_id %}" class="btn btn-primary btn-view-details">View Details</a>
+                            <a href="{% url 'select_showtime' movie.movie_id %}" class="btn btn-primary mt-2">Book Now</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
-    </section>
+    {% else %}
+        <p>No movies found in this section.</p>
+    {% endif %}
+</section>
 {% endblock %}

@@ -1,31 +1,25 @@
 from django.urls import path
 from . import views
-# from django.contrib.auth.views import LogoutView
-from .views import CustomLogoutView 
-# from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
-from .views import change_password_view, ConfirmLogoutView, profile_view, change_payment_method
+from accounts.views.password_views import *
+from accounts.views.customer_views import CustomLogoutView, ConfirmLogoutView, register, activate_account, check_email_exists
+from accounts.views.profile_views import profile_view, edit_profile
+from accounts.views.card_views import modify_payment_method, show_payment_methods, delete_payment_method
 
 urlpatterns = [
-    path("login/", views.user_login, name="user_login"),
-    path("register/", views.register, name="register"),
-    path("test_session/", views.test_session, name="test_session"),
-    path("check_session/", views.check_session, name="check_session"),
-    path('password_reset/', views.password_reset_request, name='password_reset'),
-    path('reset/<str:token>/', views.password_reset_confirm, name='password_reset_confirm'),
-    path('password_reset/done/', views.password_reset_done, name='password_reset_done'),
-    path('reset/done/', views.password_reset_complete, name='password_reset_complete'),
-    path('edit_profile/', views.edit_profile, name='edit_profile'),
-<<<<<<< HEAD
-    path('change_password/', CustomPasswordChangeView.as_view(), name='change_password'),
-=======
+    path("register/", register, name="register"),
+    path("check-email/", check_email_exists, name="check_email_exists"),
+    path('password_reset/', password_reset_request, name='password_reset'),
+    path('reset/<str:token>/', password_reset_confirm, name='password_reset_confirm'),
+    path('password_reset/done/', password_reset_done, name='password_reset_done'),
+    path('reset/done/', password_reset_complete, name='password_reset_complete'),
+    path('activate/<uidb64>/<token>/', activate_account, name='activate_account'),
+    path('edit_profile/', edit_profile, name='edit_profile'),
     path('change_password/', change_password_view, name='change_password'),
     path('logout/', CustomLogoutView.as_view(), name='user_logout'),
     path('confirm_logout/', ConfirmLogoutView.as_view(), name='confirm_logout'),
     path('profile/', profile_view, name='profile'),
-    path('change-payment-method/', change_payment_method, name='change_payment_method'),
->>>>>>> 34753366547cb490da32fec25d38354c3827bc88
+    path('payment-methods/', show_payment_methods, name='show_payment_methods'),
+    path('payment-methods/modify/<int:card_id>/', modify_payment_method, name='modify_payment_method'),
+    path('payment-methods/modify/', modify_payment_method, name='modify_payment_method'),
+    path('payment-methods/delete/<int:card_id>/', delete_payment_method, name='delete_payment_method'),
 ]
-#<a href="{% url 'logout' %}">Logout</a>
-# path('register/step1/', views.register_step1, name='register_step1'),
-# path('register/step2/', views.register_step2, name='register_step2'),
-# path('register/step3/', views.register_step3, name='register_step3'),

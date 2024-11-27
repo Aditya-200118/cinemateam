@@ -1,0 +1,134 @@
+{% extends "admin/base_site.html" %}
+{% load custom_filters %}
+{% block content %}
+<div class="container m-4">
+    <h1 class="mb-4 text-center">Create Promotion</h1>
+    <div class="row">
+        <!-- Active Promotions Card -->
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Active Promotions</h5>
+                    {% if active_promotions %}
+                    <ul class="list-group">
+                        {% for promotion in active_promotions %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>
+                                <strong>{{ promotion.title }}</strong><br>
+                                {{ promotion.promo_code }} ({{ promotion.discount }}% off)
+                            </span>
+                            <small class="text-muted">
+                                {{ promotion.valid_from }} - {{ promotion.valid_to }}
+                            </small>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-center text-muted">No active promotions available.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Future Promotions Card -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Future Promotions</h5>
+                    {% if future_promotions %}
+                    <ul class="list-group">
+                        {% for promotion in future_promotions %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>
+                                <strong>{{ promotion.title }}</strong><br>
+                                {{ promotion.promo_code }} ({{ promotion.discount }}% off)
+                            </span>
+                            <small class="text-muted">
+                                Starts: {{ promotion.valid_from }} <br> Ends: {{ promotion.valid_to }}
+                            </small>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-center text-muted">No future promotions scheduled.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Create Promotion Form Card -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Enter Promotion Details</h5>
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        <!-- Promo Code -->
+                        <div class="mb-3">
+                            <label for="id_promo_code" class="form-label">Promo Code</label>
+                            {{ form.promo_code|add_class:"form-control" }}
+                            <div class="valid-feedback">Looks good!</div>
+                            <div class="invalid-feedback">
+                                Please enter a unique promo code.
+                            </div>
+                        </div>
+
+                        <!-- Title -->
+                        <div class="mb-3">
+                            <label for="id_title" class="form-label">Title</label>
+                            {{ form.title|add_class:"form-control" }}
+                            <div class="valid-feedback">Looks good!</div>
+                            <div class="invalid-feedback">
+                                Please enter the title of the promotion.
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label for="id_description" class="form-label">Description</label>
+                            {{ form.description|add_class:"form-control" }}
+                            <div class="valid-feedback">Looks good!</div>
+                            <div class="invalid-feedback">
+                                Please enter a description for the promotion.
+                            </div>
+                        </div>
+
+                        <!-- Discount -->
+                        <div class="mb-3">
+                            <label for="id_discount" class="form-label">Discount (%)</label>
+                            {{ form.discount|add_class:"form-control" }}
+                            <div class="valid-feedback">Looks good!</div>
+                            <div class="invalid-feedback">
+                                Please enter a valid discount percentage.
+                            </div>
+                        </div>
+
+                        <!-- Valid From -->
+                        <div class="mb-3">
+                            <label for="id_valid_from" class="form-label">Valid From</label>
+                            {{ form.valid_from|add_class:"form-control" }}
+                            <div class="valid-feedback">Looks good!</div>
+                            <div class="invalid-feedback">
+                                Please enter the starting date for the promotion.
+                            </div>
+                        </div>
+
+                        <!-- Valid To -->
+                        <div class="mb-3">
+                            <label for="id_valid_to" class="form-label">Valid To</label>
+                            {{ form.valid_to|add_class:"form-control" }}
+                            <div class="valid-feedback">Looks good!</div>
+                            <div class="invalid-feedback">
+                                Please enter the ending date for the promotion.
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary mt-3">Create Promotion</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

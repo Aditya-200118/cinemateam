@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import Customer, Address, Card
-from .admin_views import admin_site
+from admin.admin_views import admin_site
 
 class CardInline(admin.TabularInline):
     model = Card
@@ -50,7 +50,7 @@ class AddressAdmin(admin.ModelAdmin):
     list_filter = ('city', 'state')
 
 class CardAdmin(admin.ModelAdmin):
-    list_display = ('customer', 'card_number', 'expiry_date')
+    list_display = ('customer', 'card_number', 'expiry_date', 'card_name')
     search_fields = ('customer__email', 'card_number')
 
 # Register models with the custom admin site

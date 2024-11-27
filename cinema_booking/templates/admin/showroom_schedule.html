@@ -1,0 +1,31 @@
+{% extends 'admin/base_site.html' %}
+
+{% block title %}{{ showroom.name }} Schedule{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Schedule for Showroom: {{ showroom.name }}</h2>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Movie Title</th>
+        <th>Screening Date</th>
+        <th>Screening Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for screening in screenings %}
+      <tr>
+        <td>{{ screening.movie.title }}</td>
+        <td>{{ screening.date }}</td>
+        <td>{{ screening.show_time }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="3">No screenings scheduled.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

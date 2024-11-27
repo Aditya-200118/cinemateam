@@ -1,0 +1,91 @@
+/* General styles for movie cards */
+.movie-card {
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.movie-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+}
+
+.movie-poster {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.movie-info {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+
+    /* Glass effect */
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(3.4px);
+    -webkit-backdrop-filter: blur(3.4px);
+    color: #fff; /* Set text to white */
+    text-align: center; /* Center text alignment */
+}
+
+.movie-card:hover .movie-info {
+    transform: translateY(0);
+}
+
+.movie-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.movie-synopsis {
+    font-size: 0.9rem;
+    margin: 10px 0;
+}
+
+.movie-rating {
+    font-size: 0.85rem;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.btn-view-details {
+    text-decoration: none;
+    color: #fff;
+    background-color: #007bff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.btn-view-details:hover {
+    background-color: #0056b3;
+}
+
+
+.btn-book-movie {
+    text-decoration: none;
+    color: #fff;
+    background-color: #007bff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.btn-book-movie:hover {
+    background-color: #0056b3;
+}

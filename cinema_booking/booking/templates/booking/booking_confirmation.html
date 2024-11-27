@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Booking Confirmation{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow-sm">
+        <div class="card-body text-center">
+            <h5 class="card-title text-primary">Booking Confirmed</h5>
+            <p class="card-text">Thank you for your booking! Here are your details:</p>
+            <ul class="list-unstyled">
+                <li><strong>Booking ID:</strong> {{ booking.booking_id }}</li>
+                <li><strong>Show Time:</strong> {{ booking.show_time }}</li>
+                <li><strong>Total Price:</strong> ${{ booking.total_price }}</li>
+            </ul>
+            <a href="{% url 'home' %}" class="btn btn-primary mt-3">Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

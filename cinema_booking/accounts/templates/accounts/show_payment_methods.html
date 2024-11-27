@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Payment Methods{% endblock %}
+{% load static %}
+{% block content %}
+<section class="p-3 p-md-4 p-xl-5">
+  <div class="container">
+    <h2 class="mb-4">Your Payment Methods</h2>
+    <div class="row">
+      {% for card in cards %}
+      <div class="col-12 col-md-6 mb-4">
+        <div class="card payment-card">
+          <div class="card-body">
+            <img src="{% static 'visa-logo.png' %}" alt="Visa Logo" class="card-logo">
+            <p class="card-text">Card number: <span class="card-number">{{ card.card_number_safe }}</span></p>
+            <p class="card-text">Name: <span class="card-name">{{ card.card_name }}</span></p>
+            <p class="card-text">CVV: <span class="card-ccv">{{ card.cvv_safe }}</span></p>
+            <a href="{% url 'modify_payment_method' card.id %}" class="btn btn-primary">Modify</a>            
+            <form method="post" action="{% url 'delete_payment_method' card.id %}" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <a href="{% url 'modify_payment_method' %}" class="btn btn-success">Add New Card</a>
+    <a href="{% url 'profile' %}" class="btn btn-secondary">Go Back</a>
+  </div>
+</section>
+{% endblock %}
