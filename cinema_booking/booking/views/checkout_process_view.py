@@ -7,18 +7,16 @@ from booking.services.promotion_service import PromotionService
 from accounts.services.transcation_service import TransactionService
 from booking.builder.booking_builder import BookingBuilder
 from accounts.services.card_service import CardService
-from booking.forms import CouponForm
+# from booking.forms import CouponForm
 from django.contrib import messages
 from accounts.models import Card
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from booking.models.promotion_model import CouponUsage
 
 @login_required
 def checkout(request, screening_id):
-    """
-    Checkout process for booking tickets, including applying promotions
-    and selecting saved cards for payment.
-    """
+
     screening = get_object_or_404(Screening, pk=screening_id)
     movie = screening.movie
     customer = get_object_or_404(Customer, pk=request.user.pk)
@@ -120,9 +118,6 @@ from django.http import JsonResponse
 
 @login_required
 def select_saved_card(request):
-    """
-    API to select a saved card and store its ID in the session.
-    """
     if request.method == 'POST':
         try:
             # Parse the JSON data from the request body
@@ -150,9 +145,6 @@ def select_saved_card(request):
 
 @login_required
 def get_saved_cards(request):
-    """
-    API to fetch saved cards for the current customer.
-    """
     try:
         customer = request.user
         card_service = CardService()  # Initialize the CardService
@@ -188,39 +180,55 @@ def apply_coupon(request):
         coupon_code = request.POST.get('coupon_code', '').strip()
         total_cost = Decimal(request.session.get('total_cost', 0.0))
 
-        # If no coupon code is provided, proceed without discount
+        # Case 1: No coupon code provided
         if not coupon_code:
+            # Remove session data if no coupon is applied
             request.session.pop('promotion_id', None)
             request.session.pop('discount_amount', None)
             request.session.pop('new_total', None)
             return JsonResponse({
                 'success': True,
+                'message': 'No coupon applied.',
                 'discount_amount': 0,
                 'new_total': float(total_cost),
             })
 
         try:
-            # Fetch the promotion with an exact match on promo_code
             promotion = Promotion.objects.filter(promo_code__iexact=coupon_code).first()
-            
-            if not promotion:
-                return JsonResponse({'success': False, 'error': 'Invalid or expired coupon code.'})
 
-            # Calculate the discount and the new total
+            # Case 2: Invalid or expired coupon
+            if not promotion:
+                request.session.pop('promotion_id', None)
+                request.session.pop('discount_amount', None)
+                request.session.pop('new_total', None)
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Invalid or expired coupon code.',
+                })
+
+            # Case 3: Check if the coupon has already been used by the customer
+            if CouponUsage.objects.filter(customer=request.user, promotion=promotion).exists():
+                request.session.pop('promotion_id', None)
+                request.session.pop('discount_amount', None)
+                request.session.pop('new_total', None)
+                raise ValidationError("This coupon has already been used.")
+
             discount = Decimal(promotion.discount)
             discount_amount = (total_cost * discount) / Decimal(100)
             new_total = total_cost - discount_amount
 
-            # Store promotion in session for future use
             request.session['promotion_id'] = promotion.promo_code
             request.session['discount_amount'] = float(discount_amount)
             request.session['new_total'] = float(new_total)
 
             return JsonResponse({
                 'success': True,
+                'message': 'Coupon applied successfully!',
                 'discount_amount': float(discount_amount),
                 'new_total': float(new_total),
             })
+        except ValidationError as ve:
+            return JsonResponse({'success': False, 'error': str(ve)})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
