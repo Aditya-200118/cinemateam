@@ -19,7 +19,7 @@ class MovieService:
 
     @staticmethod
     def update_movie(movie_id, **fields):
-        # You can add validation or business rules here (e.g., ensure at least one field is updated)
+
         movie = MovieRepository.update_movie(movie_id, **fields)
         if not movie:
             raise ValidationError("Movie not found.")
