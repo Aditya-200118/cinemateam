@@ -123,7 +123,6 @@ class MyAdminSite(AdminSite):
 
                 try: 
                     with transaction.atomic():
-                    # Use the facade to create the customer
                         customer = facade.create_customer(
                             email=user_form.cleaned_data["email"],
                             password=user_form.cleaned_data["password"],
@@ -133,13 +132,11 @@ class MyAdminSite(AdminSite):
                             address_data=address_data,
                         )
 
-                        # Set additional boolean fields from the form
                         customer.is_staff = request.POST.get('is_staff') == 'on'
                         customer.is_superuser = request.POST.get('is_superuser') == 'on'
                         customer.is_active = request.POST.get('is_active') == 'on'
                         customer.save()
 
-                        # Redirect to the admin accounts page after successful customer creation
                         return redirect('admin_accounts')
 
                 except Exception as e:
@@ -228,8 +225,6 @@ class MyAdminSite(AdminSite):
             'screenings': screenings,
         })
 
-    # admin/views.py
-
     def add_movie(self, request):
         movie_form = MovieForm(request.POST or None, request.FILES or None)
 
@@ -259,7 +254,7 @@ class MyAdminSite(AdminSite):
         pass
 
     def manage_screenings(self, request):
-        # Instantiate the forms
+
         theatre_form = TheatreForm(request.POST or None)
         showroom_form = ShowroomForm(request.POST or None)
         screening_form = ScreeningForm(request.POST or None)
@@ -360,7 +355,6 @@ class MyAdminSite(AdminSite):
         if request.method == 'POST':
             form = PromotionForm(request.POST)
             if form.is_valid():
-                # Create the promotion using the service
                 promotion_data = form.cleaned_data
                 try:
                     PromotionService.create_promotion(
@@ -374,7 +368,7 @@ class MyAdminSite(AdminSite):
 
                     users = user_service.get_users_signed_up_for_promotions()
 
-                    # Sending email
+                    # Sending email right now its seequential will switch to asynch.
                     subject = f"New Promotion: {promotion_data['title']}"
                     message = (
                         f"Dear Customer,\n\n"
