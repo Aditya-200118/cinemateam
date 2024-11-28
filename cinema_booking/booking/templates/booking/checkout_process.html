@@ -3,20 +3,20 @@
 {% block title %}Checkout{% endblock %}
 
 {% block content %}
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
   <div class="container-fluid">
-      <a class="navbar-brand" href="{% url 'home' %}">
-          <img src="{% static 'icon.png' %}" width="40" height="40" alt="Logo">
+      <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+          <img src="{% static 'icon.png' %}" width="40" height="40" alt="Logo" class="me-2">
           <span class="h4 text-primary mb-0 fw-bold">BOOK MY TICKET</span>
       </a>
       <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
               {% if user.is_authenticated %}
-              <li class="nav-item"><a class="btn btn-primary me-3" href="{% url 'user_logout' %}">Logout</a></li>
-              <li class="nav-item"><a class="btn btn-primary me-3" href="{% url 'profile' %}">Profile</a></li>
+              <li class="nav-item"><a class="btn btn-outline-primary me-2" href="{% url 'profile' %}">Profile</a></li>
+              <li class="nav-item"><a class="btn btn-primary" href="{% url 'user_logout' %}">Logout</a></li>
               {% else %}
-              <li class="nav-item"><a class="btn btn-primary me-3" href="{% url 'user_login' %}">Log In</a></li>
-              <li class="nav-item"><a class="btn btn-primary me-3" href="{% url 'register' %}">Sign Up</a></li>
+              <li class="nav-item"><a class="btn btn-primary me-2" href="{% url 'user_login' %}">Log In</a></li>
+              <li class="nav-item"><a class="btn btn-outline-primary" href="{% url 'register' %}">Sign Up</a></li>
               {% endif %}
           </ul>
       </div>
@@ -24,84 +24,106 @@
 </nav>
 
 {% for message in messages %}
-<div class="alert {{ message.tags }} alert-dismissible shadow fade show" role="alert">
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-    </button>
-    {{ message | safe }}
+<div class="alert {{ message.tags }} alert-dismissible shadow fade show mt-3 container" role="alert">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    {{ message|safe }}
 </div>
 {% endfor %}
 
 <div class="container mt-4">
-    <h2>Review Your Booking</h2>
-    <p>Movie: {{ movie.title }}</p>
-    <p>Showtime: {{ screening.show_time }}</p>
-    <p>Selected Seats: {{ selected_seats|join:", " }}</p>
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h4 class="card-title text-primary">Review Your Booking</h4>
+                    <p><strong>Movie:</strong> {{ movie.title }}</p>
+                    <p><strong>Showtime:</strong> {{ screening.show_time }}</p>
+                    <p><strong>You Have Selected Seat No:</strong> {{ selected_seats|join:", " }}</p>
+                </div>
+            </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Ticket Type</th>
-                <th>Count</th>
-                <th>Price</th>
-                <th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Adult</td>
-                <td>{{ adult_count }}</td>
-                <td>{{ adult_price }}</td>
-                <td id="adult-total">{{ adult_count|floatformat:2|add:"*"|add:adult_price }}</td>
-            </tr>
-            <tr>
-                <td>Senior</td>
-                <td>{{ senior_count }}</td>
-                <td>{{ senior_price }}</td>
-                <td id="senior-total">{{ senior_count|floatformat:2|add:"*"|add:senior_price }}</td>
-            </tr>
-            <tr>
-                <td>Child</td>
-                <td>{{ child_count }}</td>
-                <td>{{ child_price }}</td>
-                <td id="child-total">{{ child_count|floatformat:2|add:"*"|add:child_price }}</td>
-            </tr>            
-        </tbody>
-        <tfoot>
-            <tr>
-                <th colspan="3">Total Cost</th>
-                <th id="total-cost">{{ total_cost }}</th>
-            </tr>
-            <tr>
-                <th colspan="3">Discount Applied</th>
-                <th id="discount-amount">0</th>
-            </tr>
-            <tr>
-                <th colspan="3">New Total</th>
-                <th id="new-total">{{ total_cost }}</th>
-            </tr>
-        </tfoot>
-    </table>
-
-    <form id="apply-coupon-form" method="post" action="{% url 'apply_coupon' %}">
-        {% csrf_token %}
-        <div class="input-group mb-3">
-            <input type="text" name="coupon_code" class="form-control" placeholder="Enter Coupon Code">
-            <button type="submit" class="btn btn-success">Apply</button>
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">Ticket Summary</h5>
+                    <table class="table table-borderless">
+                        <thead>
+                            <tr class="text-muted">
+                                <th>Ticket Type</th>
+                                <th>Count</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Adult</td>
+                                <td>{{ adult_count }}</td>
+                                <td>{{ adult_price }}</td>
+                                <td>{{ adult_count|floatformat:2|add:"*"|add:adult_price }}</td>
+                            </tr>
+                            <tr>
+                                <td>Senior</td>
+                                <td>{{ senior_count }}</td>
+                                <td>{{ senior_price }}</td>
+                                <td>{{ senior_count|floatformat:2|add:"*"|add:senior_price }}</td>
+                            </tr>
+                            <tr>
+                                <td>Child</td>
+                                <td>{{ child_count }}</td>
+                                <td>{{ child_price }}</td>
+                                <td>{{ child_count|floatformat:2|add:"*"|add:child_price }}</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="3">Total Cost</th>
+                                <th>{{ total_cost }}</th>
+                            </tr>
+                            <tr>
+                                <th colspan="3">Discount Applied</th>
+                                <th id="discount-amount">0</th>
+                            </tr>
+                            <tr class="table-primary">
+                                <th colspan="3">New Total</th>
+                                <th id="new-total">{{ total_cost }}</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
         </div>
-    </form>
 
-    <div class="form-group">
-        <label for="saved_cards">Select a saved card</label>
-        <select id="saved_cards" name="saved_card" class="form-control">
-            <option value="">-- Select a card --</option>
-            <!-- Options will be populated dynamically using AJAX -->
-        </select>
-    </div>    
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-primary">Confirm Booking</button>
-    </form>
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">Apply Coupon</h5>
+                    <form id="apply-coupon-form" method="post" action="{% url 'apply_coupon' %}">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            <input type="text" name="coupon_code" class="form-control" placeholder="Enter Coupon Code">
+                            <button type="submit" class="btn btn-success">Apply</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">Payment</h5>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="saved_cards" class="form-label">Saved Cards</label>
+                            <select id="saved_cards" name="saved_card" class="form-select">
+                                <option value="">-- Select a card --</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Confirm Booking</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
