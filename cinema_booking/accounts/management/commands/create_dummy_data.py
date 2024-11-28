@@ -54,18 +54,18 @@ class Command(BaseCommand):
         # Create customers with unique addresses
         customers = [
             Customer.objects.create(
-                first_name="Aditya",
-                last_name="Bhargava",
-                email="bhargavaaditya2001@gmail.com",
+                first_name="Daniel",
+                last_name="Smith",
+                email="daniel.smith@example.com",
                 password=make_password("password123"),
                 address=addresses[0],
                 promotions=True,
             ),
             Customer.objects.create(
-                first_name="Ji",
-                middle_name="Hoon",
-                last_name="Bang",
-                email="jane.bhargavaaditya200117@gmail.com",
+                first_name="Jane",
+                middle_name="Lee",
+                last_name="Grey",
+                email="jane.lee@example.com",
                 password=make_password("password123"),
                 address=addresses[1],
                 promotions=False,
