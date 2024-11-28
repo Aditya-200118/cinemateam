@@ -87,9 +87,8 @@ def checkout(request, screening_id):
 
             # Finalize the booking and record the transaction
             booking = builder.finalize()
-            payment_amount = Decimal(request.session.get('total_cost', 0.0))
             transaction_service = TransactionService()
-            transaction_service.create_transaction(customer, booking, card.card_number, payment_amount)
+            transaction_service.create_transaction(customer, booking, card.card_number, booking.total_price)
 
             return redirect('booking_confirmation', booking_id=booking.booking_id)
 

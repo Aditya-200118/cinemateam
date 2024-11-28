@@ -355,6 +355,7 @@ class Command(BaseCommand):
         ]
         today = timezone.now()
         one_year_ago = today - timedelta(days=365)
+        yesterday = today - timedelta(days=1)
         # Create movies and discounts
         for (
             title,
@@ -411,7 +412,7 @@ class Command(BaseCommand):
                 title="Save 10%",
                 description="Get 10% off on your purchase.",
                 discount=10,
-                valid_from=today.date(),
+                valid_from=yesterday.date(),
                 valid_to=(today + timedelta(days=30)).date(),
             ),
             Promotion.objects.create(
@@ -419,7 +420,7 @@ class Command(BaseCommand):
                 title="Summer Sale",
                 description="Enjoy 20% off this summer.",
                 discount=20,
-                valid_from=today.date(),
+                valid_from=yesterday.date(),
                 valid_to=(today + timedelta(days=60)).date(),
             ),
             Promotion.objects.create(
