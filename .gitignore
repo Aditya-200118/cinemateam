@@ -162,3 +162,4 @@ cython_debug/
 #.idea/
 tests/
 cinema_booking/booking/master_test.py
+classes_name.txt
