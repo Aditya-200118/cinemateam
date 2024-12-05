@@ -3,7 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 /ideas
-**/management
+
 populate_movies.py
 # C extensions
 *.so
@@ -179,3 +179,10 @@ cinema_booking/templates/admin/welcome.html
 **models.py
 **views.py
 **tree.py
+cinema_booking/movie/management/commands/upcoming.py
+cinema_booking/movie/management/commands/script.py
+cinema_booking/movie/management/commands/omdb.py
+cinema_booking/movie/management/commands/enterdb.py
+cinema_booking/movie/management/commands/dynamic.py
+cinema_booking/movie/management/commands/__init__.py
+cinema_booking/movie/management/__init__.py
