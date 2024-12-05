@@ -1,0 +1,141 @@
+{% extends "accounts_base.html" %}
+
+{% block title %}
+Order History
+{% endblock %}
+
+{% block content %}
+<section class="p-3 p-md-4 p-xl-5">
+  <div class="container" style="overflow: hidden;">
+    <div class="card border-light-subtle shadow-sm" style="width: 80%; height: auto; margin: auto;">
+      <div class="card-body">
+        {% if order_history %}
+          <div class="card card-white border-0">
+            <div class="card-body">
+              <h5 class="card-title">Order History</h5>
+              <table class="table table-striped table-hover mt-4">
+                <thead>
+                  <tr>
+                    <th scope="col">Booking ID</th>
+                    <th scope="col">Show Time</th>
+                    <th scope="col">Total Price</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for booking in order_history %}
+                    <tr>
+                      <td class="text-center">{{ booking.booking_id }}</td>
+                      <!-- Using the same format as the modal for show_time -->
+                      <td>{{ booking.show_time|date:"F j, Y, g:i a" }}</td>
+                      <td>${{ booking.total_price }}</td>
+                      <td>
+                        <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#ticketModal" data-booking-id="{{ booking.booking_id }}" data-show-time="{{ booking.show_time|date:"F j, Y, g:i a" }}">
+                          View Tickets
+                        </button>
+                        <button class="btn btn-primary" id="printButton{{ booking.booking_id }}" onclick="printTicket({{ booking.booking_id }})">Print Ticket</button>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        {% else %}
+          <div class="alert alert-warning">
+            No order history found for your account.
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="modal fade" id="ticketModal" tabindex="-1" aria-labelledby="ticketModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="ticketModalLabel">Ticket Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="ticketDetails"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <hr class="mt-5 mb-4 border-secondary-subtle">
+    <p class="m-0 text-secondary text-center">Want to go back to the home page? <a href="{% url 'home' %}" class="link-primary text-decoration-none">Home</a></p>
+    <p class="m-0 text-secondary text-center">Back to your <a href="{% url 'profile' %}" class="link-primary text-decoration-none">Profile</a></p>
+  </div>
+</div>
+
+<script>
+  const ticketModal = document.getElementById('ticketModal');
+  ticketModal.addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+    const bookingId = button.getAttribute('data-booking-id');
+    const showTime = button.getAttribute('data-show-time');
+    
+    fetch(`/accounts/get-tickets/${bookingId}`)
+      .then(response => response.json())
+      .then(data => {
+        const ticketDetails = data.tickets.map(ticket => `
+          <div class="card mb-3 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">Ticket #${ticket.ticket_id}</h5>
+              <p><strong>Seat Number:</strong> ${ticket.seat_number}</p>
+              <p><strong>Ticket Type:</strong> ${ticket.ticket_type}</p>
+              <p><strong>Price:</strong> $${ticket.price}</p>
+              <p><strong>Show Time:</strong> ${showTime}</p> <!-- Using the same show time as the table -->
+            </div>
+          </div>
+        `).join('');
+        document.getElementById('ticketDetails').innerHTML = ticketDetails;
+      })
+      .catch(error => {
+        console.error('Error fetching ticket details:', error);
+        document.getElementById('ticketDetails').innerHTML = '<div class="alert alert-danger">Could not load ticket details. Please try again later.</div>';
+      });
+  });
+
+  function printTicket(bookingId) {
+    fetch(`/accounts/get-tickets/${bookingId}`)
+      .then(response => response.json())
+      .then(data => {
+        const ticketDetails = data.tickets.map(ticket => `
+          <div class="card mb-3 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">Ticket #${ticket.ticket_id}</h5>
+              <p><strong>Seat Number:</strong> ${ticket.seat_number}</p>
+              <p><strong>Ticket Type:</strong> ${ticket.ticket_type}</p>
+              <p><strong>Price:</strong> $${ticket.price}</p>
+              <p><strong>Show Time:</strong> ${new Date(ticket.show_time).toLocaleString()}</p> <!-- Ensure format is the same -->
+            </div>
+          </div>
+        `).join('');
+
+        const printWindow = window.open('', '_blank', 'width=800,height=600');
+        printWindow.document.write('<html><head><title>Print Ticket</title>');
+        printWindow.document.write('<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">');
+        printWindow.document.write('</head><body>');
+        printWindow.document.write('<div class="container mt-4">');
+        printWindow.document.write('<h3>Ticket Details</h3>');
+        printWindow.document.write(ticketDetails);
+        printWindow.document.write('</div>');
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+        
+        printWindow.print();
+      })
+      .catch(error => {
+        console.error('Error fetching ticket details for print:', error);
+      });
+  }
+</script>
+
+{% endblock %}

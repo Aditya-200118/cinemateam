@@ -2,69 +2,17 @@
 {% load custom_filters %}
 {% block content %}
 <div class="container m-4">
-    <h1 class="mb-4 text-center">Create Promotion</h1>
     <div class="row">
-        <!-- Active Promotions Card -->
-        <div class="col-md-6">
-            <div class="card shadow-sm mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm border-0 ">
+                <div class="card-header bg-primary text-white text-center">Creation Promotion</div>
                 <div class="card-body">
-                    <h5 class="card-title text-center">Active Promotions</h5>
-                    {% if active_promotions %}
-                    <ul class="list-group">
-                        {% for promotion in active_promotions %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>
-                                <strong>{{ promotion.title }}</strong><br>
-                                {{ promotion.promo_code }} ({{ promotion.discount }}% off)
-                            </span>
-                            <small class="text-muted">
-                                {{ promotion.valid_from }} - {{ promotion.valid_to }}
-                            </small>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                    {% else %}
-                    <p class="text-center text-muted">No active promotions available.</p>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Future Promotions Card -->
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title text-center">Future Promotions</h5>
-                    {% if future_promotions %}
-                    <ul class="list-group">
-                        {% for promotion in future_promotions %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>
-                                <strong>{{ promotion.title }}</strong><br>
-                                {{ promotion.promo_code }} ({{ promotion.discount }}% off)
-                            </span>
-                            <small class="text-muted">
-                                Starts: {{ promotion.valid_from }} <br> Ends: {{ promotion.valid_to }}
-                            </small>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                    {% else %}
-                    <p class="text-center text-muted">No future promotions scheduled.</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Create Promotion Form Card -->
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title text-center">Enter Promotion Details</h5>
-                    <form method="post" novalidate>
+                    <form method="post" id="promotionForm" novalidate>
                         {% csrf_token %}
                         <!-- Promo Code -->
                         <div class="mb-3">
                             <label for="id_promo_code" class="form-label">Promo Code</label>
-                            {{ form.promo_code|add_class:"form-control" }}
+                            {{ form.promo_code }}
                             <div class="valid-feedback">Looks good!</div>
                             <div class="invalid-feedback">
                                 Please enter a unique promo code.
@@ -74,7 +22,7 @@
                         <!-- Title -->
                         <div class="mb-3">
                             <label for="id_title" class="form-label">Title</label>
-                            {{ form.title|add_class:"form-control" }}
+                            {{ form.title }}
                             <div class="valid-feedback">Looks good!</div>
                             <div class="invalid-feedback">
                                 Please enter the title of the promotion.
@@ -84,7 +32,7 @@
                         <!-- Description -->
                         <div class="mb-3">
                             <label for="id_description" class="form-label">Description</label>
-                            {{ form.description|add_class:"form-control" }}
+                            {{ form.description }}
                             <div class="valid-feedback">Looks good!</div>
                             <div class="invalid-feedback">
                                 Please enter a description for the promotion.
@@ -94,7 +42,7 @@
                         <!-- Discount -->
                         <div class="mb-3">
                             <label for="id_discount" class="form-label">Discount (%)</label>
-                            {{ form.discount|add_class:"form-control" }}
+                            {{ form.discount }}
                             <div class="valid-feedback">Looks good!</div>
                             <div class="invalid-feedback">
                                 Please enter a valid discount percentage.
@@ -104,7 +52,7 @@
                         <!-- Valid From -->
                         <div class="mb-3">
                             <label for="id_valid_from" class="form-label">Valid From</label>
-                            {{ form.valid_from|add_class:"form-control" }}
+                            {{ form.valid_from }}
                             <div class="valid-feedback">Looks good!</div>
                             <div class="invalid-feedback">
                                 Please enter the starting date for the promotion.
@@ -114,7 +62,7 @@
                         <!-- Valid To -->
                         <div class="mb-3">
                             <label for="id_valid_to" class="form-label">Valid To</label>
-                            {{ form.valid_to|add_class:"form-control" }}
+                            {{ form.valid_to }}
                             <div class="valid-feedback">Looks good!</div>
                             <div class="invalid-feedback">
                                 Please enter the ending date for the promotion.
@@ -123,7 +71,9 @@
 
                         <!-- Submit Button -->
                         <div class="text-center">
-                            <button type="submit" class="btn btn-primary mt-3">Create Promotion</button>
+                            <button type="button" id="confirmButton" class="btn btn-primary w-100 mt-3" disabled>
+                                Confirm and Create Promotion
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -131,4 +81,148 @@
         </div>
     </div>
 </div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Confirm Promotion Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to create this promotion with the provided details?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="submitFormButton" class="btn btn-primary">Create Promotion</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("promotionForm");
+        const confirmButton = document.getElementById("confirmButton");
+        const promoCodeField = document.getElementById("id_promo_code");
+        const titleField = document.getElementById("id_title");
+        const discountField = document.getElementById("id_discount");
+        const validFromField = document.getElementById("id_valid_from");
+        const validToField = document.getElementById("id_valid_to");
+        const checkPromotionURL = "/admin/check-promotion-title-code/";
+        function isFormValid() {
+            return [...form.elements].every(input => {
+                if (
+                    input.type === "hidden" ||
+                    input.type === "submit" ||
+                    input.type === "button"
+                ) {
+                    return true;
+                }
+                return input.checkValidity();
+            });
+        }
+
+        function validateField(input) {
+            if (!input.checkValidity()) {
+                input.classList.add("is-invalid");
+                input.classList.remove("is-valid");
+            } else {
+                input.classList.remove("is-invalid");
+                input.classList.add("is-valid");
+            }
+            confirmButton.disabled = !isFormValid();
+        }
+
+        function formatDate(input) {
+            const value = input.value.trim();
+            const parts = value.split(" ");
+            if (parts.length === 3) {
+                const [day, month, year] = parts;
+                if (day && month && year) {
+                    input.value = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+                }
+            }
+        }
+
+        function validateDates() {
+            const validFromDate = new Date(validFromField.value);
+            const validToDate = new Date(validToField.value);
+            if (validToDate < validFromDate) {
+                validToField.setCustomValidity("'Valid To' date must be after 'Valid From' date.");
+            } else {
+                validToField.setCustomValidity("");
+            }
+            validateField(validToField);
+        }
+
+        function checkForDuplicates() {
+        const title = titleField.value.trim();
+        const promoCode = promoCodeField.value.trim();
+
+        if (!title && !promoCode) return;
+
+        fetch(`${checkPromotionURL}?title=${encodeURIComponent(title)}&promo_code=${encodeURIComponent(promoCode)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.exists) {
+                    if (title) {
+                        titleField.setCustomValidity("Title already exists.");
+                        validateField(titleField);
+                    }
+                    if (promoCode) {
+                        promoCodeField.setCustomValidity("Promo code already exists.");
+                        validateField(promoCodeField);
+                    }
+                } else {
+                    titleField.setCustomValidity("");
+                    promoCodeField.setCustomValidity("");
+                    validateField(titleField);
+                    validateField(promoCodeField);
+                }
+            })
+            .catch(error => {
+                console.error("Error checking duplicates:", error);
+                titleField.setCustomValidity("Error while checking duplicates.");
+                promoCodeField.setCustomValidity("Error while checking duplicates.");
+                validateField(titleField);
+                validateField(promoCodeField);
+            });
+    }
+
+        form.addEventListener("input", event => {
+            const input = event.target;
+            validateField(input);
+            if (input === promoCodeField || input === titleField) {
+                checkForDuplicates();
+            }
+            if (input === validFromField || input === validToField) {
+                formatDate(input);
+                validateDates();
+            }
+        });
+
+        discountField.addEventListener("input", () => {
+            const discountValue = parseFloat(discountField.value);
+            if (isNaN(discountValue) || discountValue > 50) {
+                discountField.setCustomValidity("Discount cannot exceed 50%.");
+            } else {
+                discountField.setCustomValidity("");
+            }
+            validateField(discountField);
+        });
+
+        confirmButton.addEventListener("click", () => {
+            const modal = new bootstrap.Modal(document.getElementById("confirmModal"));
+            modal.show();
+        });
+
+        document.getElementById("submitFormButton").addEventListener("click", () => {
+            form.submit();
+        });
+    });
+</script>
+
+
 {% endblock %}

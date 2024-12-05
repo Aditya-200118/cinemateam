@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "accounts_base.html" %}
 
 {% block title %}Profile{% endblock %}
 
@@ -81,6 +81,7 @@
                   <a href="{% url 'edit_profile' %}" class="btn btn-primary">Edit Profile</a>
                   <a href="{% url 'show_payment_methods' %}" class="btn btn-secondary">Modify Payment</a>
                   <a href="{% url 'change_password' %}" class="btn btn-secondary">Change Password</a>
+                  <a href="{% url 'order_history' %}" class="btn btn-secondary">Order History</a>
                 </div>
               </div>
             </div>

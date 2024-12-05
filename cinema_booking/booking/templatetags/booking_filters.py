@@ -18,6 +18,17 @@ def last_row_seat_count(seat_count):
 @register.filter
 def num_rows(seat_count):
     return ceil(seat_count / 10)
+
+@register.filter
+def index_add_one(value):
+    try:
+        if isinstance(value, list):  # If the input is a list
+            return [str(int(v) + 1) for v in value]
+        return str(int(value) + 1)  # If the input is a single string
+    except (TypeError, ValueError):
+        return value  # Return unchanged if input is invalid
+
+
 # your_app/templatetags/custom_filters.py
 
 # In your app's templatetags directory, create a file called `custom_filters.py` if you haven't already

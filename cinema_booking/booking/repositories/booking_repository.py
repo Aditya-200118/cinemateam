@@ -9,7 +9,7 @@ class BookingRepository:
         try:
             booking = Booking.objects.create(customer=customer, show_time=show_time)
             return booking
-        except IntegrityError: # integrity constraints as per deliverable 7
+        except IntegrityError:
             return None  # In case of an integrity error, such as a foreign key issue
     
     @staticmethod

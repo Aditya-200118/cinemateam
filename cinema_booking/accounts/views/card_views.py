@@ -1,4 +1,4 @@
-# views/card_views.py
+# accounts/views/card_views.py
 from . import *
 from accounts.services.card_facade import CardFacade
 
@@ -60,7 +60,7 @@ def change_payment_method(request):
 
 
 
-# views/card_views.py
+# accounts/views/card_views.py
 
 
 @login_required
@@ -101,7 +101,7 @@ def modify_payment_method(request, card_id=None):
 
 
 
-# views/card_views.py
+# accounts/views/card_views.py
 
 @login_required
 def show_payment_methods(request):
@@ -119,10 +119,13 @@ def show_payment_methods(request):
             card.card_number_safe = "Invalid"  # Set to Invalid if decryption fails
             card.cvv_safe = "****"  # Mask CVV if decryption fails
 
-    return render(request, 'accounts/show_payment_methods.html', {'cards': cards})
+    card_count = cards.count()
+    disable_add_card = card_count >=4  
+
+    return render(request, 'accounts/show_payment_methods.html', {'cards': cards, 'disable_add_card': disable_add_card})
 
 
-# views/card_views.py
+# accounts/views/card_views.py
 
 
 @login_required

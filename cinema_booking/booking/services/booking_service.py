@@ -41,3 +41,10 @@ class BookingService:
         if not booking:
             raise ValidationError("Booking not found.")
         return booking
+    
+    @staticmethod
+    def get_order_history_for_customer(customer):
+        bookings = BookingRepository.get_all_bookings_for_customer(customer)
+        if not bookings.exists():
+            raise ValidationError("No order history found for the customer.")
+        return bookings

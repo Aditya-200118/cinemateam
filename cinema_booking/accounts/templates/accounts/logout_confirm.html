@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "accounts_base.html" %}
 
 {% block title %}Log-out{% endblock %}
 
@@ -11,7 +11,7 @@
                     <div class="card-body">
                         <h2 class="text-center">Log-out</h2>
                         <p class="text-center">Are you sure you want to log out?</p>
-                        <form method="post" action="{% url 'confirm_logout' %}">
+                        <form method="post" action="{% url 'user_logout' %}">
                             {% csrf_token %}
                             <div class="d-grid">
                                 <button type="submit" class="btn btn-primary">Log out</button>

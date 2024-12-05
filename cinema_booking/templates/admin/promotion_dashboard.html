@@ -1,0 +1,26 @@
+{% extends 'admin/base_site.html' %}
+
+{% block title %}Promotion Management{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Promotion Management</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Manage Promotions</h5>
+                    <!-- Link to Promotion Dashboard -->
+                    <a href="{% url 'promotion_data' %}" class="btn btn-primary me-2 mb-2">
+                        View Promotions
+                    </a>
+                    <!-- Link to Create Promotion -->
+                    <a href="{% url 'create_promotion' %}" class="btn btn-secondary mb-2">
+                        Create New Promotion
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

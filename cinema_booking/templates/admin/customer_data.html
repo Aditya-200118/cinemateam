@@ -16,9 +16,6 @@
         <th>City</th>
         <th>State</th>
         <th>Zip Code</th>
-        <!-- <th>Card Name</th>
-        <th>Card Number</th>
-        <th>Expiry Date</th> -->
         <th>Actions</th>
       </tr>
     </thead>
@@ -33,9 +30,7 @@
         <td>{{ customer.address.city }}</td>
         <td>{{ customer.address.state }}</td>
         <td>{{ customer.address.zip_code }}</td>
-        <!-- <td>{{ customer.cards.first.card_name }}</td>
-        <td>{{ customer.cards.first.card_number }}</td>
-        <td>{{ customer.cards.first.expiry_date }}</td> -->
+
         <td>
           <a href="{% url 'modify_customer' customer.pk %}" class="btn btn-primary btn-sm">Modify</a>
           <form method="post" action="{% url 'delete_customer' customer.pk %}" style="display:inline;">

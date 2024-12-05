@@ -7,8 +7,7 @@ from django.utils import timezone
 class MovieService:
     @staticmethod
     def add_movie(title, category, cast, director, producer, synopsis, reviews, trailer_url, rating, release_date, price, duration, poster=None):
-        """Service method to add a new movie."""
-        # Add any business logic if needed (e.g., validation, extra processing)
+        # Add any business logic if needed
         if not title or not category:
             raise ValidationError("Title and Category are required fields.")
 
@@ -19,7 +18,6 @@ class MovieService:
 
     @staticmethod
     def update_movie(movie_id, **fields):
-
         movie = MovieRepository.update_movie(movie_id, **fields)
         if not movie:
             raise ValidationError("Movie not found.")
@@ -44,6 +42,7 @@ class MovieService:
     
     @staticmethod
     def get_now_playing_movies(search_query=None):
+
         today = timezone.now().date()
         if search_query:
             return MovieRepository.filter_movies(title__icontains=search_query, release_date__lte=today)
@@ -72,7 +71,6 @@ class MovieService:
             raise ValidationError("Category is required.")
 
         today = timezone.now().date()
-        # Use the existing filter_movies method in the repository
         return MovieRepository.filter_movies(category__icontains=category, release_date__lte=today)
 
     @staticmethod
@@ -98,8 +96,4 @@ class MovieService:
         today = timezone.now().date()
 
         return MovieRepository.filter_movies(title__icontains=title, release_date__gt=today)
-
-    # @staticmethod
-    # def get_movie_by_id(movie_id):
-    #     return get_object_or_404(Movie, pk=movie_id)
 

@@ -23,7 +23,6 @@ class BookingBuilder:
         if not self.customer:
             raise Exception("Customer must be set to apply a promotion.")
         print(f"Apply Promotion is will call the service now for validate_and_use_coupon: {promo_code}")
-        # Validate and use the coupon
         self.promotion = PromotionService.validate_and_use_coupon(self.customer, promo_code)
         return self
 
@@ -58,3 +57,45 @@ class BookingBuilder:
         self.booking.save()
         return self.booking
 
+class BookingController:
+    """Director that orchestrates the building of a booking."""
+    def __init__(self, builder):
+        self.builder = builder
+
+    def construct_booking(self, customer, screening, tickets, promo_code=None):
+        """Construct a booking using the builder."""
+        self.builder.create_booking()
+
+        if promo_code:
+            self.builder.apply_promotion(promo_code)
+
+        for ticket in tickets:
+            self.builder.add_ticket(
+                movie=ticket['movie'],
+                show_time=ticket['show_time'],
+                screening=ticket['screening'],
+                seat_number=ticket['seat_number'],
+                price=ticket['price'],
+                ticket_type=ticket['ticket_type']
+            )
+
+        return self.builder.finalize()
+
+
+class ConcreteBookingBuilder(BookingBuilder):
+    """Concrete implementation of the BookingBuilder."""
+    def create_booking(self):
+        print("ConcreteBuilder: Creating booking...")
+        return super().create_booking()
+
+    def apply_promotion(self, promo_code):
+        print(f"ConcreteBuilder: Applying promotion code {promo_code}...")
+        return super().apply_promotion(promo_code)
+
+    def add_ticket(self, movie, show_time, screening, seat_number, price, ticket_type):
+        print(f"ConcreteBuilder: Adding ticket for seat {seat_number}...")
+        return super().add_ticket(movie, show_time, screening, seat_number, price, ticket_type)
+
+    def finalize(self):
+        print("ConcreteBuilder: Finalizing the booking...")
+        return super().finalize()

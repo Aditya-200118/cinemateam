@@ -10,39 +10,13 @@
     <form id="movieForm" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
         {% csrf_token %}
 
-        <!-- Theatre Section -->
-        <!-- <div class="card mb-4">
-            <div class="card-header">Theatre</div>
-            <div class="card-body">
-                {{ theatre_form.as_p }}
-            </div>
-        </div> -->
-
-        <!-- Showroom Section -->
-        <!-- <div class="card mb-4">
-            <div class="card-header">Showroom</div>
-            <div class="card-body">
-                {{ showroom_form.as_p }}
-            </div>
-        </div> -->
-
-        <!-- Movie Section -->
-        <div class="card mb-4 shadow-sm">
+        <div class="card mb-4 shadow-sm border-0">
             <div class="card-header bg-primary text-white text-center">Movie Details</div>
             <div class="card-body">
                 {{ movie_form.as_p }}
             </div>
         </div>
 
-        <!-- Screening Section -->
-        <!-- <div class="card mb-4">
-            <div class="card-header">Screening</div>
-            <div class="card-body">
-                {{ screening_form.as_p }}
-            </div>
-        </div> -->
-
-        <!-- Submit Button -->
         <div class="text-center">
             <button type="submit" class="btn btn-primary">Save</button>
         </div>
@@ -50,7 +24,7 @@
 </div>
 
 <script>
-    // Dynamic showroom update logic (unchanged)
+    
     document.getElementById('id_existing_theatre').addEventListener('change', function () {
         const theatreId = this.value;
         const showroomSelect = document.getElementById('id_existing_showroom');

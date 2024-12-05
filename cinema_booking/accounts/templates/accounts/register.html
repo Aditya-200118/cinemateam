@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "accounts_base.html" %}
 
 {% block title %}Register{% endblock %}
 
@@ -16,22 +16,18 @@
                                 aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
 
-                        {% if messages %}
-                        <div>
-                            {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                    aria-label="Close"></button>
-                            </div>
-                            {% endfor %}
+                        {% for message in messages %}
+                        <div class="alert {{ message.tags }} alert-dismissible shadow fade show" role="alert">
+                            <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            {{ message | safe }}
                         </div>
-                        {% endif %}
+                        {% endfor %}
 
                         <form id="registrationForm" method="post" class="needs-validation" novalidate>
                             {% csrf_token %}
-                            {{ user_form.non_field_errors }}
-
+                            <!-- {{ user_form.non_field_errors }} -->
                             <!-- Step 1: User Details -->
                             <div id="step1" class="step">
                                 <div class="mb-3">
@@ -180,7 +176,7 @@
 <script>
     function updateProgressBar(step) {
         const progressBar = document.getElementById('progressBar');
-        const stepPercentage = (step / 3) * 100;
+        const stepPercentage = (step / 3) * 100; // Assuming 3 steps
         progressBar.style.width = stepPercentage + '%';
     }
 
@@ -399,6 +395,8 @@
             if (!password.value) {
                 password.classList.add("is-invalid");
                 password.classList.remove("is-valid");
+                // passwordInvalidFeedback.style.display = "block"; // Show "Password must be validated"
+                // passwordMismatchFeedback.style.display = "none"; // Hide password mismatch feedback
                 nextButton.disabled = true;
                 return;
             }
@@ -418,17 +416,19 @@
 
         function checkPasswordMatch() {
             if (password.value === "" || password2.value === "") {
+                // If either password field is empty, hide both feedback elements.
                 passwordMismatchFeedback.style.display = "none";
                 passwordMatchFeedback.style.display = "none";
                 password2.classList.remove("is-valid", "is-invalid");
                 return;
             }
 
+            // Ensure the format of the password is valid before checking for a match.
             const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
             if (!passwordPattern.test(password.value)) {
-                passwordMismatchFeedback.style.display = "none";
-                passwordMatchFeedback.style.display = "none";
-                return;
+                passwordMismatchFeedback.style.display = "none"; // Hide mismatch feedback
+                passwordMatchFeedback.style.display = "none"; // Hide match feedback
+                return; // Don't proceed with match validation if format is invalid.
             }
 
             // Check if passwords match.
@@ -436,14 +436,14 @@
                 passwordMatchFeedback.style.display = "none";
                 password2.classList.add("is-invalid");
                 password2.classList.remove("is-valid");
-                passwordMismatchFeedback.style.display = "block";
+                passwordMismatchFeedback.style.display = "block"; // Show mismatch feedback
                 nextButton.disabled = true;
             } else {
-                passwordMismatchFeedback.style.display = "none";
+                passwordMismatchFeedback.style.display = "none"; // Hide mismatch feedback
                 password2.classList.remove("is-invalid");
                 password2.classList.add("is-valid");
-                passwordMatchFeedback.style.display = "block";
-                validateForm();
+                passwordMatchFeedback.style.display = "block"; // Show match feedback
+                validateForm(); // Enable the "Next" button if all validations pass.
             }
         }
 
@@ -458,7 +458,7 @@
                 email.classList.add("is-invalid");
                 email.classList.remove("is-valid");
                 emailInvalidFeedback.textContent = "Email is required.";
-                emailInvalidFeedback.style.display = "block";
+                emailInvalidFeedback.style.display = "block"; // Show "Password must be validated"
                 // emailInvalidFeedback.style.display = "none"; // Hide password mismatch feedback
                 nextButton.disabled = true;
                 return;

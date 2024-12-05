@@ -1,0 +1,60 @@
+{% extends "admin/base_site.html" %}
+{% load custom_filters %}
+{% block content %}
+<div class="container m-4">
+    <!-- <h1 class="mb-4 text-center">Promotion Data</h1> -->
+    <div class="row">
+        <!-- Active Promotions Card -->
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4 border-0">
+                <div class="card-body ">
+                    <h5 class="card-title text-center">Active Promotions</h5>
+                    {% if active_promotions %}
+                    <ul class="list-group">
+                        {% for promotion in active_promotions %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>
+                                <strong>{{ promotion.title }}</strong><br>
+                                {{ promotion.promo_code }} ({{ promotion.discount }}% off)
+                            </span>
+                            <small class="text-muted">
+                                {{ promotion.valid_from }} - {{ promotion.valid_to }}
+                            </small>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-center text-muted">No active promotions available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <!-- Future Promotions Card -->
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Future Promotions</h5>
+                    {% if future_promotions %}
+                    <ul class="list-group">
+                        {% for promotion in future_promotions %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>
+                                <strong>{{ promotion.title }}</strong><br>
+                                {{ promotion.promo_code }} ({{ promotion.discount }}% off)
+                            </span>
+                            <small class="text-muted">
+                                Starts: {{ promotion.valid_from }} <br> Ends: {{ promotion.valid_to }}
+                            </small>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-center text-muted">No future promotions scheduled.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

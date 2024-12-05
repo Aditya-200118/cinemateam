@@ -2,10 +2,12 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+/ideas
+**/management
+populate_movies.py
 # C extensions
 *.so
-tree.py
+
 # Distribution / packaging
 .Python
 build/
@@ -153,13 +155,26 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
-
+myapp_models.png
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
 #  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
-tests/
-cinema_booking/booking/master_test.py
-classes_name.txt
+clean.py
+cinema_booking/accounts/forms.py
+cinema_booking/accounts/models.py
+cinema_booking/accounts/views.py
+cinema_booking/booking/forms.py
+cinema_booking/booking/models.py
+cinema_booking/booking/views.py
+cinema_booking/movie/forms.py
+cinema_booking/movie/models.py
+cinema_booking/movie/views.py
+cinema_booking/templates/admin/welcome.html
+
+**test.py
+**forms.py
+**models.py
+**views.py

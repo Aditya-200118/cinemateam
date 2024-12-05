@@ -34,9 +34,7 @@ class UserRepository:
 
     @staticmethod
     def delete_customer(customer):
-        """
-        Deletes the given customer from the database.
-        """
+        # Ensure the customer exists before attempting deletion
         if customer:
             customer.delete()
             return True
@@ -45,23 +43,20 @@ class UserRepository:
     @staticmethod
     @transaction.atomic
     def delete_customer(customer):
-        """
-        Deletes the given customer and all associated records from the database. As of now no soft delete for bookings, bookings arent deleted in case a user is deleted.
-        """
         if customer:
+            # Delete associated cards
             cards = Card.objects.filter(customer=customer)
             cards.delete()
             
+            # Delete associated address
             if customer.address:
                 customer.address.delete()
             
+            # Finally, delete the customer
             customer.delete()
             return True
         return False
 
     @staticmethod
     def get_users_signed_up_for_promotions():
-        """
-        Fetching all the users who have opted into receiving promotions.
-        """
         return Customer.objects.filter(promotions=True)

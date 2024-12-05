@@ -13,10 +13,11 @@ from accounts.services.email_proxy import EmailProxy, DjangoEmailService
 from accounts.services.user_profile_facade import UserProfileFacade
 from booking.services.promotion_service import PromotionService
 from . import Theatre, Showroom, Movie, Screening, get_object_or_404, JsonResponse, transaction
-from .admin_forms import TheatreForm, ShowroomForm, MovieForm, ScreeningForm, PromotionForm
+from .admin_forms import TheatreForm, ShowroomForm, MovieForm, ScreeningForm, PromotionForm, EditMovieForm, MovieTicketTypeDiscountForm
 from django import forms
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from booking.models.ticket_model import MovieTicketTypeDiscount, TicketType
 from django.urls import reverse
 from django.forms import modelformset_factory
 from django.db import transaction
@@ -68,13 +69,18 @@ class MyAdminSite(AdminSite):
             # Movie scheduling URLs
             path('movie/', self.admin_view(self.movie_admin_home), name='admin_movie'),
             path('add-movie/', self.admin_view(self.add_movie), name='add_movie'),
+            path('edit-movie/<int:movie_id>', self.admin_view(self.edit_movie), name='edit_movie'),
             path('movie-data/', self.admin_view(self.movie_data_view), name='movie_data'),
+            path('theatre-data/', self.admin_view(self.theatre_data_view), name='theatre_data'),
             path('showroom-schedule/<int:showroom_id>/', self.admin_view(self.showroom_schedule_view), name='showroom_schedule'),
             path('get-showrooms/<int:theatre_id>/', self.admin_view(self.get_showrooms), name='get_showrooms'),
 
             path('manage_screenings/', self.admin_view(self.manage_screenings), name='manage_screenings'),
             path('get_screenings/<int:movie_id>/<int:theatre_id>/<int:showroom_id>/', self.admin_view(self.get_screenings), name='get_screenings'),
-            path('create_promotion/', self.admin_view(self.create_promotion), name="create_promotions")
+            path('promotion_dashboard/', self.admin_view(self.promotion_dashboard), name="promotion_dashboard"),
+            path('promotion_data/', self.admin_view(self.promotion_data), name="promotion_data"),
+            path('create_promotion/', self.admin_view(self.create_promotion), name="create_promotions"),
+            path('check-promotion-title-code/', self.admin_view(self.check_promotion_title_or_code), name='check_promotion_title'),
         ]
         return custom_urls + urls
     
@@ -123,6 +129,7 @@ class MyAdminSite(AdminSite):
 
                 try: 
                     with transaction.atomic():
+                    # Use the facade to create the customer
                         customer = facade.create_customer(
                             email=user_form.cleaned_data["email"],
                             password=user_form.cleaned_data["password"],
@@ -132,11 +139,13 @@ class MyAdminSite(AdminSite):
                             address_data=address_data,
                         )
 
+                        # Set additional boolean fields from the form
                         customer.is_staff = request.POST.get('is_staff') == 'on'
                         customer.is_superuser = request.POST.get('is_superuser') == 'on'
                         customer.is_active = request.POST.get('is_active') == 'on'
                         customer.save()
 
+                        # Redirect to the admin accounts page after successful customer creation
                         return redirect('admin_accounts')
 
                 except Exception as e:
@@ -148,9 +157,11 @@ class MyAdminSite(AdminSite):
                         'error': "Error adding the customer. Please try again."
                     })
         else:
+            # Initialize empty forms if the request is not POST
             user_form = UserRegistrationForm()
             address_form = AddressForm()
 
+        # Render the form in the response
         return render(request, 'admin/add_customer.html', {
             'user_form': user_form,
             'address_form': address_form
@@ -191,10 +202,10 @@ class MyAdminSite(AdminSite):
     def delete_customer_view(self, request, pk):
         try:
             facade = UserProfileFacade()
-            customer = Customer.objects.get(user_id=pk)
+            customer = Customer.objects.get(user_id=pk)  # Use `user_id` instead of `pk` if needed
 
             if request.method == "POST":
-                facade.delete_customer(request, customer.user_id) 
+                facade.delete_customer(request, customer.user_id)  # Call `delete_customer` properly
                 return redirect("admin_accounts")
             else:
                 return render(request, "admin/customer_data.html", {"customers": Customer.objects.all()})
@@ -209,9 +220,13 @@ class MyAdminSite(AdminSite):
 
         return render(request, 'admin/movie_admin_home.html')
 
-    def movie_data_view(self, request):
+    def theatre_data_view(self, request):
         theatres = Theatre.objects.all()
-        return render(request, 'admin/movie_data.html', {'theatres': theatres})
+        return render(request, 'admin/theatre_data.html', {'theatres': theatres})
+    
+    def movie_data_view(self, request):
+        movie = Movie.objects.all()
+        return render(request, 'admin/movie_data.html', {'movies': movie})
 
     def showroom_schedule_view(self, request, showroom_id):
         # Retrieve the showroom by showroom_id
@@ -230,9 +245,25 @@ class MyAdminSite(AdminSite):
 
         if request.method == 'POST':
             with transaction.atomic():
-                # if all([theatre_form.is_valid(), showroom_form.is_valid(), movie_form.is_valid()]):
-                if all([ movie_form.is_valid()]):
+                if movie_form.is_valid():
+                    # Save the movie object
                     movie = movie_form.save()
+
+                    # Define default discounts for each ticket type
+                    default_discounts = {
+                        1: 15,  # Ticket type 1
+                        2: 30,  # Ticket type 2
+                        3: 0,   # Ticket type 3
+                    }
+
+                    # Create MovieTicketTypeDiscount objects
+                    for ticket_type_id, discount in default_discounts.items():
+                        MovieTicketTypeDiscount.objects.create(
+                            movie=movie,
+                            ticket_type_id=ticket_type_id,
+                            discount=discount
+                        )
+
                     return redirect('admin_movie')
 
         return render(
@@ -242,6 +273,7 @@ class MyAdminSite(AdminSite):
                 'movie_form': movie_form,
             }
         )
+
 
     def get_showrooms(self, request, theatre_id):
         showrooms = Showroom.objects.filter(theatre_id=theatre_id).values('showroom_id', 'name')
@@ -254,11 +286,12 @@ class MyAdminSite(AdminSite):
         pass
 
     def manage_screenings(self, request):
-
+        # Instantiate the forms
         theatre_form = TheatreForm(request.POST or None)
         showroom_form = ShowroomForm(request.POST or None)
         screening_form = ScreeningForm(request.POST or None)
 
+        # Handle POST request
         if request.method == "POST":
             showroom_id = request.POST.get('showroom_id')
             movie_id = request.POST.get('movie_id')
@@ -266,14 +299,15 @@ class MyAdminSite(AdminSite):
 
             if not all([showroom_id, movie_id, show_time]):
                 messages.error(request, "Missing required fields.")
-                return redirect('manage_screenings')
+                return redirect('manage_screenings')  # Redirect to the same page on error
 
             try:
-
+                # Use the form instance for validation and saving
                 showroom = Showroom.objects.get(pk=showroom_id)
                 movie = Movie.objects.get(pk=movie_id)
                 selected_time = datetime.fromisoformat(show_time)
 
+                # Check for conflicting screenings in the selected showroom
                 conflict = Screening.objects.filter(
                     showroom=showroom,
                     show_time__range=[selected_time - timedelta(minutes=15), selected_time + timedelta(minutes=15)]
@@ -283,14 +317,15 @@ class MyAdminSite(AdminSite):
                     messages.error(request, "A conflict exists: There's already a screening scheduled near this time in the selected showroom.")
                     return redirect('manage_screenings')
 
+                # Add the showroom to the form's context so it can be used in validation
                 screening_form = ScreeningForm(request.POST, showroom=showroom)
                 if screening_form.is_valid():
                     screening = screening_form.save(commit=False)
-                    screening.movie = movie 
-                    screening.showroom = showroom
+                    screening.movie = movie  # Set the movie manually
+                    screening.showroom = showroom  # Set the showroom manually
                     screening.save()
                     messages.success(request, f"Screening added successfully: {screening}")
-                    return redirect('manage_screenings') 
+                    return redirect('manage_screenings')  # Redirect on success
                 else:
                     messages.error(request, "Form is invalid.")
                     return redirect('manage_screenings')
@@ -348,6 +383,20 @@ class MyAdminSite(AdminSite):
             logger.error(f"Error fetching screenings for movie_id={movie_id}: {e}")
             return JsonResponse({"error": "Error fetching screenings"}, status=500)
 
+    def promotion_dashboard(self, request):
+        # This view only renders the navigation page for promotion management.
+        return render(request, 'admin/promotion_dashboard.html')
+
+    def promotion_data(self, request):
+        # Fetch active and future promotions for display
+        active_promotions = PromotionService.get_active_promotions()
+        future_promotions = PromotionService.get_future_promotions()
+
+        return render(request, 'admin/promotion_data.html', {
+            'active_promotions': active_promotions,
+            'future_promotions': future_promotions
+        })
+
     def create_promotion(self, request):
         user_service = UserService()
         email_proxy = EmailProxy(DjangoEmailService())
@@ -355,6 +404,7 @@ class MyAdminSite(AdminSite):
         if request.method == 'POST':
             form = PromotionForm(request.POST)
             if form.is_valid():
+                # Create the promotion using the service
                 promotion_data = form.cleaned_data
                 try:
                     PromotionService.create_promotion(
@@ -366,9 +416,10 @@ class MyAdminSite(AdminSite):
                         valid_to=promotion_data['valid_to']
                     )
 
+                    # Get users signed up for promotions
                     users = user_service.get_users_signed_up_for_promotions()
 
-                    # Sending email right now its seequential will switch to asynch.
+                    # Send email to these users
                     subject = f"New Promotion: {promotion_data['title']}"
                     message = (
                         f"Dear Customer,\n\n"
@@ -393,14 +444,76 @@ class MyAdminSite(AdminSite):
         else:
             form = PromotionForm()
 
-        # Fetch active and future promotions for display
-        active_promotions = PromotionService.get_active_promotions()
-        future_promotions = PromotionService.get_future_promotions()
-
         return render(request, 'admin/create_promotion.html', {
-            'form': form,
-            'active_promotions': active_promotions,
-            'future_promotions': future_promotions
+            'form': form
         })
+
+
+    def check_promotion_title_or_code(self, request):
+        title = request.GET.get("title", "").strip()
+        promo_code = request.GET.get("promo_code", "").strip()
+        if not title and not promo_code:
+            return JsonResponse({"error": "Either title or promo code is required."}, status=400)
+        try:
+            exists = PromotionService.promotion_exists_by_title_or_code(title, promo_code)
+            return JsonResponse({"exists": exists})
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+        
+
+    def edit_movie(self, request, movie_id):
+        # Fetch the movie instance
+        movie = get_object_or_404(Movie, movie_id=movie_id)
+
+        # Initialize movie form
+        movie_form = EditMovieForm(instance=movie)
+
+        # Fetch the discount data for the movie
+        discounts = MovieTicketTypeDiscount.objects.filter(movie=movie)
+        initial_data = {
+            'child_discount': discounts.filter(ticket_type__type='Child').first().discount if discounts.filter(ticket_type__type='Child').exists() else 0,
+            'adult_discount': discounts.filter(ticket_type__type='Adult').first().discount if discounts.filter(ticket_type__type='Adult').exists() else 0,
+            'senior_discount': discounts.filter(ticket_type__type='Senior').first().discount if discounts.filter(ticket_type__type='Senior').exists() else 0,
+        }
+
+        # Initialize discount form with initial data
+        discount_form = MovieTicketTypeDiscountForm(initial=initial_data)
+
+        if request.method == 'POST':
+            movie_form = EditMovieForm(request.POST, request.FILES, instance=movie)
+            discount_form = MovieTicketTypeDiscountForm(request.POST)
+
+            if movie_form.is_valid() and discount_form.is_valid():
+                with transaction.atomic():
+                    # Save the movie
+                    movie = movie_form.save()
+
+                    # Save the discounts
+                    MovieTicketTypeDiscount.objects.update_or_create(
+                        movie=movie, 
+                        ticket_type=TicketType.objects.get(type='Child'), 
+                        defaults={'discount': discount_form.cleaned_data['child_discount']}
+                    )
+                    MovieTicketTypeDiscount.objects.update_or_create(
+                        movie=movie, 
+                        ticket_type=TicketType.objects.get(type='Adult'), 
+                        defaults={'discount': discount_form.cleaned_data['adult_discount']}
+                    )
+                    MovieTicketTypeDiscount.objects.update_or_create(
+                        movie=movie, 
+                        ticket_type=TicketType.objects.get(type='Senior'), 
+                        defaults={'discount': discount_form.cleaned_data['senior_discount']}
+                    )
+
+                    return redirect('movie_data')  # Redirect to the movie list or another page
+
+        return render(
+            request,
+            'admin/edit_movie.html',
+            {
+                'movie_form': movie_form,
+                'discount_form': discount_form
+            }
+        )
 
 admin_site = MyAdminSite(name='myadmin')

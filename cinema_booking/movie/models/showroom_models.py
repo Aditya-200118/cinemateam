@@ -5,7 +5,7 @@ from . import *
 class Showroom(models.Model):
     showroom_id = models.AutoField(primary_key=True)
     seat_count = models.IntegerField(default=100)
-    name = models.CharField(max_length=100, null=True, blank=True)
+    name = models.CharField(max_length=100, null=True, blank=True) 
     theatre = models.ForeignKey(Theatre, on_delete=models.CASCADE)
 
     def get_available_seats(self):

@@ -23,7 +23,7 @@ class PromotionService:
 
     @staticmethod
     def get_active_promotions():
-        """Get active promotions based on current date."""
+
         now = timezone.now()
         return PromotionRepository.filter_promotions(valid_from__lte=now, valid_to__gte=now)
 
@@ -35,13 +35,13 @@ class PromotionService:
 
     @staticmethod
     def get_future_promotions():
-        """Get future promotions based on start date."""
+
         now = timezone.now()
         return PromotionRepository.filter_promotions(valid_from__gt=now)
 
     @staticmethod
     def get_coupon(promo_code):
-        """Retrieve and validate a coupon (promotion) by code."""
+
         promotion = PromotionRepository.get_promotion_by_code(promo_code)
         if not promotion:
             raise ValidationError("Coupon code is invalid.")
@@ -52,14 +52,13 @@ class PromotionService:
             raise ValidationError("Coupon code is expired or not yet valid.")
 
         # Check that the discount is reasonable (e.g., not negative or too high)
-        if promotion.discount < 0 or promotion.discount > 100:
+        if promotion.discount < 0 or promotion.discount > 50:
             raise ValidationError("Coupon discount must be between 0% and 100%.")
 
         return promotion
     
     @staticmethod
     def validate_and_use_coupon(customer, promo_code):
-        """Validate and mark a coupon as used for a customer."""
         promotion = PromotionRepository.get_promotion_by_code(promo_code)
         print(f"The promotion is here (inside validate and use coupon): {promotion}")
         if not promotion:
@@ -77,3 +76,14 @@ class PromotionService:
         # Mark the coupon as used
         CouponUsage.objects.create(customer=customer, promotion=promotion)
         return promotion
+
+    @staticmethod
+    def promotion_exists_by_title(title):
+        return PromotionRepository.filter_promotions(title__iexact=title).exists()
+
+    @staticmethod
+    def promotion_exists_by_title_or_code(title, promo_code):
+        return (
+            PromotionRepository.filter_promotions(title__iexact=title).exists() or
+            PromotionRepository.filter_promotions(promo_code__iexact=promo_code).exists()
+        )

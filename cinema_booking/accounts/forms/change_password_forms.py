@@ -6,8 +6,8 @@ class PasswordResetRequestForm(PasswordResetForm):
     email = forms.EmailField(
         label='Enter your registered email here',
         widget=forms.EmailInput(attrs={
-            'class': 'form-control',  # Bootstrap class for styling
-            'placeholder': 'Enter your email address',  # Placeholder text
+            'class': 'form-control',
+            'placeholder': 'Enter your email address',
             'type': 'email',
             'name': 'email'
         })

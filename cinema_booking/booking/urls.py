@@ -2,7 +2,7 @@ from django.urls import path
 from booking.views.booking_confirmation_view import booking_confirmation
 from booking.views.seat_selection_view import seat_selection
 from booking.views.select_showtime_view import select_showtime
-from booking.views.checkout_process_view import checkout, apply_coupon, get_saved_cards, select_saved_card
+from booking.views.checkout_process_view import checkout, apply_coupon, get_saved_cards, select_saved_card, add_payment_method_checkout
 urlpatterns = [
     path('showtime/<int:movie_id>/', select_showtime, name='select_showtime'),
     path('seat_selection/<int:screening_id>/', seat_selection, name='seat_selection'),
@@ -11,5 +11,6 @@ urlpatterns = [
     path('apply-coupon/', apply_coupon, name='apply_coupon'),
     path('get-saved-cards/', get_saved_cards, name='get_saved_cards'),
     path('select-saved-cards/', select_saved_card, name='select_saved_cards'),
+    path('add_payment_method/<int:screening_id>/', add_payment_method_checkout, name="add_payment_method_checkout"),
 ]
 

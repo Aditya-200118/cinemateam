@@ -6,26 +6,50 @@ from django.contrib.auth.views import LogoutView
 from accounts.services.card_facade import CardFacade  # Updated to use CardFacade
 from accounts.services.user_profile_facade import UserProfileFacade  # Added facade import
 from accounts.services.email_proxy import EmailProxy, DjangoEmailService
+from django.utils.decorators import method_decorator
 from django.contrib import messages
 logger = logging.getLogger(__name__)
+from django.contrib.auth import logout
+from django.views import View
 
 
+# class CustomLogoutView(View):
+#     template_name = "accounts/logout_confirm.html"
+
+#     def get(self, request, *args, **kwargs):
+#         return render(request, self.template_name)
+
+#     def post(self, request, *args, **kwargs):
+#         # Clear the session
+#         request.session.flush()
+#         return redirect('home')
+
+# class ConfirmLogoutView(LogoutView):
+#     next_page = "home"
+#     def dispatch(self, request, *args, **kwargs):
+#         response = super().dispatch(request, *args, **kwargs)
+#         return redirect(self.next_page)
+    
+@method_decorator(login_required, name='dispatch')
 class CustomLogoutView(View):
     template_name = "accounts/logout_confirm.html"
-
-    def get(self, request, *args, **kwargs):
-        return render(request, self.template_name)
-
-    def post(self, request, *args, **kwargs):
-        # Clear the session
-        request.session.flush()
-        return redirect('home')
-
-class ConfirmLogoutView(LogoutView):
     next_page = "home"
 
-    def dispatch(self, request, *args, **kwargs):
-        response = super().dispatch(request, *args, **kwargs)
+    def get(self, request, *args, **kwargs):
+        # Set headers to prevent caching
+        response = render(request, self.template_name)
+        # force remove any cache
+        # response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        # response['Pragma'] = 'no-cache'
+        # response['Expires'] = '0'
+        return response
+
+    def post(self, request, *args, **kwargs):
+        logout(request)
+        response = redirect(self.next_page)
+        # response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        # response['Pragma'] = 'no-cache'
+        # response['Expires'] = '0'
         return redirect(self.next_page)
     
 def user_login(request):

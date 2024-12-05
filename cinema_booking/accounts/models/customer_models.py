@@ -1,3 +1,5 @@
+#  accounts/models/customer_models.py
+
 from . import models
 from accounts.models.user_models import User 
 

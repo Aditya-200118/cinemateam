@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Edit Movie</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <!-- Movie Details Section -->
+        <div class="card mb-4">
+            <div class="card-header">Movie Details</div>
+            <div class="card-body">
+                {% for field in movie_form %}
+                    <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Ticket Discounts Section -->
+        <div class="card mb-4">
+            <div class="card-header">Ticket Type Discounts</div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="child-discount" class="form-label">Child Discount</label>
+                    {{ discount_form.child_discount }}
+                    {% for error in discount_form.child_discount.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="mb-3">
+                    <label for="adult-discount" class="form-label">Adult Discount</label>
+                    {{ discount_form.adult_discount }}
+                    {% for error in discount_form.adult_discount.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="mb-3">
+                    <label for="senior-discount" class="form-label">Senior Discount</label>
+                    {{ discount_form.senior_discount }}
+                    {% for error in discount_form.senior_discount.errors %}
+                        <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a href="{% url 'movie_data' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

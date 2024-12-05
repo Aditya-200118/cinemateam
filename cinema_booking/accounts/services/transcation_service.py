@@ -2,7 +2,6 @@ from decimal import Decimal
 from accounts.services.card_service import CardService
 from accounts.repositories.transaction_repository import TransactionRepository
 
-
 class TransactionService:
     def __init__(self, transaction_repository=None, card_service=None):
         self.transaction_repository = transaction_repository or TransactionRepository()

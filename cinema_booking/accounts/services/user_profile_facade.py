@@ -14,9 +14,7 @@ class UserProfileFacade:
         self.user_service = user_service or UserService()
     
     def create_customer(self, email, password, first_name, last_name, profile_data, address_data):
-        """
-        Creates the user's profile and address by deleating the tasks to UserService
-        """
+
         if not address_data:
             raise ValueError("Address data is required to create a customer profile.")
         
@@ -37,6 +35,7 @@ class UserProfileFacade:
             raise e
 
     def update_user_profile(self, customer, profile_data, address_data):
+
         try:
             with transaction.atomic():
                 # Update customer profile via UserService

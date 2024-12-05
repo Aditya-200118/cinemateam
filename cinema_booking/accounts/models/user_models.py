@@ -24,7 +24,6 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
 
-        # Create a default address for the superuser
         default_address = Address.objects.create(
             billing_address="Default Address",
             city="Default City",
@@ -48,7 +47,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=100)
     is_staff = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
 
     REQUIRED_FIELDS = ["first_name", "last_name"]

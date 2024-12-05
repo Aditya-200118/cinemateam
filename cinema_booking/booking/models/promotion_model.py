@@ -9,11 +9,11 @@ from datetime import timedelta
 
 class Promotion(models.Model):
     promo_code = models.CharField(max_length=50, unique=True)
-    title = models.CharField(max_length=100, default="N/A")
-    description = models.TextField(default="N/A") 
-    discount = models.FloatField()
-    valid_from = models.DateField(default=timezone.now)
-    valid_to = models.DateField(default=timezone.now().date() + timedelta(days=30)) 
+    title = models.CharField(max_length=100, default="N/A")  # Title for the promotion
+    description = models.TextField(default="N/A")  # Detailed description of the promotion
+    discount = models.FloatField()  # Discount value
+    valid_from = models.DateField(default=timezone.now)  # Start date of the promotion
+    valid_to = models.DateField(default=timezone.now().date() + timedelta(days=30))  # End date of the promotion
 
     def add_promotion(self, promo_code, title, description, discount, valid_from, valid_to):
         promotion = Promotion(

@@ -40,11 +40,16 @@ urlpatterns = [
     path('admin/delete-customer/<int:pk>/', admin_site.admin_view(admin_site.delete_customer_view), name='delete_customer'),
     path('admin/movie/', admin_site.admin_view(admin_site.movie_admin_home), name='admin_movie'),
     path('admin/add-movie/', admin_site.admin_view(admin_site.add_movie), name='add_movie'),
+    path('admin/edit-movie/<int:movie_id>', admin_site.admin_view(admin_site.edit_movie), name='edit_movie'),
     path('admin/movie-data', admin_site.admin_view(admin_site.movie_data_view), name='movie_data'),
+    path('admin/theatre-data', admin_site.admin_view(admin_site.theatre_data_view), name='theatre_data'),
     path('admin/showroom-schedule/<int:showroom_id>/', admin_site.admin_view(admin_site.showroom_schedule_view), name='showroom_schedule'),
     path('admin/manage_screenings/', admin_site.admin_view(admin_site.manage_screenings), name='manage_screenings'),
     path('admin/get_screenings/<int:movie_id>/<int:theatre_id>/<int:showroom_id>', admin_site.admin_view(admin_site.get_screenings), name='get_screenings'),
-    path('admin/create_promotion/', admin_site.admin_view(admin_site.create_promotion), name="create_promotions")
+    path('admin/promotion_dashboard/', admin_site.admin_view(admin_site.promotion_dashboard), name="promotion_dashboard"),
+    path('admin/promotion_data/', admin_site.admin_view(admin_site.promotion_data), name="promotion_data"),
+    path('admin/create_promotion/', admin_site.admin_view(admin_site.create_promotion), name="create_promotion"),
+    path('admin/check-promotion-title-code/', admin_site.admin_view(admin_site.check_promotion_title_or_code), name='check_promotion')
 ]
 """This is only for development environment."""
 if settings.DEBUG:

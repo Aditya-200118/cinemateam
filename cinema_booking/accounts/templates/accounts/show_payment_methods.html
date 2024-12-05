@@ -1,31 +1,78 @@
-{% extends "base.html" %}
+{% extends "accounts_base.html" %}
 {% block title %}Payment Methods{% endblock %}
-{% load static %}
+
 {% block content %}
 <section class="p-3 p-md-4 p-xl-5">
-  <div class="container">
-    <h2 class="mb-4">Your Payment Methods</h2>
-    <div class="row">
-      {% for card in cards %}
-      <div class="col-12 col-md-6 mb-4">
-        <div class="card payment-card">
-          <div class="card-body">
-            <img src="{% static 'visa-logo.png' %}" alt="Visa Logo" class="card-logo">
-            <p class="card-text">Card number: <span class="card-number">{{ card.card_number_safe }}</span></p>
-            <p class="card-text">Name: <span class="card-name">{{ card.card_name }}</span></p>
-            <p class="card-text">CVV: <span class="card-ccv">{{ card.cvv_safe }}</span></p>
-            <a href="{% url 'modify_payment_method' card.id %}" class="btn btn-primary">Modify</a>            
-            <form method="post" action="{% url 'delete_payment_method' card.id %}" style="display:inline;">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-danger">Delete</button>
-            </form>
-          </div>
-        </div>
-      </div>
-      {% endfor %}
+    {% for message in messages %}
+    <div class="alert {{ message.tags }} alert-dismissible shadow fade show" role="alert">
+        <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        {{ message | safe }}
     </div>
-    <a href="{% url 'modify_payment_method' %}" class="btn btn-success">Add New Card</a>
-    <a href="{% url 'profile' %}" class="btn btn-secondary">Go Back</a>
-  </div>
+    {% endfor %}
+    <div class="container" style="min-height: 100vh; padding-top: 5%; padding-bottom: 5%; overflow: hidden;">
+        <div class="card border-light-subtle shadow-sm" style="margin: auto;">
+            <div class="row g-0">
+                <div class="col-12 col-md-6 text-bg-primary">
+                    <div class="d-flex align-items-center justify-content-center h-100">
+                        <div class="col-10 col-xl-8 py-3">
+                            <h2 class="h1 mb-4">Your Payment Methods</h2>
+                            <p class="lead m-0">Manage and update your saved payment methods securely.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="card-body p-3 p-md-4 p-xl-5">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-5">
+                                    <h2 class="h3">Saved Cards</h2>
+                                    <h3 class="fs-6 fw-normal text-secondary m-0">Your current payment methods are listed below.</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% for card in cards %}
+                        <div class="card border-light mb-4 shadow-sm">
+                            <div class="card-body d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <p class="mb-2"><strong>Card Number:</strong> {{ card.card_number_safe }}</p>
+                                    <p class="mb-2"><strong>Name:</strong> {{ card.card_name }}</p>
+                                    <p class="mb-0"><strong>CVV:</strong> {{ card.cvv_safe }}</p>
+                                </div>
+                                <div class="ms-3">
+                                    <a href="{% url 'modify_payment_method' card.id %}" class="btn btn-primary btn-sm">Modify</a>
+                                    <form method="post" action="{% url 'delete_payment_method' card.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        {% if not disable_add_card %}
+                        <div class="d-grid">
+                            <a href="{% url 'modify_payment_method' %}" class="btn btn-success">Add New Card</a>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-warning text-center mt-3" role="alert">
+                            You have reached the maximum number of cards allowed (4).
+                        </div>
+                        {% endif %}
+
+                        <div class="row">
+                            <div class="col-12">
+                                <hr class="mt-5 mb-4 border-secondary-subtle">
+                                <p class="m-0 text-secondary text-center">Want to go back? <a href="{% url 'profile' %}"
+                                        class="link-primary text-decoration-none">View Profile</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 {% endblock %}

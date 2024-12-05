@@ -2,6 +2,7 @@
 
 from accounts.repositories.card_repository import CardRepository
 # all the business related logic goes here
+from django.core.exceptions import ValidationError
 from accounts.repositories.card_repository import CardRepository
 from accounts.services.encryption_services import EncryptionService, FernetEncryptionStrategy
 from accounts.services.validation_services import CardValidator
@@ -13,6 +14,9 @@ class CardService:
         self.validator = validator or CardValidator()
 
     def add_card(self, customer, card_data):
+
+        if self.card_repository.get_cards_by_customer(customer).count() >= 4:
+            raise ValidationError("A customer can have a maximum of 4 cards.")
         # Validate card data
         self.validator.validate_card_number(card_data['card_number'])
         self.validator.validate_expiry_date(card_data['expiry_date'])
@@ -54,5 +58,7 @@ class CardService:
         return "*" * len(decrypted_cvv)
 
     def encrypt_card_data(self, card_number):
-        """Encrypt card data using the encryption service."""
         return self.encryption_service.encrypt(card_number)
+    
+    def get_customer_card_count(self, customer):
+        return self.card_repository.get_cards_by_customer(customer).count()

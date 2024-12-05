@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load booking_filters %}
 {% block title %}Checkout{% endblock %}
 
 {% block content %}
@@ -38,7 +39,7 @@
                     <h4 class="card-title text-primary">Review Your Booking</h4>
                     <p><strong>Movie:</strong> {{ movie.title }}</p>
                     <p><strong>Showtime:</strong> {{ screening.show_time }}</p>
-                    <p><strong>You Have Selected Seat No:</strong> {{ selected_seats|join:", " }}</p>
+                    <p><strong>You Have Selected Seat No:</strong> {{ selected_seats|index_add_one|join:", " }}</p>
                 </div>
             </div>
 
@@ -117,6 +118,7 @@
                             <select id="saved_cards" name="saved_card" class="form-select">
                                 <option value="">-- Select a card --</option>
                             </select>
+                            <a href="{% url 'add_payment_method_checkout' screening_id=screening.screening_id %}" class="btn btn-primary">Add Payment Method</a>
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Confirm Booking</button>
                     </form>

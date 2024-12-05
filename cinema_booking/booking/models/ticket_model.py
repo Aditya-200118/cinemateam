@@ -13,13 +13,13 @@ class Ticket(models.Model):
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE, related_name="tickets")  
 
     def save(self, *args, **kwargs):
-        self.clean()  # Call clean to enforce additional validation, otherwise edge cases might miss.
+        self.clean()  # Call clean to enforce additional validation
         super().save(*args, **kwargs)
 
     def clean(self):
         # Ensure the seat number is valid for the associated showroom
-        showroom = self.screening.showroom 
-        # 1 based to zero based index for backend while frontend shows the 1 based index
+        showroom = self.screening.showroom  # Assuming `showroom` is accessible from `screening`
+        # chaing from from 1 based to zero based index for backend while frontend shows the 1 based index
         print(self.seat_number)
         try:
             seat_number = int(self.seat_number)

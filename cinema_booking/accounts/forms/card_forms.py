@@ -66,5 +66,5 @@ class ModifyCardForm(CardForm):
     def clean(self):
         cleaned_data = super().clean()
         if cleaned_data.get('delete'):
-            return cleaned_data  # Skip further validation if deleting
+            return cleaned_data
         return cleaned_data

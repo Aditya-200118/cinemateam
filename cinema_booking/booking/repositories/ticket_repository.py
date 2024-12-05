@@ -41,37 +41,24 @@ class TicketRepository:
         except Ticket.DoesNotExist:
             return False
         
-
+"""This is confusing at this point. Hence adding notes for self reference in future."""
 class MovieTicketTypeDiscountRepository:
     
     @staticmethod
     def get_discount(movie, ticket_type):
         """
         Fetch the discount record for the given movie and ticket type.
-        Args:
-            movie: Movie object.
-            ticket_type: TicketType object.
-
-        Returns:
-            MovieTicketTypeDiscount: Discount record if found, else None.
         """
         try:
             discount_record = MovieTicketTypeDiscount.objects.get(movie=movie, ticket_type=ticket_type)
             return discount_record
         except ObjectDoesNotExist:
-            return None  # No discount found for the given movie and ticket type
+            return None 
 
     @staticmethod
     def create_discount(movie, ticket_type, discount_value):
         """
         Creates a new discount or updates the existing one for the given movie and ticket type.
-        Args:
-            movie: Movie object.
-            ticket_type: TicketType object.
-            discount_value: Decimal value for the discount.
-
-        Returns:
-            MovieTicketTypeDiscount: The created or updated discount record.
         """
         discount_record, created = MovieTicketTypeDiscount.objects.update_or_create(
             movie=movie,
@@ -86,14 +73,9 @@ class TicketTypeRepository:
     def get_ticket_type(ticket_type_value):
         """
         Fetches the TicketType object for the given ticket type value (e.g., 'Child', 'Senior', 'Adult').
-        Args:
-            ticket_type_value: A string representing the ticket type (e.g., 'Child', 'Senior', 'Adult').
-
-        Returns:
-            TicketType: TicketType object if found, else None.
         """
         try:
             ticket_type = TicketType.objects.get(type=ticket_type_value)
             return ticket_type
         except ObjectDoesNotExist:
-            return None  # No ticket type found for the given value
+            return None

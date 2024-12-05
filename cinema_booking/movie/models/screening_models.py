@@ -23,7 +23,7 @@ class Screening(models.Model):
         self.save()
 
     def available_seats(self):
-        Ticket = apps.get_model('booking', 'Ticket')  # Lazy load Ticket model
+        Ticket = apps.get_model('booking', 'Ticket')  # Lazy load Ticket model to avoid circular import
         all_seats = self.showroom.seats.values_list('seat_number', flat=True)
         booked_seats = Ticket.objects.filter(screening=self).values_list('seat__seat_number', flat=True)
         return [seat for seat in all_seats if seat not in booked_seats]
