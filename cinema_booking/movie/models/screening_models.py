@@ -1,7 +1,7 @@
 # movie/models/screening_models.py
 
 from . import *
-
+from accounts.models.customer_models import Customer
 class Screening(models.Model):
     screening_id = models.AutoField(primary_key=True)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
@@ -30,3 +30,16 @@ class Screening(models.Model):
 
     def __str__(self):
         return f"Screening of {self.movie.title} at {self.show_time} in {self.showroom}"
+
+from django.utils.timezone import now, timedelta
+
+class SeatLock(models.Model):
+    screening = models.ForeignKey(Screening, on_delete=models.CASCADE)
+    seat_number = models.IntegerField()
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    locked_at = models.DateTimeField(auto_now_add=True)
+
+    def is_expired(self):
+        return now() > self.locked_at + timedelta(minutes=5)
+    class Meta:
+        unique_together = ('screening', 'seat_number')  # Prevent multiple locks for the same seat

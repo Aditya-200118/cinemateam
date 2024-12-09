@@ -1,7 +1,11 @@
 # accounts/repositories/address_repository.py
 
 from accounts.models import Address
-
+# crud
+# create 
+# read
+# update
+# delete
 class AddressRepository:
     @staticmethod
     def create_address(billing_address, city, state, zip_code):

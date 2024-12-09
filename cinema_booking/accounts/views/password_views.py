@@ -3,6 +3,13 @@ User = get_user_model()
 from accounts.forms import CustomPasswordChangeForm
 from accounts.services.email_proxy import EmailProxy, DjangoEmailService
 
+# mvc ~ mvt(django)
+
+# model = model
+# view = templates
+# controller = views (presentation_layer + controller + business logic)
+
+
 logger = logging.getLogger(__name__)
 def generate_temp_password(length=12):
     #random temparary passowrd

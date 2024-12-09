@@ -16,15 +16,21 @@ from django.contrib.auth.decorators import login_required
 from booking.models.promotion_model import CouponUsage
 from accounts.services.card_facade import CardFacade
 from accounts.forms.card_forms import ModifyCardForm
-
+from movie.models.screening_models import SeatLock
 from django.db import transaction
+from django.views.decorators.cache import never_cache
 
+@never_cache
 @login_required
 def checkout(request, screening_id):
     screening = get_object_or_404(Screening, pk=screening_id)
     movie = screening.movie
     customer = get_object_or_404(Customer, pk=request.user.pk)
-
+    selected_seats = request.session.get('selected_seats', [])
+    if not selected_seats:
+        # Redirect back to seat selection with a warning
+        # messages.warning(request, "You must select at least one seat to proceed to checkout.")
+        return redirect('seat_selection', screening_id=screening_id)
     selected_seats = request.session.get('selected_seats', [])
     adult_count = int(request.session.get('adult_count', 0))
     senior_count = int(request.session.get('senior_count', 0))
@@ -101,6 +107,7 @@ def checkout(request, screening_id):
                 request.session.pop('promotion_id', None)
                 request.session.pop('discount_amount', None)
                 request.session.pop('new_total', None)
+                SeatLock.objects.filter(customer=customer, screening=screening).delete()
 
             # Redirect after the transaction is successfully committed
             return redirect('booking_confirmation', booking_id=booking.booking_id)
