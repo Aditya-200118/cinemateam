@@ -186,3 +186,4 @@ cinema_booking/movie/management/commands/enterdb.py
 cinema_booking/movie/management/commands/dynamic.py
 cinema_booking/movie/management/commands/__init__.py
 cinema_booking/movie/management/__init__.py
+**settings.py
