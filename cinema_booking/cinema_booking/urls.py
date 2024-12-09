@@ -54,5 +54,3 @@ urlpatterns = [
 """This is only for development environment."""
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-# path('admin/movie/delete/<int:pk>/', admin_site.admin_view(movie_admin_views.delete_screening_view), name='delete_screening'),

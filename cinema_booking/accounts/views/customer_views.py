@@ -11,23 +11,6 @@ from django.contrib import messages
 logger = logging.getLogger(__name__)
 from django.contrib.auth import logout
 from django.views import View
-
-# class CustomLogoutView(View):
-#     template_name = "accounts/logout_confirm.html"
-
-#     def get(self, request, *args, **kwargs):
-#         return render(request, self.template_name)
-
-#     def post(self, request, *args, **kwargs):
-#         # Clear the session
-#         request.session.flush()
-#         return redirect('home')
-
-# class ConfirmLogoutView(LogoutView):
-#     next_page = "home"
-#     def dispatch(self, request, *args, **kwargs):
-#         response = super().dispatch(request, *args, **kwargs)
-#         return redirect(self.next_page)
     
 @method_decorator(login_required, name='dispatch')
 class CustomLogoutView(View):
@@ -37,26 +20,18 @@ class CustomLogoutView(View):
     def get(self, request, *args, **kwargs):
         # Set headers to prevent caching
         response = render(request, self.template_name)
-        # force remove any cache
-        # response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-        # response['Pragma'] = 'no-cache'
-        # response['Expires'] = '0'
         return response
 
     def post(self, request, *args, **kwargs):
         logout(request)
         response = redirect(self.next_page)
-        # response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-        # response['Pragma'] = 'no-cache'
-        # response['Expires'] = '0'
         return redirect(self.next_page)
     
 def user_login(request):
     error_message = None
 
-    # Prevent logged-in users from accessing the login page
     if request.user.is_authenticated:
-        return redirect("home")  # Or any other page you want logged-in users to be redirected to
+        return redirect("home") 
 
     if request.method == "POST":
         form = LoginForm(request.POST)
@@ -110,7 +85,7 @@ def register(request):
 
     email_service = EmailProxy(DjangoEmailService())
 
-    if request.method == "POST":
+    if request.method == "POST": # this is a post request meaning that user is pressing the register button to submit his details he filled in form
         user_form = UserRegistrationForm(request.POST)
         address_form = AddressForm(request.POST)
         card_form = CardForm(request.POST, is_registration=True)

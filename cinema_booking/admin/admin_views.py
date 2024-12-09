@@ -438,7 +438,7 @@ class MyAdminSite(AdminSite):
                     # Get users signed up for promotions
                     users = user_service.get_users_signed_up_for_promotions()
 
-                    # Send email to these users
+                    # Send email to these users, now uses proxy
                     subject = f"New Promotion: {promotion_data['title']}"
                     message = (
                         f"Dear Customer,\n\n"

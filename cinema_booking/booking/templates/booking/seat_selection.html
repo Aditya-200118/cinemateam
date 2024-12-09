@@ -7,204 +7,203 @@
 {% block content %}
 {% if messages %}
 <div class="messages">
-    {% for message in messages %}
-    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-    {% endfor %}
+	{% for message in messages %}
+	<div class="alert alert-{{ message.tags }}">{{ message }}</div>
+	{% endfor %}
 </div>
 {% endif %}
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <div class="container-fluid">
-      <a class="navbar-brand" href="{% url 'home' %}">
-          <img src="{% static 'icon.png' %}" width="40" height="40" alt="Logo">
-          <span class="h4 text-primary mb-0 fw-bold">BOOK MY TICKET</span>
-      </a>
-      <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-              {% if user.is_authenticated %}
-              <li class="nav-item"><a class="btn btn-primary me-3" href="{% url 'user_logout' %}">Logout</a></li>
-              <li class="nav-item"><a class="btn btn-primary me-3" href="{% url 'profile' %}">Profile</a></li>
-              {% else %}
-              <li class="nav-item"><a class="btn btn-primary me-3" href="{% url 'user_login' %}">Log In</a></li>
-              <li class="nav-item"><a class="btn btn-primary me-3" href="{% url 'register' %}">Sign Up</a></li>
-              {% endif %}
-          </ul>
-      </div>
-  </div>
+	<div class="container-fluid">
+		<a class="navbar-brand" href="{% url 'home' %}">
+			<img src="{% static 'icon.png' %}" width="40" height="40" alt="Logo">
+			<span class="h4 text-primary mb-0 fw-bold">BOOK MY TICKET</span>
+		</a>
+		<div class="collapse navbar-collapse" id="navbarNav">
+			<ul class="navbar-nav ms-auto">
+				{% if user.is_authenticated %}
+				<li class="nav-item"><a class="btn btn-primary me-3" href="{% url 'user_logout' %}">Logout</a></li>
+				<li class="nav-item"><a class="btn btn-primary me-3" href="{% url 'profile' %}">Profile</a></li>
+				{% else %}
+				<li class="nav-item"><a class="btn btn-primary me-3" href="{% url 'user_login' %}">Log In</a></li>
+				<li class="nav-item"><a class="btn btn-primary me-3" href="{% url 'register' %}">Sign Up</a></li>
+				{% endif %}
+			</ul>
+		</div>
+	</div>
 </nav>
 
 <div class="container mt-4">
-    <h2>Select Your Seats for {{ screening.movie.title }}</h2>
-    <p>Showtime: {{ screening.show_time }}</p>
-    <!-- <p>Number of seats in this showroom with id {{ screening.showroom.showroom_id }} is {{ screening.showroom.seat_count }}</p> -->
-    <div class="row">
-        <div class="col-8">
-            <div class="screen bg-dark text-white text-center py-2 mb-4">Screen</div>
-            <div class="seat-matrix">
-                {% for row in num_rows|get_range %}
-                <div class="row mb-2">
-                    {% if row == last_row_index %}
-                    <!-- Last row: Use last_row_seats for the correct number of seats -->
-                    {% for col in last_row_seats|get_range %}
-                    {% with seat_position=row|seat_position:col %}
-                    {% if seat_position < seat_count %}
-                    <div class="col">
-                        {% with seat_number=seat_position|add:1 %}
-                        <button type="button" class="btn btn-outline-primary seat" data-row="{{ row }}" data-col="{{ col }}"
-                            {% if seat_position in booked_seats %} disabled {% endif %}>
-                            {{ seat_number }}  <!-- Display 1-based seat number -->
-                        </button>
-                        {% endwith %}
-                    </div>
-                    {% endif %}
-                    {% endwith %}
-                    {% endfor %}
-                    {% else %}
-                    <!-- All other rows: Display exactly 10 seats -->
-                    {% for col in 10|get_range %}
-                    {% with seat_position=row|seat_position:col %}
-                    {% if seat_position < seat_count %}
-                    <div class="col">
-                        {% with seat_number=seat_position|add:1 %}
-                        <button type="button" class="btn btn-outline-primary seat" data-row="{{ row }}" data-col="{{ col }}"
-                            {% if seat_position in booked_seats %} disabled {% endif %}>
-                            {{ seat_number }}  <!-- Display 1-based seat number -->
-                        </button>
-                        {% endwith %}
-                    </div>
-                    {% endif %}
-                    {% endwith %}
-                    {% endfor %}
-                    {% endif %}
-                </div>
-                {% endfor %}
-            </div>
-        </div>
+	<h2>Select Your Seats for {{ screening.movie.title }}</h2>
+	<p>Showtime: {{ screening.show_time }}</p>
+	<!-- <p>Number of seats in this showroom with id {{ screening.showroom.showroom_id }} is {{ screening.showroom.seat_count }}</p> -->
+	<div class="row">
+		<div class="col-8">
+			<div class="screen bg-dark text-white text-center py-2 mb-4">Screen</div>
+			<div class="seat-matrix">
+				{% for row in num_rows|get_range %}
+				<div class="row mb-2">
+					{% if row == last_row_index %}
+					<!-- Last row: Use last_row_seats for the correct number of seats -->
+					{% for col in last_row_seats|get_range %}
+					{% with seat_position=row|seat_position:col %}
+					{% if seat_position < seat_count %} <div class="col">
+						{% with seat_number=seat_position|add:1 %}
+						<button type="button" class="btn btn-outline-primary seat" data-row="{{ row }}"
+							data-col="{{ col }}" {% if seat_position in booked_seats %} disabled {% endif %}>
+							{{ seat_number }} <!-- Display 1-based seat number -->
+						</button>
+						{% endwith %}
+				</div>
+				{% endif %}
+				{% endwith %}
+				{% endfor %}
+				{% else %}
+				<!-- All other rows: Display exactly 10 seats -->
+				{% for col in 10|get_range %}
+				{% with seat_position=row|seat_position:col %}
+				{% if seat_position < seat_count %} <div class="col">
+					{% with seat_number=seat_position|add:1 %}
+					<button type="button" class="btn btn-outline-primary seat" data-row="{{ row }}" data-col="{{ col }}"
+						{% if seat_position in booked_seats %} disabled {% endif %}>
+						{{ seat_number }} <!-- Display 1-based seat number -->
+					</button>
+					{% endwith %}
+			</div>
+			{% endif %}
+			{% endwith %}
+			{% endfor %}
+			{% endif %}
+		</div>
+		{% endfor %}
+	</div>
+</div>
 
-    <div class="col-4">
-      <form method="POST" action="{% url 'seat_selection' screening_id=screening.screening_id %}">
-        {% csrf_token %}
-        <div class="mb-3">
-          <span class="h5">Selected Seats: <span id="selected-count">0</span></span>
-        </div>
-        <div class="mb-3">{{ ticket_type_form.adult_count.label_tag }}{{ ticket_type_form.adult_count }}</div>
-        <div class="mb-3">{{ ticket_type_form.senior_count.label_tag }}{{ ticket_type_form.senior_count }}</div>
-        <div class="mb-3">{{ ticket_type_form.child_count.label_tag }}{{ ticket_type_form.child_count }}</div>
-        <div class="mb-3">{{ ticket_type_form.total_cost.label_tag }}{{ ticket_type_form.total_cost }}</div>
-        
-        <div class="alert alert-danger d-none" id="seat-alert" role="alert">
-          The number of selected seats does not match the total number of occupants!
-        </div>
-        
-        <button type="submit" class="btn btn-primary" id="submit-button" disabled>Proceed to Checkout</button>
-      </form>
-    </div>
-  </div>
+<div class="col-4">
+	<form method="POST" action="{% url 'seat_selection' screening_id=screening.screening_id %}">
+		{% csrf_token %}
+		<div class="mb-3">
+			<span class="h5">Selected Seats: <span id="selected-count">0</span></span>
+		</div>
+		<div class="mb-3">{{ ticket_type_form.adult_count.label_tag }}{{ ticket_type_form.adult_count }}</div>
+		<div class="mb-3">{{ ticket_type_form.senior_count.label_tag }}{{ ticket_type_form.senior_count }}</div>
+		<div class="mb-3">{{ ticket_type_form.child_count.label_tag }}{{ ticket_type_form.child_count }}</div>
+		<div class="mb-3">{{ ticket_type_form.total_cost.label_tag }}{{ ticket_type_form.total_cost }}</div>
+
+		<div class="alert alert-danger d-none" id="seat-alert" role="alert">
+			The number of selected seats does not match the total number of occupants!
+		</div>
+
+		<button type="submit" class="btn btn-primary" id="submit-button" disabled>Proceed to Checkout</button>
+	</form>
+</div>
+</div>
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const seats = document.querySelectorAll('.seat');
-    const selectedCount = document.getElementById('selected-count');
-    const seatAlert = document.getElementById('seat-alert');
-    const submitButton = document.getElementById('submit-button');
-    const totalCostField = document.getElementById('id_total_cost');
+	document.addEventListener('DOMContentLoaded', function () {
+		const seats = document.querySelectorAll('.seat');
+		const selectedCount = document.getElementById('selected-count');
+		const seatAlert = document.getElementById('seat-alert');
+		const submitButton = document.getElementById('submit-button');
+		const totalCostField = document.getElementById('id_total_cost');
 
-    const adultInput = document.getElementById('id_adult_count');
-    const seniorInput = document.getElementById('id_senior_count');
-    const childInput = document.getElementById('id_child_count');
+		const adultInput = document.getElementById('id_adult_count');
+		const seniorInput = document.getElementById('id_senior_count');
+		const childInput = document.getElementById('id_child_count');
 
-    const adultPrice = {{ adult_price }};
-    const seniorDiscount = {{ senior_discount }};
-    const childDiscount = {{ child_discount }};
-    const seniorPrice = adultPrice * (1 - Number(seniorDiscount) / 100);
-    const childPrice = adultPrice * (1 - Number(childDiscount) / 100);
+		const adultPrice = {{ adult_price }
+	};
+	const seniorDiscount = {{ senior_discount }};
+	const childDiscount = {{ child_discount }};
+	const seniorPrice = adultPrice * (1 - Number(seniorDiscount) / 100);
+	const childPrice = adultPrice * (1 - Number(childDiscount) / 100);
 
-    let selectedSeats = [];
+	let selectedSeats = [];
 
-    function updateTotalCost() {
-      const adultCount = parseInt(adultInput.value) || 0;
-      const seniorCount = parseInt(seniorInput.value) || 0;
-      const childCount = parseInt(childInput.value) || 0;
-      const totalCost = (adultCount * adultPrice) + (seniorCount * seniorPrice) + (childCount * childPrice);
-      totalCostField.value = totalCost.toFixed(2);
-    }
+	function updateTotalCost() {
+		const adultCount = parseInt(adultInput.value) || 0;
+		const seniorCount = parseInt(seniorInput.value) || 0;
+		const childCount = parseInt(childInput.value) || 0;
+		const totalCost = (adultCount * adultPrice) + (seniorCount * seniorPrice) + (childCount * childPrice);
+		totalCostField.value = totalCost.toFixed(2);
+	}
 
-    function checkSeatCount() {
-      const totalTickets = parseInt(adultInput.value) + parseInt(seniorInput.value) + parseInt(childInput.value);
-      if (totalTickets !== selectedSeats.length) {
-        seatAlert.classList.remove('d-none');
-        submitButton.disabled = true;
-      } else {
-        seatAlert.classList.add('d-none');
-        submitButton.disabled = false;
-      }
-    }
+	function checkSeatCount() {
+		const totalTickets = parseInt(adultInput.value) + parseInt(seniorInput.value) + parseInt(childInput.value);
+		if (totalTickets !== selectedSeats.length) {
+			seatAlert.classList.remove('d-none');
+			submitButton.disabled = true;
+		} else {
+			seatAlert.classList.add('d-none');
+			submitButton.disabled = false;
+		}
+	}
 
-    function updateSelectedSeats(seat) {
-      const row = seat.getAttribute('data-row');
-      const col = seat.getAttribute('data-col');
-      const seatNumber = `${row}${col}`;
-      
-      if (selectedSeats.includes(seatNumber)) {
-        selectedSeats = selectedSeats.filter(seat => seat !== seatNumber);
-      } else {
-        selectedSeats.push(seatNumber);
-      }
+	function updateSelectedSeats(seat) {
+		const row = seat.getAttribute('data-row');
+		const col = seat.getAttribute('data-col');
+		const seatNumber = `${row}${col}`;
 
-      selectedCount.textContent = selectedSeats.length;
+		if (selectedSeats.includes(seatNumber)) {
+			selectedSeats = selectedSeats.filter(seat => seat !== seatNumber);
+		} else {
+			selectedSeats.push(seatNumber);
+		}
 
-      updateTotalCost();
-      checkSeatCount();
-    }
+		selectedCount.textContent = selectedSeats.length;
 
-    seats.forEach(seat => {
-      seat.addEventListener('click', function() {
-        if (this.classList.contains('btn-outline-primary')) {
-          this.classList.replace('btn-outline-primary', 'btn-success');
-        } else {
-          this.classList.replace('btn-success', 'btn-outline-primary');
-        }
-        updateSelectedSeats(this);
-      });
-    });
+		updateTotalCost();
+		checkSeatCount();
+	}
 
-    [adultInput, seniorInput, childInput].forEach(input => {
-      input.addEventListener('input', () => {
-        updateTotalCost();
-        checkSeatCount();
-      });
-    });
+	seats.forEach(seat => {
+		seat.addEventListener('click', function () {
+			if (this.classList.contains('btn-outline-primary')) {
+				this.classList.replace('btn-outline-primary', 'btn-success');
+			} else {
+				this.classList.replace('btn-success', 'btn-outline-primary');
+			}
+			updateSelectedSeats(this);
+		});
+	});
 
-    updateTotalCost();
-  
-    // Handle form submission with selected seat data
-    const form = document.querySelector("form");
-    form.addEventListener("submit", function(event) {
-      event.preventDefault(); // Prevent default form submission
-  
-      // Send data using AJAX
-      fetch(form.action, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRFToken": "{{ csrf_token }}"
-        },
-        body: JSON.stringify({
-          seats: selectedSeats,
-          adult_count: adultInput.value,
-          senior_count: seniorInput.value,
-          child_count: childInput.value,
-          total_cost: totalCostField.value
-        })
-      }).then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            window.location.href = data.redirect_url;
-          } else {
-            alert("Error: " + data.error);
-          }
-        });
-    });
+	[adultInput, seniorInput, childInput].forEach(input => {
+		input.addEventListener('input', () => {
+			updateTotalCost();
+			checkSeatCount();
+		});
+	});
+
+	updateTotalCost();
+
+	// Handle form submission with selected seat data
+	const form = document.querySelector("form");
+	form.addEventListener("submit", function (event) {
+		event.preventDefault(); // Prevent default form submission
+
+		// Send data using AJAX
+		fetch(form.action, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				"X-CSRFToken": "{{ csrf_token }}"
+			},
+			body: JSON.stringify({
+				seats: selectedSeats,
+				adult_count: adultInput.value,
+				senior_count: seniorInput.value,
+				child_count: childInput.value,
+				total_cost: totalCostField.value
+			})
+		}).then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					window.location.href = data.redirect_url;
+				} else {
+					alert("Error: " + data.error);
+				}
+			});
+	});
   });
-</script>  
+</script>
 {% endblock %}

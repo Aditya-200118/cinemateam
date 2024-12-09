@@ -6,7 +6,7 @@
 
 {% block content %}
 <div class="container mt-4">
-    <!-- Movie Information -->
+
     <div class="card shadow-sm mb-4 border-0">
         <div class="card-body text-center">
             <h2 class="card-title">{{ movie.title }}</h2>
@@ -14,13 +14,11 @@
         </div>
     </div>
 
-    <!-- Filter Form -->
     <div class="card shadow-sm mb-4 border-0">
         <div class="card-body">
             <form method="POST" action="{% url 'select_showtime' movie.movie_id %}">
                 {% csrf_token %}
 
-                <!-- Month Filter -->
                 <h5 class="mb-3">Select Month:</h5>
                 <div class="d-flex flex-wrap gap-2">
                     {% for month in month_day_form.selected_month.field.choices %}
@@ -32,7 +30,6 @@
                     {% endfor %}
                 </div>
 
-                <!-- Day Filter -->
                 <h5 class="mt-4 mb-3">Select Day:</h5>
                 <div class="d-flex flex-wrap gap-2">
                     {% for day in month_day_form.selected_day.field.choices %}
@@ -44,7 +41,6 @@
                     {% endfor %}
                 </div>
 
-                <!-- Submit Button -->
                 <div class="mt-4">
                     <button type="submit" class="btn btn-primary w-100">Filter</button>
                 </div>
@@ -52,7 +48,6 @@
         </div>
     </div>
 
-    <!-- Theatre and Showtimes -->
     <div class="card shadow-sm border-0">
         <div class="card-body">
             <h5 class="card-title">Available Showtimes</h5>

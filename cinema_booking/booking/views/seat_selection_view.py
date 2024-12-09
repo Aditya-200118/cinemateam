@@ -4,9 +4,7 @@ from . import *
 from decimal import Decimal
 
 from decimal import Decimal
-from booking.services.ticket_service import MovieTicketTypeDiscountService, TicketService  # Use the service
-# from booking.services.booking_service import BookingService
-from booking.builder.booking_builder import BookingBuilder
+from booking.services.ticket_service import MovieTicketTypeDiscountService
 from django.urls import reverse
 from movie.models.screening_models import SeatLock
 from django.utils.timezone import now, timedelta

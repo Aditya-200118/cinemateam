@@ -7,7 +7,6 @@ from booking.services.promotion_service import PromotionService
 from accounts.services.transcation_service import TransactionService
 from booking.builder.booking_builder import ConcreteBookingBuilder, BookingController
 from accounts.services.card_service import CardService
-# from booking.forms import CouponForm
 from django.contrib import messages
 from django.db import transaction
 from accounts.models import Card
@@ -15,7 +14,6 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from booking.models.promotion_model import CouponUsage
 from accounts.services.card_facade import CardFacade
-from accounts.forms.card_forms import ModifyCardForm
 from movie.models.screening_models import SeatLock
 from django.db import transaction
 from django.views.decorators.cache import never_cache

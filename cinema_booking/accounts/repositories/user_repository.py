@@ -24,7 +24,6 @@ class UserRepository:
     def get_customer_by_id(customer_id):
         return Customer.objects.filter(user_id=customer_id).first()
 
-    # this method is yet to be reviewed
     @staticmethod
     def update_customer(customer, **kwargs):
         for attr, value in kwargs.items():
@@ -34,7 +33,6 @@ class UserRepository:
 
     @staticmethod
     def delete_customer(customer):
-        # Ensure the customer exists before attempting deletion
         if customer:
             customer.delete()
             return True

@@ -15,12 +15,12 @@ from django.utils.crypto import get_random_string
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 from django.contrib.auth import update_session_auth_hash
-# Missing imports (added these now)
+
 from django.db import transaction
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 import logging
-# Forms that are used across multiple views
+
 from accounts.forms import (
     LoginForm,
     UserRegistrationForm,
@@ -31,10 +31,6 @@ from accounts.forms import (
     ModifyCardForm
 )
 
-# Models used across multiple views
 from accounts.models import Customer, Card, Address
 
-# Services that might be used across multiple views
-# from accounts.services.user_service import UserService
-# from accounts.services.card_service import CardService
 from accounts.services.user_profile_facade import UserProfileFacade

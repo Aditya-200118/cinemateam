@@ -28,7 +28,7 @@ class Command(BaseCommand):
         superuser = get_user_model()
         if not superuser.objects.filter(email="root@root.com").exists():
             superuser.objects.create_superuser(
-                email="root@root.com", first_name="root", last_name="root", password="root@root", is_active = True
+                email="root@root.com", first_name="root", last_name="root", password="root@root", is_active = True, is_staff = True
         )
         # Create unique addresses for each customer
         addresses = [

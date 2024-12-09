@@ -4,81 +4,82 @@
 
 {% block content %}
 <section class="p-3 p-md-4 p-xl-5">
-  <div class="container" style="overflow: hidden;">
-    <div class="card border-light-subtle shadow-sm" style="width: 80%; height: auto; margin: auto;">
-      <div class="row g-0">
-        <div class="col-12 col-md-6 text-bg-primary">
-          <div class="d-flex align-items-center justify-content-center h-100">
-            <div class="col-10 col-xl-8 py-3">
-              <h2 class="h1 mb-4">Update Your Profile</h2>
-              <p class="lead m-0">Manage your personal information and account settings.</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-12 col-md-6">
-          <div class="card-body p-3 p-md-4 p-xl-5">
-            <div class="row">
-              <div class="col-12">
-                <div class="mb-5">
-                  <h2 class="h3">Edit Profile</h2>
-                  <h3 class="fs-6 fw-normal text-secondary m-0">Update your details below</h3>
-                </div>
-              </div>
-            </div>
-            <form method="post">
-              {% csrf_token %}
-              <div class="row gy-3 gy-md-4 overflow-hidden">
-                <div class="col-12">
-                  {{ profile_form.first_name }}
-                </div>
-                <div class="col-12">
-                  {{ profile_form.last_name }}
-                </div>
-                <div class="col-12">
-                  {{ profile_form.middle_name }}
-                </div>
-                <div class="col-12">
-                  <input type="email" class="form-control" value="{{ user.email }}" readonly>
-                </div>
-                <div class="col-12">
-                  {{ profile_form.contact_no }}
-                </div>
-                <div class="col-12">
-                  {{ profile_form.promotions }}
-                  <p>Sign up for promotions!</p>
-                </div>
-                <div class="col-12">
-                  {{ address_form.billing_address }}
-                </div>
-                <div class="col-12">
-                  {{ address_form.city }}
-                </div>
-                <div class="col-12">
-                  {{ address_form.state }}
-                </div>
-                <div class="col-12">
-                  {{ address_form.zip_code }}
-                </div>
-                <div class="col-12">
-                  <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                    <a href="{% url 'profile' %}" class="btn btn-secondary">Go Back!</a>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                    <a href="{% url 'change_password' %}" class="btn btn-secondary">Change Password</a>
-                  </div>
-                </div>
-              </div>
-            </form>
-            <div class="row">
-              <div class="col-12">
-                <hr class="mt-5 mb-4 border-secondary-subtle">
-                <p class="m-0 text-secondary text-center">Want to view your profile? <a href="#"
-                    class="link-primary text-decoration-none">View Profile</a></p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+	<div class="container" style="overflow: hidden;">
+		<div class="card border-light-subtle shadow-sm" style="width: 80%; height: auto; margin: auto;">
+			<div class="row g-0">
+				<div class="col-12 col-md-6 text-bg-primary">
+					<div class="d-flex align-items-center justify-content-center h-100">
+						<div class="col-10 col-xl-8 py-3">
+							<h2 class="h1 mb-4">Update Your Profile</h2>
+							<p class="lead m-0">Manage your personal information and account settings.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-12 col-md-6">
+					<div class="card-body p-3 p-md-4 p-xl-5">
+						<div class="row">
+							<div class="col-12">
+								<div class="mb-5">
+									<h2 class="h3">Edit Profile</h2>
+									<h3 class="fs-6 fw-normal text-secondary m-0">Update your details below</h3>
+								</div>
+							</div>
+						</div>
+						<form method="post">
+							{% csrf_token %}
+							<div class="row gy-3 gy-md-4 overflow-hidden">
+								<div class="col-12">
+									{{ profile_form.first_name }}
+								</div>
+								<div class="col-12">
+									{{ profile_form.last_name }}
+								</div>
+								<div class="col-12">
+									{{ profile_form.middle_name }}
+								</div>
+								<div class="col-12">
+									<input type="email" class="form-control" value="{{ user.email }}" readonly>
+								</div>
+								<div class="col-12">
+									{{ profile_form.contact_no }}
+								</div>
+								<div class="col-12">
+									{{ profile_form.promotions }}
+									<p>Sign up for promotions!</p>
+								</div>
+								<div class="col-12">
+									{{ address_form.billing_address }}
+								</div>
+								<div class="col-12">
+									{{ address_form.city }}
+								</div>
+								<div class="col-12">
+									{{ address_form.state }}
+								</div>
+								<div class="col-12">
+									{{ address_form.zip_code }}
+								</div>
+								<div class="col-12">
+									<div class="d-grid gap-2 d-md-flex justify-content-md-end">
+										<a href="{% url 'profile' %}" class="btn btn-secondary">Go Back!</a>
+										<button type="submit" class="btn btn-primary">Save Changes</button>
+										<a href="{% url 'change_password' %}" class="btn btn-secondary">Change
+											Password</a>
+									</div>
+								</div>
+							</div>
+						</form>
+						<div class="row">
+							<div class="col-12">
+								<hr class="mt-5 mb-4 border-secondary-subtle">
+								<p class="m-0 text-secondary text-center">Want to view your profile? <a href="#"
+										class="link-primary text-decoration-none">View Profile</a></p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </section>
 {% endblock %}

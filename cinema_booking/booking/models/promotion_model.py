@@ -9,11 +9,11 @@ from datetime import timedelta
 
 class Promotion(models.Model):
     promo_code = models.CharField(max_length=50, unique=True)
-    title = models.CharField(max_length=100, default="N/A")  # Title for the promotion
-    description = models.TextField(default="N/A")  # Detailed description of the promotion
-    discount = models.FloatField()  # Discount value
-    valid_from = models.DateField(default=timezone.now)  # Start date of the promotion
-    valid_to = models.DateField(default=timezone.now().date() + timedelta(days=30))  # End date of the promotion
+    title = models.CharField(max_length=100, default="")
+    description = models.TextField(default="")
+    discount = models.FloatField()
+    valid_from = models.DateField(default=timezone.now)
+    valid_to = models.DateField(default=timezone.now().date() + timedelta(days=30)) 
 
     def add_promotion(self, promo_code, title, description, discount, valid_from, valid_to):
         promotion = Promotion(
@@ -28,7 +28,6 @@ class Promotion(models.Model):
         return promotion
 
     def remove_promotion(self):
-        """Delete the promotion instance."""
         self.delete()
 
     def __str__(self):
@@ -45,7 +44,7 @@ class CouponUsage(models.Model):
     used_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('customer', 'promotion')  # Ensures one-time use per customer
+        unique_together = ('customer', 'promotion')
 
     def __str__(self):
         return f"{self.customer.email} - {self.promotion.promo_code}"

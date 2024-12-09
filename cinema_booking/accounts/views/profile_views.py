@@ -20,7 +20,7 @@ def profile_view(request):
 def edit_profile(request):
     user = request.user
     customer = Customer.objects.get(email=user.email)
-    facade = UserProfileFacade()  # Initialize the facade
+    facade = UserProfileFacade()  # creating a facade object or initialzing the facade
 
     if request.method == "POST":
         profile_form = EditProfileForm(request.POST, instance=customer)

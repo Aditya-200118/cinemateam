@@ -16,5 +16,5 @@ class Movie(models.Model):
     rating = models.CharField(max_length=5, choices=MPAA_RATINGS)
     release_date = models.DateField(default=timezone.now)
     poster = models.ImageField(upload_to='movie/posters', null=True, blank=True)
-    price = models.DecimalField(max_digits=6, decimal_places=2, default=0)  # Add price field
-    duration = models.IntegerField(default=0)  # Add duration field in minutes
+    price = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+    duration = models.IntegerField(default=0)

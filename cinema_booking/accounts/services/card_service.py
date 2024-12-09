@@ -1,9 +1,7 @@
 # accounts/services/card_serivce.py
 
 from accounts.repositories.card_repository import CardRepository
-# all the business related logic goes here
 from django.core.exceptions import ValidationError
-from accounts.repositories.card_repository import CardRepository
 from accounts.services.encryption_services import EncryptionService, FernetEncryptionStrategy
 from accounts.services.validation_services import CardValidator
 

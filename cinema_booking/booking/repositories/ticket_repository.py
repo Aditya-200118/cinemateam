@@ -41,7 +41,6 @@ class TicketRepository:
         except Ticket.DoesNotExist:
             return False
         
-"""This is confusing at this point. Hence adding notes for self reference in future."""
 class MovieTicketTypeDiscountRepository:
     
     @staticmethod

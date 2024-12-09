@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 class UserProfileFacade:
     def __init__(self, user_service=None):
+        """By default this will use the UserServices defined in accounts/services/user_service.py"""
         self.user_service = user_service or UserService()
     
     def create_customer(self, email, password, first_name, last_name, profile_data, address_data):

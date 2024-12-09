@@ -13,11 +13,3 @@ class Booking(models.Model):
         # Calculate total price based on associated tickets
         self.total_price = sum(ticket.price for ticket in self.tickets.all())
         self.save()
-
-    def cancel_booking(self):
-        # Logic to cancel a booking
-        pass
-
-    def apply_promotion(self, promo_code):
-        # Logic to apply a promotion
-        pass

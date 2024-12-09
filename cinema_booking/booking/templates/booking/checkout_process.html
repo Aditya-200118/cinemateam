@@ -5,23 +5,23 @@
 
 {% block content %}
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
-  <div class="container-fluid">
-      <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
-          <img src="{% static 'icon.png' %}" width="40" height="40" alt="Logo" class="me-2">
-          <span class="h4 text-primary mb-0 fw-bold">BOOK MY TICKET</span>
-      </a>
-      <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-              {% if user.is_authenticated %}
-              <li class="nav-item"><a class="btn btn-outline-primary me-2" href="{% url 'profile' %}">Profile</a></li>
-              <li class="nav-item"><a class="btn btn-primary" href="{% url 'user_logout' %}">Logout</a></li>
-              {% else %}
-              <li class="nav-item"><a class="btn btn-primary me-2" href="{% url 'user_login' %}">Log In</a></li>
-              <li class="nav-item"><a class="btn btn-outline-primary" href="{% url 'register' %}">Sign Up</a></li>
-              {% endif %}
-          </ul>
-      </div>
-  </div>
+    <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+            <img src="{% static 'icon.png' %}" width="40" height="40" alt="Logo" class="me-2">
+            <span class="h4 text-primary mb-0 fw-bold">BOOK MY TICKET</span>
+        </a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                {% if user.is_authenticated %}
+                <li class="nav-item"><a class="btn btn-outline-primary me-2" href="{% url 'profile' %}">Profile</a></li>
+                <li class="nav-item"><a class="btn btn-primary" href="{% url 'user_logout' %}">Logout</a></li>
+                {% else %}
+                <li class="nav-item"><a class="btn btn-primary me-2" href="{% url 'user_login' %}">Log In</a></li>
+                <li class="nav-item"><a class="btn btn-outline-primary" href="{% url 'register' %}">Sign Up</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
 </nav>
 
 {% for message in messages %}
@@ -118,7 +118,8 @@
                             <select id="saved_cards" name="saved_card" class="form-select">
                                 <option value="">-- Select a card --</option>
                             </select>
-                            <a href="{% url 'add_payment_method_checkout' screening_id=screening.screening_id %}" class="btn btn-primary">Add Payment Method</a>
+                            <a href="{% url 'add_payment_method_checkout' screening_id=screening.screening_id %}"
+                                class="btn btn-primary">Add Payment Method</a>
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Confirm Booking</button>
                     </form>
@@ -129,171 +130,171 @@
 </div>
 
 <script>
-// Function to load saved cards via AJAX
-document.addEventListener('DOMContentLoaded', function () {
-    // Load saved cards via AJAX
-    fetch("{% url 'get_saved_cards' %}")
-        .then(response => response.json())
-        .then(data => {
-            const select = document.getElementById('saved_cards');
-            select.innerHTML = '';
-            const defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.textContent = '-- Select a card --';
-            select.appendChild(defaultOption);
+    // Function to load saved cards via AJAX
+    document.addEventListener('DOMContentLoaded', function () {
+        // Load saved cards via AJAX
+        fetch("{% url 'get_saved_cards' %}")
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById('saved_cards');
+                select.innerHTML = '';
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.textContent = '-- Select a card --';
+                select.appendChild(defaultOption);
 
-            if (data.cards && data.cards.length > 0) {
-                data.cards.forEach(card => {
-                    const option = document.createElement('option');
-                    option.value = card.id;
-                    option.textContent = `${card.card_name} - ${card.decrypted_card_number}`;
-                    select.appendChild(option);
+                if (data.cards && data.cards.length > 0) {
+                    data.cards.forEach(card => {
+                        const option = document.createElement('option');
+                        option.value = card.id;
+                        option.textContent = `${card.card_name} - ${card.decrypted_card_number}`;
+                        select.appendChild(option);
+                    });
+                } else {
+                    const noCardsOption = document.createElement('option');
+                    noCardsOption.value = '';
+                    noCardsOption.textContent = 'No saved cards available';
+                    select.appendChild(noCardsOption);
+                }
+            });
+
+        // Listen for changes in the card dropdown
+        document.getElementById('saved_cards').addEventListener('change', function (event) {
+            const selectedCardId = event.target.value;
+
+            // Send the selected card ID to the server
+            fetch("{% url 'select_saved_cards' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                },
+                body: JSON.stringify({ card_id: selectedCardId }),
+            }).then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        alert(data.error);
+                    }
                 });
-            } else {
-                const noCardsOption = document.createElement('option');
-                noCardsOption.value = '';
-                noCardsOption.textContent = 'No saved cards available';
-                select.appendChild(noCardsOption);
-            }
         });
-
-    // Listen for changes in the card dropdown
-    document.getElementById('saved_cards').addEventListener('change', function (event) {
-        const selectedCardId = event.target.value;
-
-        // Send the selected card ID to the server
-        fetch("{% url 'select_saved_cards' %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-            },
-            body: JSON.stringify({ card_id: selectedCardId }),
-        }).then(response => response.json())
-          .then(data => {
-              if (!data.success) {
-                  alert(data.error);
-              }
-          });
     });
-});
-// Function to handle coupon application
-document.getElementById('apply-coupon-form').addEventListener('submit', async function (event) {
-    event.preventDefault();
+    // Function to handle coupon application
+    document.getElementById('apply-coupon-form').addEventListener('submit', async function (event) {
+        event.preventDefault();
 
-    const form = event.target;
-    const formData = new FormData(form);
+        const form = event.target;
+        const formData = new FormData(form);
 
-    try {
-        const response = await fetch(form.action, {
-            method: 'POST',
-            body: formData,
-        });
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+            });
 
-        const result = await response.json();
+            const result = await response.json();
 
-        // Clear previous alerts
-        removeAlerts();
+            // Clear previous alerts
+            removeAlerts();
 
-        if (result.success) {
-            // Case 1: No coupon or valid coupon applied
-            const message = result.message || 'Coupon applied successfully!';
-            showAlert(message, 'success');
+            if (result.success) {
+                // Case 1: No coupon or valid coupon applied
+                const message = result.message || 'Coupon applied successfully!';
+                showAlert(message, 'success');
 
-            // Update UI for valid coupon
-            if (result.discount_amount) {
-                document.getElementById('discount-amount').textContent = result.discount_amount.toFixed(2);
-                document.getElementById('new-total').textContent = result.new_total.toFixed(2);
+                // Update UI for valid coupon
+                if (result.discount_amount) {
+                    document.getElementById('discount-amount').textContent = result.discount_amount.toFixed(2);
+                    document.getElementById('new-total').textContent = result.new_total.toFixed(2);
+                }
+            } else {
+                // Case 2: Invalid or expired coupon
+                showAlert(result.error || 'An error occurred. Please try again.', 'danger');
             }
-        } else {
-            // Case 2: Invalid or expired coupon
-            showAlert(result.error || 'An error occurred. Please try again.', 'danger');
+        } catch (error) {
+            removeAlerts();
+            showAlert('Failed to apply coupon. Please try again.', 'danger');
         }
-    } catch (error) {
-        removeAlerts();
-        showAlert('Failed to apply coupon. Please try again.', 'danger');
-    }
-});
+    });
 
-function showAlert(message, type) {
-    const alertContainer = document.createElement('div');
-    alertContainer.className = `alert alert-${type} alert-dismissible shadow fade show`;
-    alertContainer.role = 'alert';
-    alertContainer.innerHTML = `
+    function showAlert(message, type) {
+        const alertContainer = document.createElement('div');
+        alertContainer.className = `alert alert-${type} alert-dismissible shadow fade show`;
+        alertContainer.role = 'alert';
+        alertContainer.innerHTML = `
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         ${message}
     `;
-    document.querySelector('.container').prepend(alertContainer);
-}
-
-function removeAlerts() {
-    const existingAlerts = document.querySelectorAll('.alert');
-    existingAlerts.forEach(alert => alert.remove());
-}
-
-
-document.addEventListener('DOMContentLoaded', function () {
-    // Reference to the coupon input field and apply button
-    const couponInput = document.querySelector('input[name="coupon_code"]');
-    const applyButton = document.querySelector('#apply-coupon-form button[type="submit"]');
-
-    // Function to toggle the button's disabled state based on input value
-    function toggleApplyButton() {
-        applyButton.disabled = !couponInput.value.trim();
+        document.querySelector('.container').prepend(alertContainer);
     }
 
-    // Attach input event listener to enable/disable the button
-    couponInput.addEventListener('input', toggleApplyButton);
+    function removeAlerts() {
+        const existingAlerts = document.querySelectorAll('.alert');
+        existingAlerts.forEach(alert => alert.remove());
+    }
 
-    // Initially disable the button if input is empty
-    toggleApplyButton();
 
-    // Existing saved cards loading functionality
-    fetch("{% url 'get_saved_cards' %}")
-        .then(response => response.json())
-        .then(data => {
-            const select = document.getElementById('saved_cards');
-            select.innerHTML = '';
-            const defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.textContent = '-- Select a card --';
-            select.appendChild(defaultOption);
+    document.addEventListener('DOMContentLoaded', function () {
+        // Reference to the coupon input field and apply button
+        const couponInput = document.querySelector('input[name="coupon_code"]');
+        const applyButton = document.querySelector('#apply-coupon-form button[type="submit"]');
 
-            if (data.cards && data.cards.length > 0) {
-                data.cards.forEach(card => {
-                    const option = document.createElement('option');
-                    option.value = card.id;
-                    option.textContent = `${card.card_name} - ${card.decrypted_card_number}`;
-                    select.appendChild(option);
+        // Function to toggle the button's disabled state based on input value
+        function toggleApplyButton() {
+            applyButton.disabled = !couponInput.value.trim();
+        }
+
+        // Attach input event listener to enable/disable the button
+        couponInput.addEventListener('input', toggleApplyButton);
+
+        // Initially disable the button if input is empty
+        toggleApplyButton();
+
+        // Existing saved cards loading functionality
+        fetch("{% url 'get_saved_cards' %}")
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById('saved_cards');
+                select.innerHTML = '';
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.textContent = '-- Select a card --';
+                select.appendChild(defaultOption);
+
+                if (data.cards && data.cards.length > 0) {
+                    data.cards.forEach(card => {
+                        const option = document.createElement('option');
+                        option.value = card.id;
+                        option.textContent = `${card.card_name} - ${card.decrypted_card_number}`;
+                        select.appendChild(option);
+                    });
+                } else {
+                    const noCardsOption = document.createElement('option');
+                    noCardsOption.value = '';
+                    noCardsOption.textContent = 'No saved cards available';
+                    select.appendChild(noCardsOption);
+                }
+            });
+
+        // Listen for changes in the card dropdown
+        document.getElementById('saved_cards').addEventListener('change', function (event) {
+            const selectedCardId = event.target.value;
+
+            // Send the selected card ID to the server
+            fetch("{% url 'select_saved_cards' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                },
+                body: JSON.stringify({ card_id: selectedCardId }),
+            }).then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        alert(data.error);
+                    }
                 });
-            } else {
-                const noCardsOption = document.createElement('option');
-                noCardsOption.value = '';
-                noCardsOption.textContent = 'No saved cards available';
-                select.appendChild(noCardsOption);
-            }
         });
-
-    // Listen for changes in the card dropdown
-    document.getElementById('saved_cards').addEventListener('change', function (event) {
-        const selectedCardId = event.target.value;
-
-        // Send the selected card ID to the server
-        fetch("{% url 'select_saved_cards' %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-            },
-            body: JSON.stringify({ card_id: selectedCardId }),
-        }).then(response => response.json())
-          .then(data => {
-              if (!data.success) {
-                  alert(data.error);
-              }
-          });
     });
-});
 
 </script>
 {% endblock %}
