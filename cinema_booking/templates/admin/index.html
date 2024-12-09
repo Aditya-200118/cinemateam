@@ -5,6 +5,12 @@
 {% block content %}
 <div class="container mt-4">
   <!-- Welcome Section -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+        <h5 class="card-title">Welcome, {{ user.first_name }}</h5>
+        <p class="card-text"><small class="text-muted">Last login: {{ user.last_login }}</small></p>
+    </div>
+</div>
   <div class="card mb-4 card-white shadow-sm rounded-3 border-0">
     <div class="card-body">
       <h5 class="card-title text-primary">Welcome, Admin</h5>

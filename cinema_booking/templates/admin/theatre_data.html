@@ -1,36 +1,49 @@
 {% extends 'admin/base_site.html' %}
 
-{% block title %}Theatre Data{% endblock %}
+{% block title %}Theatre Management{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-  <h2>Theatre Data</h2>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Theatre Name</th>
-        <th>Showrooms</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for theatre in theatres %}
-      <tr>
-        <td>{{ theatre.name }}</td>
-        <td>
-          {% for showroom in theatre.showroom_set.all %}
-		  <a href="{% url 'showroom_schedule' showroom.showroom_id %}" class="btn btn-info btn-sm">
-			{{ showroom.name }} (ID: {{ showroom.showroom_id }})
-		  </a>
-          {% empty %}
-            <span>No showrooms available</span>
-          {% endfor %}
-        </td>
-        <td>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 >Theatre Management</h2>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <table class="table table-hover table-responsive">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Theatre Name</th>
+                        <th scope="col">Showrooms</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for theatre in theatres %}
+                        <tr>
+                            <td>
+                                <strong>{{ theatre.name }}</strong>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-wrap">
+                                    {% for showroom in theatre.showroom_set.all %}
+                                        <a href="{% url 'showroom_schedule' showroom.showroom_id %}" 
+                                           class="btn btn-outline-primary btn-sm me-2 mb-2">
+                                            {{ showroom.name }} (ID: {{ showroom.showroom_id }})
+                                        </a>
+                                    {% empty %}
+                                        <span class="text-muted">No showrooms available</span>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">No theatres available</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 {% endblock %}

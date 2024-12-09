@@ -4,28 +4,43 @@
 
 {% block content %}
 <div class="container mt-4">
-  <h2>Schedule for Showroom: {{ showroom.name }}</h2>
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th>Movie Title</th>
-        <th>Screening Date</th>
-        <th>Screening Time</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for screening in screenings %}
-      <tr>
-        <td>{{ screening.movie.title }}</td>
-        <td>{{ screening.date }}</td>
-        <td>{{ screening.show_time }}</td>
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="3">No screenings scheduled.</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Schedule for Showroom: <span class="text-primary">{{ showroom.name }}</span></h2>
+        
+        <div>
+            <form method="GET" class="d-flex">
+                <label for="sort_by" class="me-2">Sort by:</label>
+                <select name="sort_by" id="sort_by" class="form-select" onchange="this.form.submit()">
+                    <option value="movie_title" {% if sort_by == 'movie_title' %}selected{% endif %}>Movie Title</option>
+                    <option value="show_time" {% if sort_by == 'show_time' %}selected{% endif %}>Screening Time</option>
+                </select>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 m-3">
+        <div class="card-body">
+            <table class="table table-hover table-responsive">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Movie Title</th>
+                        <th scope="col">Screening Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for screening in screenings %}
+                        <tr>
+                            <td><strong>{{ screening.movie.title }}</strong></td>
+                            <td>{{ screening.show_time|date:"d M Y, h:i A" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="2" class="text-center text-muted">No screenings scheduled.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -3,10 +3,10 @@
 {% block title %}Add Customer{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-  <div class="card card-white">
+<div class="container m-5">
+  <div class="card card-white border-0">
+    <div class="card-header bg-primary text-white text-center">Add User</div>
     <div class="card-body">
-      <h5 class="card-title">Add User</h5>
       <form method="post" action="{% url 'add_customer' %}">
         {% csrf_token %}
         {{ user_form.as_p }}

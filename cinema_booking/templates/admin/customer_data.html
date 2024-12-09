@@ -4,43 +4,47 @@
 
 {% block content %}
 <div class="container mt-4">
-  <h2>Customer Data</h2>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>First Name</th>
-        <th>Last Name</th>
-        <th>Email</th>
-        <th>Contact Number</th>
-        <th>Billing Address</th>
-        <th>City</th>
-        <th>State</th>
-        <th>Zip Code</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for customer in customers %}
-      <tr>
-        <td>{{ customer.first_name }}</td>
-        <td>{{ customer.last_name }}</td>
-        <td>{{ customer.email }}</td>
-        <td>{{ customer.contact_no }}</td>
-        <td>{{ customer.address.billing_address }}</td>
-        <td>{{ customer.address.city }}</td>
-        <td>{{ customer.address.state }}</td>
-        <td>{{ customer.address.zip_code }}</td>
-
-        <td>
-          <a href="{% url 'modify_customer' customer.pk %}" class="btn btn-primary btn-sm">Modify</a>
-          <form method="post" action="{% url 'delete_customer' customer.pk %}" style="display:inline;">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-          </form>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <h2 class="text-center">Customer Data</h2>
+  
+  <div class="card shadow-sm border-0 m-3">
+    <div class="card-body">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Contact Number</th>
+            <th>Billing Address</th>
+            <th>City</th>
+            <th>State</th>
+            <th>Zip Code</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for customer in customers %}
+          <tr>
+            <td>{{ customer.first_name }}</td>
+            <td>{{ customer.last_name }}</td>
+            <td>{{ customer.email }}</td>
+            <td>{{ customer.contact_no }}</td>
+            <td>{{ customer.address.billing_address }}</td>
+            <td>{{ customer.address.city }}</td>
+            <td>{{ customer.address.state }}</td>
+            <td>{{ customer.address.zip_code }}</td>
+            <td>
+              <a href="{% url 'modify_customer' customer.pk %}" class="btn btn-primary btn-sm">Modify</a>
+              <form method="post" action="{% url 'delete_customer' customer.pk %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 {% endblock %}

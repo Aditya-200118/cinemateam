@@ -24,6 +24,7 @@ from django.db import transaction
 from django.contrib.auth.forms import AuthenticationForm
 import logging
 logger = logging.getLogger(__name__)
+from django.contrib.auth.decorators import user_passes_test
 class AdminLoginForm(AuthenticationForm):
     def __init__(self, request=None, *args, **kwargs):
         super().__init__(request=request, *args, **kwargs)
@@ -106,6 +107,7 @@ class MyAdminSite(AdminSite):
         customers = Customer.objects.all()
         return render(request, 'admin/customer_data.html', {'customers': customers})
 
+    # @user_passes_test(lambda user: user.is_superuser)
     def add_customer_view(self, request):
         if request.method == 'POST':
             user_form = UserRegistrationForm(request.POST)
@@ -167,6 +169,7 @@ class MyAdminSite(AdminSite):
             'address_form': address_form
         })
 
+    # @user_passes_test(lambda user: user.is_superuser)
     def modify_customer_view(self, request, pk):
         customer = Customer.objects.get(pk=pk)
         address = customer.address
@@ -181,6 +184,13 @@ class MyAdminSite(AdminSite):
                 address_data = address_form.cleaned_data
                 try:
                     facade.update_user_profile(customer, profile_data, address_data)
+
+                    # Allow modification of `is_staff`, `is_superuser`, `is_active`
+                    customer.is_staff = request.POST.get('is_staff') == 'on'
+                    customer.is_superuser = request.POST.get('is_superuser') == 'on'
+                    customer.is_active = request.POST.get('is_active') == 'on'
+                    customer.save()
+
                     return redirect('customer_data')
                 except Exception as e:
                     return render(request, 'admin/modify_customer.html', {
@@ -198,6 +208,7 @@ class MyAdminSite(AdminSite):
             'address_form': address_form, 
             'customer': customer
         })
+
 
     def delete_customer_view(self, request, pk):
         try:
@@ -235,9 +246,17 @@ class MyAdminSite(AdminSite):
         # Fetch scheduled movies for this showroom
         screenings = showroom.screening_set.select_related('movie').all()
 
+        sort_by = request.GET.get('sort_by', 'movie_title')
+
+        if sort_by == 'movie_title':
+            screenings = screenings.order_by('movie__title')
+        elif sort_by == 'show_time':
+            screenings = screenings.order_by('show_time')
+
         return render(request, 'admin/showroom_schedule.html', {
             'showroom': showroom,
             'screenings': screenings,
+            'sort_by': sort_by,
         })
 
     def add_movie(self, request):
