@@ -19,34 +19,19 @@ def select_showtime(request, movie_id):
     )
     theatres = Theatre.objects.filter(showroom__screening__movie=movie).distinct()
 
-    month_day_form = MonthDayForm()
-
-    months = [current_date.strftime("%B")]
-    months += [
-        (current_date + timedelta(days=30 * i)).strftime("%B") for i in range(1, 3)
-    ]
-    days_of_week = [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-    ]
-
+    # Set up form with default values for GET requests
     if request.method == "POST":
-        month_day_form = MonthDayForm(request.POST)
+        month_day_form = MonthDayForm(request.POST)  # Handle form data on POST
         if month_day_form.is_valid():
             selected_month = int(month_day_form.cleaned_data["selected_month"])
             selected_day = month_day_form.cleaned_data["selected_day"]
-            # this one needs fixing
+
             # Apply month filter
             if selected_month == 0:
                 # Show all screenings from today onward
                 screenings = screenings.filter(show_time__date__gte=current_date.date())
             elif selected_month == 1:
-                # Current month, but only from today onward
+                # Current month only from today onward
                 screenings = screenings.filter(
                     show_time__month=current_date.month,
                     show_time__date__gte=current_date.date(),
@@ -59,7 +44,7 @@ def select_showtime(request, movie_id):
                     show_time__date__gte=current_date.date(),
                 )
             elif selected_month == 3:
-                # Month after next, all dates
+                # Month after next
                 next_month = (current_date.month % 12) + 1
                 month_after_next = (next_month % 12) + 1
                 screenings = screenings.filter(
@@ -67,20 +52,48 @@ def select_showtime(request, movie_id):
                     show_time__date__gte=current_date.date(),
                 )
 
-            # Apply day filter
+            # **Apply the weekday filter independently**
             if selected_day != "all":
+                days_of_week = [
+                    "Sunday",
+                    "Monday",
+                    "Tuesday",
+                    "Wednesday",
+                    "Thursday",
+                    "Friday",
+                    "Saturday",
+                ]
                 day_index = days_of_week.index(selected_day.capitalize())
                 screenings = screenings.filter(
                     show_time__week_day=day_index + 1,
                     show_time__date__gte=current_date.date(),
                 )
+    else:
+        # Handle GET request with default initial values
+        month_day_form = MonthDayForm(initial={"selected_month": 0, "selected_day": "all"})
+
+    selected_day = month_day_form['selected_day'].value()
+    if selected_day and selected_day != "all":
+        days_of_week = [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+        ]
+        day_index = days_of_week.index(selected_day.capitalize())
+        screenings = screenings.filter(
+            show_time__week_day=day_index + 1,
+            show_time__date__gte=current_date.date(),
+        )
 
     context = {
         "movie": movie,
         "theatres": theatres,
         "screenings": screenings,
-        "months": months,
-        "days_of_week": days_of_week,
         "month_day_form": month_day_form,
     }
     return render(request, "booking/select_showtime.html", context)
+
