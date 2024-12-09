@@ -7,27 +7,36 @@
     <div class="row justify-content-center">
         <div class="col-md-10">
             <div class="card-group">
+                <!-- Login Form Card -->
                 <div class="card p-4">
                     <div class="card-body">
                         <h2 class="text-center">Log-in</h2>
                         <p class="text-center">Please, use the following form to log-in:</p>
+                        
                         {% if error_message %}
-                        <div class="alert alert-danger" role="alert">
+                        <div class="alert alert-danger text-center" role="alert">
                             {{ error_message }}
                         </div>
                         {% endif %}
+
                         <form method="post">
+                            {% csrf_token %}
                             <div class="mb-3">
                                 {{ form.email }}
                             </div>
                             <div class="mb-3 position-relative">
-                                {{ form.password }}
-                            </div> 
-                            {% csrf_token %}
+                                <div class="input-group">
+                                    {{ form.password }}
+                                    <button type="button" class="btn btn-outline-secondary toggle-password" tabindex="-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Show/Hide Password">
+                                        <i class="fa fa-eye" id="password-toggle-icon"></i>
+                                    </button>
+                                </div>
+                            </div>
                             <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">Log in</button>
+                                <button type="submit" class="btn btn-primary" id="login-btn">Log in</button>
                             </div>
                         </form>
+
                         <div class="text-center mt-3">
                             <a href="{% url 'password_reset' %}" class="text-primary">Forgot password?</a>
                         </div>
@@ -36,20 +45,56 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Right-Side Card -->
                 <div class="card text-white bg-primary py-5 d-md-down-none" style="width:44%">
                     <div class="card-body text-center d-flex flex-column justify-content-center">
                         <div>
                             <h2>Hello, Cinephile!</h2>
                             <p>Create your personalized movie experience and start your journey with us.</p>
-                            <a href="{% url 'register' %}" class="btn btn-outline-light">Sign Up</a>
+                            <a href="{% url 'register' %}" class="btn btn-outline-light">
+                                <i class="fa fa-user-plus me-1"></i> Sign Up
+                            </a>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Footer Section -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <hr class="mt-5 mb-4 border-secondary-subtle">
+                    <p class="m-0 text-secondary text-center">
+                        Want to go to home page? 
+                        <a href="{% url 'home' %}" class="link-primary text-decoration-none">Home Page</a>
+                    </p>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+
+    document.querySelector('.toggle-password').addEventListener('click', function () {
+        const passwordField = document.querySelector('input[name="password"]');
+        const icon = document.getElementById('password-toggle-icon');
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            passwordField.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    });
 </script>
 {% endblock %}
