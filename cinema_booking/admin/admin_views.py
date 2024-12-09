@@ -22,6 +22,7 @@ from django.urls import reverse
 from django.forms import modelformset_factory
 from django.db import transaction
 from django.contrib.auth.forms import AuthenticationForm
+from movie.services.movie_service import MovieService
 import logging
 logger = logging.getLogger(__name__)
 from django.contrib.auth.decorators import user_passes_test
@@ -54,7 +55,29 @@ class MyAdminSite(AdminSite):
     site_header = 'Cinema Booking Admin'
     site_title = 'Cinema Booking Admin Portal'
     index_title = 'Welcome to Cinema Booking Admin' 
+    
+    def index(self, request, extra_context=None):
+        # Calculate metrics
+        number_of_screens = Showroom.objects.count()
+        currently_playing_movies = MovieService.get_now_playing_movies().count()
+        coming_soon_movies = MovieService.get_coming_soon_movies().count()
+        number_of_users = Customer.objects.count()
+        number_of_admins = Customer.objects.filter(is_superuser=True).count()
+        active_promotions = PromotionService.get_active_promotions().count()
+        # last_sign_in = request.user.last_login
 
+        # Add metrics to context
+        extra_context = extra_context or {}
+        extra_context.update({
+            'number_of_screens': number_of_screens,
+            'currently_playing_movies': currently_playing_movies,
+            'coming_soon_movies': coming_soon_movies,
+            'number_of_users': number_of_users,
+            'number_of_admins': number_of_admins,
+            'active_promotions': active_promotions,
+            # 'last_sign_in': last_sign_in,
+        })
+        return super().index(request, extra_context)
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [

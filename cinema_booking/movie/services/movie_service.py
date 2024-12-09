@@ -66,34 +66,40 @@ class MovieService:
         return MovieRepository.filter_movies(category__icontains=search_query, release_date__lte=today)
 
     @staticmethod
-    def get_now_playing_by_category(category):
-        if not category:
-            raise ValidationError("Category is required.")
-
-        today = timezone.now().date()
-        return MovieRepository.filter_movies(category__icontains=category, release_date__lte=today)
+    def get_movies_by_release_date(release_date, now_playing=True):
+        if now_playing:
+            return MovieRepository.filter_movies(release_date=release_date, release_date__lte=timezone.now().date())
+        return MovieRepository.filter_movies(release_date=release_date, release_date__gt=timezone.now().date())
 
     @staticmethod
-    def get_coming_soon_by_category(category):
-        if not category:
-            raise ValidationError("Category is required.")
-
+    def get_now_playing_by_title(title, release_date=None):
         today = timezone.now().date()
-        return MovieRepository.filter_movies(category__icontains=category, release_date__gt=today)
-    
-    @staticmethod
-    def get_now_playing_by_title(title):
-        if not title:
-            raise ValidationError("Title is required.")
-        today = timezone.now().date()
-        
-        return MovieRepository.filter_movies(title__icontains=title, release_date__lte=today)
+        filters = {'title__icontains': title, 'release_date__lte': today}
+        if release_date:
+            filters['release_date'] = release_date
+        return MovieRepository.filter_movies(**filters)
 
     @staticmethod
-    def get_coming_soon_by_title(title):
-        if not title:
-            raise ValidationError("Title is required.")
+    def get_coming_soon_by_title(title, release_date=None):
         today = timezone.now().date()
+        filters = {'title__icontains': title, 'release_date__gt': today}
+        if release_date:
+            filters['release_date'] = release_date
+        return MovieRepository.filter_movies(**filters)
 
-        return MovieRepository.filter_movies(title__icontains=title, release_date__gt=today)
+    @staticmethod
+    def get_now_playing_by_category(category, release_date=None):
+        today = timezone.now().date()
+        filters = {'category__icontains': category, 'release_date__lte': today}
+        if release_date:
+            filters['release_date'] = release_date
+        return MovieRepository.filter_movies(**filters)
+
+    @staticmethod
+    def get_coming_soon_by_category(category, release_date=None):
+        today = timezone.now().date()
+        filters = {'category__icontains': category, 'release_date__gt': today}
+        if release_date:
+            filters['release_date'] = release_date
+        return MovieRepository.filter_movies(**filters)
 

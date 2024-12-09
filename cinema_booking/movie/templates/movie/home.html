@@ -27,6 +27,7 @@
                             <option value="title" {% if search_type == 'title' %}selected{% endif %}>By Title</option>
                             <option value="category" {% if search_type == 'category' %}selected{% endif %}>By Category</option>
                         </select>
+                        <input class="form-control me-3" type="date" name="release_date" value="{{ selected_date|default:'' }}">
                         <button class="btn btn-primary me-3" type="submit">Search</button>
                     </form>
                 </li>
