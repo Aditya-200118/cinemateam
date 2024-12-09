@@ -187,3 +187,12 @@ cinema_booking/movie/management/commands/dynamic.py
 cinema_booking/movie/management/commands/__init__.py
 cinema_booking/movie/management/__init__.py
 **settings.py
+cinema_booking/accounts/services/address_service.py
+cinema_booking/admin/admin_views_2.py
+cinema_booking/movie/static/movie/posters/Admin_Page_Welcome.png
+cinema_booking/movie/static/movie/posters/Change_Password_5BDZr5H.png
+cinema_booking/movie/static/movie/posters/Change_Password_b2JpdpP.png
+cinema_booking/movie/static/movie/posters/Change_Password_LVeS2yB.png
+cinema_booking/movie/static/movie/posters/Change_Password.png
+classes_name.txt
+cinema_booking/requirements.txt
