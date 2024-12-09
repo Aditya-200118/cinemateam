@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 from django.contrib.auth import logout
 from django.views import View
 
-
 # class CustomLogoutView(View):
 #     template_name = "accounts/logout_confirm.html"
 
@@ -54,8 +53,11 @@ class CustomLogoutView(View):
     
 def user_login(request):
     error_message = None
+
+    # Prevent logged-in users from accessing the login page
     if request.user.is_authenticated:
-        return redirect("home")
+        return redirect("home")  # Or any other page you want logged-in users to be redirected to
+
     if request.method == "POST":
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -66,11 +68,15 @@ def user_login(request):
                 password=cd["password"],
             )
             if user is not None:
+                # Check if the user is a staff or superuser (admin user)
+                if user.is_staff or user.is_superuser:
+                    error_message ="Staff Members and Admins can't login directly."
+                    return render(request, "accounts/login.html", {"form": form, "error_message": error_message})
                 if user.is_active:
                     login(request, user)
                     # Store user ID in session
                     request.session["user_id"] = user.user_id
-                    # Redirect to home page
+                    # Redirect to home page or any other page after successful login
                     return redirect("home")
                 else:
                     error_message = "Disabled account"
@@ -81,8 +87,8 @@ def user_login(request):
                     error_message = "Invalid password"
     else:
         form = LoginForm()
-    return render(request, "accounts/login.html", {"form": form, "error_message": error_message})
 
+    return render(request, "accounts/login.html", {"form": form, "error_message": error_message})
 
 def activate_account(request, uidb64, token):
     try:
