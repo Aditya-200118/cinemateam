@@ -1,26 +1,26 @@
 # booking/views/select_showtime.py
 
 from . import *
+from pytz import timezone as pytz_timezone  # 
 from datetime import datetime
+# booking/views/select_showtime.py
 
 @login_required
 def select_showtime(request, movie_id):
     movie = get_object_or_404(Movie, pk=movie_id)
-    current_date = datetime.now()
+    current_date = timezone.now()
     # Fetch screenings and theatres
     screenings = (
         Screening.objects.filter(
-            movie=movie, show_time__date__gte=current_date.date()  # Exclude past dates
+            movie=movie, show_time__date__gte=current_date.date()
         )
         .annotate(show_date=Cast("show_time", DateField()))
         .order_by("show_time")
     )
     theatres = Theatre.objects.filter(showroom__screening__movie=movie).distinct()
 
-    # initial_data = { 'selected_month': 0, 'selected_day': 'all'}
     month_day_form = MonthDayForm()
 
-    current_date = timezone.now()
     months = [current_date.strftime("%B")]
     months += [
         (current_date + timedelta(days=30 * i)).strftime("%B") for i in range(1, 3)
@@ -54,16 +54,26 @@ def select_showtime(request, movie_id):
             elif selected_month == 2:
                 # Next month, all dates
                 next_month = (current_date.month % 12) + 1
-                screenings = screenings.filter(show_time__month=next_month)
+                screenings = screenings.filter(
+                    show_time__month=next_month,
+                    show_time__date__gte=current_date.date(),
+                )
             elif selected_month == 3:
                 # Month after next, all dates
                 next_month = (current_date.month % 12) + 1
                 month_after_next = (next_month % 12) + 1
-                screenings = screenings.filter(show_time__month=month_after_next)
+                screenings = screenings.filter(
+                    show_time__month=month_after_next,
+                    show_time__date__gte=current_date.date(),
+                )
+
             # Apply day filter
             if selected_day != "all":
                 day_index = days_of_week.index(selected_day.capitalize())
-                screenings = screenings.filter(show_time__week_day=day_index + 1)
+                screenings = screenings.filter(
+                    show_time__week_day=day_index + 1,
+                    show_time__date__gte=current_date.date(),
+                )
 
     context = {
         "movie": movie,

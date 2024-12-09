@@ -22,7 +22,7 @@ def get_tickets_for_booking(request, booking_id):
     ticket_data = [
         {
             "ticket_id": ticket.ticket_id,
-            "seat_number": ticket.seat_number,
+            "seat_number": ticket.seat_number + 1,
             "ticket_type": ticket.ticket_type.type,
             "price": ticket.price,
             "show_time": ticket.show_time

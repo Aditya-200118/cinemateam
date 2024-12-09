@@ -1,76 +1,93 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load custom_filters%}
+{% load custom_filters %}
 {% load booking_filters %}
 {% block title %}Book Ticket{% endblock %}
 
 {% block content %}
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <!-- Your existing navigation code here -->
-</nav>
-
 <div class="container mt-4">
-    <div class="card text-center">
-        <div class="card-body">
+    <!-- Movie Information -->
+    <div class="card shadow-sm mb-4 border-0">
+        <div class="card-body text-center">
             <h2 class="card-title">{{ movie.title }}</h2>
-            <p class="card-text">{{ movie.category }} | {{ movie.release_date }}</p>
+            <p class="text-muted">{{ movie.category }} | {{ movie.release_date }}</p>
         </div>
     </div>
 
     <!-- Filter Form -->
-    <form method="POST" action="{% url 'select_showtime' movie.movie_id %}" class="mt-4">
-        {% csrf_token %}
+    <div class="card shadow-sm mb-4 border-0">
+        <div class="card-body">
+            <form method="POST" action="{% url 'select_showtime' movie.movie_id %}">
+                {% csrf_token %}
 
-        <h5>Select Month:</h5>
-        <div class="btn-group-toggle" data-toggle="buttons">
-            {% for month in month_day_form.selected_month.field.choices %}
-                <label class="btn btn-outline-primary {% if month_day_form.selected_month.value == month.0|stringformat:'s' %}active{% endif %}">
-                    <input type="radio" name="selected_month" value="{{ month.0 }}" autocomplete="off" {% if month_day_form.selected_month.value == month.0|stringformat:"s" %}checked{% endif %}>
-                    {{ month.1 }}
-                </label>
-            {% endfor %}
+                <!-- Month Filter -->
+                <h5 class="mb-3">Select Month:</h5>
+                <div class="d-flex flex-wrap gap-2">
+                    {% for month in month_day_form.selected_month.field.choices %}
+                        <label class="btn btn-outline-primary {% if month_day_form.selected_month.value == month.0|stringformat:'s' %}active{% endif %}">
+                            <input type="radio" name="selected_month" value="{{ month.0 }}" autocomplete="off" 
+                                   {% if month_day_form.selected_month.value == month.0|stringformat:"s" %}checked{% endif %}>
+                            {{ month.1 }}
+                        </label>
+                    {% endfor %}
+                </div>
+
+                <!-- Day Filter -->
+                <h5 class="mt-4 mb-3">Select Day:</h5>
+                <div class="d-flex flex-wrap gap-2">
+                    {% for day in month_day_form.selected_day.field.choices %}
+                        <label class="btn btn-outline-primary {% if month_day_form.selected_day.value == day.0 %}active{% endif %}">
+                            <input type="radio" name="selected_day" value="{{ day.0 }}" autocomplete="off" 
+                                   {% if month_day_form.selected_day.value == day.0 %}checked{% endif %}>
+                            {{ day.1 }}
+                        </label>
+                    {% endfor %}
+                </div>
+
+                <!-- Submit Button -->
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                </div>
+            </form>
         </div>
+    </div>
 
-        <h5 class="mt-3">Select Day:</h5>
-        <div class="btn-group-toggle" data-toggle="buttons">
-            {% for day in month_day_form.selected_day.field.choices %}
-                <label class="btn btn-outline-primary {% if month_day_form.selected_day.value == day.0 %}active{% endif %}">
-                    <input type="radio" name="selected_day" value="{{ day.0 }}" autocomplete="off" {% if month_day_form.selected_day.value == day.0 %}checked{% endif %}>
-                    {{ day.1 }}
-                </label>
-            {% endfor %}
+    <!-- Theatre and Showtimes -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <h5 class="card-title">Available Showtimes</h5>
+            <div class="table-responsive mt-3">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Theatre</th>
+                            <th scope="col">Showtimes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for theatre in theatres %}
+                            <tr>
+                                <td>{{ theatre.name }}</td>
+                                <td>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        {% for screening in screenings %}
+                                            {% if screening.showroom.theatre == theatre %}
+                                                <a href="{% url 'seat_selection' screening.screening_id %}" 
+                                                   class="btn btn-outline-primary btn-sm">{{ screening.show_time|date:'d M H:i' }}</a>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="2" class="text-center text-muted">No showtimes available</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-
-        <button type="submit" class="btn btn-primary mt-3">Filter</button>
-    </form>
-
-    <!-- Theatre and Showtimes Table -->
-    <div class="table-responsive mt-4">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">Theatre</th>
-                    <th scope="col">Showtimes</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for theatre in theatres %}
-                    <tr>
-                        <td>{{ theatre.name }}</td>
-                        <td>
-                            <div class="btn-group">
-                                {% for screening in screenings %}
-                                    {% if screening.showroom.theatre == theatre %}
-                                        <a href="{% url 'seat_selection' screening.screening_id %}" class="btn btn-outline-primary me-2">{{ screening.show_time|date:'d M H:i' }}</a>
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
     </div>
 </div>
-
 {% endblock %}

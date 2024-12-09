@@ -1,35 +1,60 @@
 {% extends 'admin/base_site.html' %}
 
-{% block title %}Movie Data{% endblock %}
+{% block title %}Movie Management{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-	<h2>Theatre Data</h2>
-	<table class="table table-striped">
-		<thead>
-			<tr>
-				<th>Movie Name</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for movie in movies %}
-			<tr>
-				<td>{{ movie.title }}</td>
-				<!-- <td>
-					{% for showroom in theatre.showroom_set.all %}
-					<a href="{% url 'showroom_schedule' showroom.showroom_id %}" class="btn btn-info btn-sm">
-						{{ showroom.name }} (ID: {{ showroom.showroom_id }})
-					</a>
-					{% empty %}
-					<span>No showrooms available</span>
-					{% endfor %}
-				</td> -->
-				<td>
-					<!-- Actions for Modify and Delete Theatre -->
-				</td>
-			</tr>
-			{% endfor %}
-		</tbody>
-	</table>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Movie Management</h2>
+        <a href="{% url 'add_movie' %}" class="btn btn-primary">Add New Movie</a>
+    </div>
+
+    <div class="card shadow-sm m-3">
+        <div class="card-body">
+            <table class="table table-hover table-responsive">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Poster</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Rating</th>
+                        <th scope="col">Release Date</th>
+                        <th scope="col">Duration</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for movie in movies %}
+                        <tr>
+                            <td>
+                                {% if movie.poster %}
+                                    <img src="{{ movie.poster.url }}" alt="{{ movie.title }}" class="img-thumbnail" style="width: 50px; height: auto;">
+                                {% else %}
+                                    <span class="text-muted">No Poster</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong>{{ movie.title }}</strong><br>
+                                <small class="text-muted">{{ movie.director }}</small>
+                            </td>
+                            <td>{{ movie.category }}</td>
+                            <td>{{ movie.get_rating_display }}</td>
+                            <td>{{ movie.release_date|date:"M d, Y" }}</td>
+                            <td>{{ movie.duration }} mins</td>
+                            <td>${{ movie.price }}</td>
+                            <td>
+                                <a href="{% url 'edit_movie' movie.movie_id %}" class="btn btn-sm btn-warning">Edit</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center text-muted">No movies available</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 {% endblock %}
