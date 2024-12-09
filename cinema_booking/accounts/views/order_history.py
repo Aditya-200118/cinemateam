@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 
 def order_history(request):
-    customer = get_object_or_404(Customer, pk = request.user.pk)  # Assuming `request.user` is linked to `Customer`
+    customer = get_object_or_404(Customer, pk = request.user.pk)
     try:
         bookings = BookingService.get_order_history_for_customer(customer)
     except ValidationError:
