@@ -4,28 +4,28 @@
 
 {% block content %}
 <div class="container m-5">
-  <div class="card card-white border-0">
-    <div class="card-header bg-primary text-white text-center">Add User</div>
-    <div class="card-body">
-      <form method="post" action="{% url 'add_customer' %}">
-        {% csrf_token %}
-        {{ user_form.as_p }}
-        {{ address_form.as_p }}
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="is_staff" name="is_staff">
-          <label class="form-check-label" for="is_staff">Is Staff</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="is_superuser" name="is_superuser">
-          <label class="form-check-label" for="is_superuser">Is Superuser</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="is_active" name="is_active" checked>
-          <label class="form-check-label" for="is_active">Is Active</label>
-        </div>
-        <button type="submit" class="btn btn-primary">Add Customer</button>
-      </form>
-    </div>
-  </div>
+	<div class="card card-white border-0">
+		<div class="card-header bg-primary text-white text-center">Add User</div>
+		<div class="card-body">
+			<form method="post" action="{% url 'add_customer' %}">
+				{% csrf_token %}
+				{{ user_form.as_p }}
+				{{ address_form.as_p }}
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" id="is_staff" name="is_staff">
+					<label class="form-check-label" for="is_staff">Is Staff</label>
+				</div>
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" id="is_superuser" name="is_superuser">
+					<label class="form-check-label" for="is_superuser">Is Superuser</label>
+				</div>
+				<div class="form-check">
+					<input class="form-check-input" type="checkbox" id="is_active" name="is_active" checked>
+					<label class="form-check-label" for="is_active">Is Active</label>
+				</div>
+				<button type="submit" class="btn btn-primary">Add Customer</button>
+			</form>
+		</div>
+	</div>
 </div>
 {% endblock %}

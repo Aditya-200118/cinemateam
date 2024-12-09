@@ -4,89 +4,90 @@
 
 {% block content %}
 <div class="container mt-4">
-  <!-- Welcome Section -->
-  <div class="card mb-4 shadow-sm">
-    <div class="card-body">
-        <h5 class="card-title">Welcome, {{ user.first_name }}</h5>
-        <p class="card-text"><small class="text-muted">Last login: {{ user.last_login }}</small></p>
-    </div>
+	<!-- Welcome Section -->
+	<div class="card mb-4 shadow-sm">
+		<div class="card-body">
+			<h5 class="card-title">Welcome, {{ user.first_name }}</h5>
+			<p class="card-text"><small class="text-muted">Last login: {{ user.last_login }}</small></p>
+		</div>
+	</div>
+	<div class="card mb-4 card-white shadow-sm rounded-3 border-0">
+		<div class="card-body">
+			<h5 class="card-title text-primary">Welcome, Admin</h5>
+			<p class="card-text">Choose an option to manage your content.</p>
+			<div class="row">
+				<div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+					<a href="{% url 'admin_movie' %}" class="card card-custom shadow-sm rounded-3 h-100 border-0">
+						<div class="card-body text-center py-4">
+							<h5 class="card-title">🎥 Movie Management</h5>
+							<p class="card-text">Manage movie listings, trailers, and schedules.</p>
+						</div>
+					</a>
+				</div>
+				<div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+					<a href="{% url 'admin_accounts' %}" class="card card-custom shadow-sm rounded-3 h-100 border-0">
+						<div class="card-body text-center py-4">
+							<h5 class="card-title">👥 User Management</h5>
+							<p class="card-text">Manage user accounts and roles.</p>
+						</div>
+					</a>
+				</div>
+				<div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+					<a href="{% url 'promotion_dashboard' %}"
+						class="card card-custom shadow-sm rounded-3 h-100 border-0">
+						<div class="card-body text-center py-4">
+							<h5 class="card-title">📢 Promotion Management</h5>
+							<p class="card-text">Manage ongoing promotions and offers.</p>
+						</div>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
-  <div class="card mb-4 card-white shadow-sm rounded-3 border-0">
-    <div class="card-body">
-      <h5 class="card-title text-primary">Welcome, Admin</h5>
-      <p class="card-text">Choose an option to manage your content.</p>
-      <div class="row">
-        <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
-          <a href="{% url 'admin_movie' %}" class="card card-custom shadow-sm rounded-3 h-100 border-0">
-            <div class="card-body text-center py-4">
-              <h5 class="card-title">🎥 Movie Management</h5>
-              <p class="card-text">Manage movie listings, trailers, and schedules.</p>
-            </div>
-          </a>
-        </div>
-        <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
-          <a href="{% url 'admin_accounts' %}" class="card card-custom shadow-sm rounded-3 h-100 border-0">
-            <div class="card-body text-center py-4">
-              <h5 class="card-title">👥 User Management</h5>
-              <p class="card-text">Manage user accounts and roles.</p>
-            </div>
-          </a>
-        </div>
-        <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
-          <a href="{% url 'promotion_dashboard' %}" class="card card-custom shadow-sm rounded-3 h-100 border-0">
-            <div class="card-body text-center py-4">
-              <h5 class="card-title">📢 Promotion Management</h5>
-              <p class="card-text">Manage ongoing promotions and offers.</p>
-            </div>
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- Summary Section -->
-  <div class="card card-white border-0">
-    <div class="card-body">
-      <h5 class="card-title">Summary</h5>
-      <table class="table">
-        <thead>
-          <tr>
-            <th scope="col">Metric</th>
-            <th scope="col">Count</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Number of Screens</td>
-            <td>...</td>
-          </tr>
-          <tr>
-            <td>Currently Playing Movies</td>
-            <td>...</td>
-          </tr>
-          <tr>
-            <td>Coming Soon Movies</td>
-            <td>...</td>
-          </tr>
-          <tr>
-            <td>Number of Users</td>
-            <td>...</td>
-          </tr>
-          <tr>
-            <td>Number of Admins</td>
-            <td>...</td>
-          </tr>
-          <tr>
-            <td>Active Promo Codes</td>
-            <td>...</td>
-          </tr>
-          <tr>
-            <td>Last Sign In</td>
-            <td>...</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+<!-- Summary Section -->
+<div class="card card-white border-0">
+	<div class="card-body">
+		<h5 class="card-title">Summary</h5>
+		<table class="table">
+			<thead>
+				<tr>
+					<th scope="col">Metric</th>
+					<th scope="col">Count</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Number of Screens</td>
+					<td>...</td>
+				</tr>
+				<tr>
+					<td>Currently Playing Movies</td>
+					<td>...</td>
+				</tr>
+				<tr>
+					<td>Coming Soon Movies</td>
+					<td>...</td>
+				</tr>
+				<tr>
+					<td>Number of Users</td>
+					<td>...</td>
+				</tr>
+				<tr>
+					<td>Number of Admins</td>
+					<td>...</td>
+				</tr>
+				<tr>
+					<td>Active Promo Codes</td>
+					<td>...</td>
+				</tr>
+				<tr>
+					<td>Last Sign In</td>
+					<td>...</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
 {% endblock %}
