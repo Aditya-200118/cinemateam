@@ -5,6 +5,25 @@
 {% block title %}Book Ticket{% endblock %}
 
 {% block content %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'home' %}">
+            <img src="{% static 'icon.png' %}" width="40" height="40" alt="Logo">
+            <span class="h4 text-primary mb-0 fw-bold">BOOK MY TICKET</span>
+        </a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                {% if user.is_authenticated %}
+                <li class="nav-item"><a class="btn btn-primary me-3" href="{% url 'user_logout' %}">Logout</a></li>
+                <li class="nav-item"><a class="btn btn-primary me-3" href="{% url 'profile' %}">Profile</a></li>
+                {% else %}
+                <li class="nav-item"><a class="btn btn-primary me-3" href="{% url 'user_login' %}">Log In</a></li>
+                <li class="nav-item"><a class="btn btn-primary me-3" href="{% url 'register' %}">Sign Up</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
 <div class="container mt-4">
 
     <div class="card shadow-sm mb-4 border-0">
