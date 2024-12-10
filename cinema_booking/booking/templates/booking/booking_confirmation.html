@@ -3,17 +3,26 @@
 {% block title %}Booking Confirmation{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-center align-items-center vh-100">
-    <div class="card shadow-sm">
-        <div class="card-body text-center">
-            <h5 class="card-title text-primary">Booking Confirmed</h5>
-            <p class="card-text">Thank you for your booking! Here are your details:</p>
-            <ul class="list-unstyled">
-                <li><strong>Booking ID:</strong> {{ booking.booking_id }}</li>
-                <li><strong>Show Time:</strong> {{ booking.show_time }}</li>
-                <li><strong>Total Price:</strong> ${{ booking.total_price }}</li>
+<div class="d-flex justify-content-center align-items-center vh-100 bg-light">
+    <div class="card shadow-lg border-0 rounded-3" style="max-width: 400px;">
+        <div class="card-body text-center p-5">
+            <div class="mb-4">
+                <i class="bi bi-check-circle-fill text-success display-4"></i>
+            </div>
+            <h4 class="card-title text-primary fw-bold">Booking Confirmed</h4>
+            <p class="card-text text-muted mt-3">Thank you for your booking! Here are your details:</p>
+            <ul class="list-group list-group-flush text-start mt-4 mb-4">
+                <li class="list-group-item">
+                    <strong>Booking ID:</strong> {{ booking.booking_id }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Show Time:</strong> {{ booking.show_time }}
+                </li>
+                <li class="list-group-item">
+                    <strong>Total Price:</strong> ${{ booking.total_price }}
+                </li>
             </ul>
-            <a href="{% url 'home' %}" class="btn btn-primary mt-3">Home</a>
+            <a href="{% url 'home' %}" class="btn btn-primary w-100 py-2">Go to Home</a>
         </div>
     </div>
 </div>

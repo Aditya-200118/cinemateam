@@ -31,24 +31,26 @@
 </div>
 {% endfor %}
 
-<div class="container mt-4">
-    <div class="row">
+<div class="container mt-5">
+    <div class="row gy-4">
+        <!-- Review Your Booking Section -->
         <div class="col-lg-8">
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h4 class="card-title text-primary">Review Your Booking</h4>
-                    <p><strong>Movie:</strong> {{ movie.title }}</p>
-                    <p><strong>Showtime:</strong> {{ screening.show_time }}</p>
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-4">
+                    <h4 class="card-title text-primary fw-bold mb-3">Review Your Booking</h4>
+                    <p class="mb-2"><strong>Movie:</strong> {{ movie.title }}</p>
+                    <p class="mb-2"><strong>Showtime:</strong> {{ screening.show_time }}</p>
                     <p><strong>You Have Selected Seat No:</strong> {{ selected_seats|index_add_one|join:", " }}</p>
                 </div>
             </div>
 
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title text-primary">Ticket Summary</h5>
-                    <table class="table table-borderless">
-                        <thead>
-                            <tr class="text-muted">
+            <!-- Ticket Summary Section -->
+            <div class="card shadow-lg border-0 mt-4">
+                <div class="card-body p-4">
+                    <h5 class="card-title text-primary fw-bold mb-3">Ticket Summary</h5>
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
                                 <th>Ticket Type</th>
                                 <th>Count</th>
                                 <th>Price</th>
@@ -59,34 +61,34 @@
                             <tr>
                                 <td>Adult</td>
                                 <td>{{ adult_count }}</td>
-                                <td>{{ adult_price }}</td>
-                                <td>{{ adult_count|floatformat:2|add:"*"|add:adult_price }}</td>
+                                <td>${{ adult_price }}</td>
+                                <td>${{ adult_count|floatformat:2|add:"*"|add:adult_price }}</td>
                             </tr>
                             <tr>
                                 <td>Senior</td>
                                 <td>{{ senior_count }}</td>
-                                <td>{{ senior_price }}</td>
-                                <td>{{ senior_count|floatformat:2|add:"*"|add:senior_price }}</td>
+                                <td>${{ senior_price }}</td>
+                                <td>${{ senior_count|floatformat:2|add:"*"|add:senior_price }}</td>
                             </tr>
                             <tr>
                                 <td>Child</td>
                                 <td>{{ child_count }}</td>
-                                <td>{{ child_price }}</td>
-                                <td>{{ child_count|floatformat:2|add:"*"|add:child_price }}</td>
+                                <td>${{ child_price }}</td>
+                                <td>${{ child_count|floatformat:2|add:"*"|add:child_price }}</td>
                             </tr>
                         </tbody>
                         <tfoot>
                             <tr>
-                                <th colspan="3">Total Cost</th>
-                                <th>{{ total_cost }}</th>
+                                <th colspan="3" class="text-end">Total Cost</th>
+                                <th>${{ total_cost }}</th>
                             </tr>
                             <tr>
-                                <th colspan="3">Discount Applied</th>
-                                <th id="discount-amount">0</th>
+                                <th colspan="3" class="text-end">Discount Applied</th>
+                                <th id="discount-amount">$0</th>
                             </tr>
                             <tr class="table-primary">
-                                <th colspan="3">New Total</th>
-                                <th id="new-total">{{ total_cost }}</th>
+                                <th colspan="3" class="text-end">New Total</th>
+                                <th id="new-total">${{ total_cost }}</th>
                             </tr>
                         </tfoot>
                     </table>
@@ -94,34 +96,40 @@
             </div>
         </div>
 
+        <!-- Apply Coupon and Payment Section -->
         <div class="col-lg-4">
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h5 class="card-title text-primary">Apply Coupon</h5>
+            <!-- Apply Coupon -->
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-4">
+                    <h5 class="card-title text-primary fw-bold mb-3">Apply Coupon</h5>
                     <form id="apply-coupon-form" method="post" action="{% url 'apply_coupon' %}">
                         {% csrf_token %}
                         <div class="input-group">
-                            <input type="text" name="coupon_code" class="form-control" placeholder="Enter Coupon Code">
+                            <input type="text" name="coupon_code" class="form-control" placeholder="Enter Coupon Code" required>
                             <button type="submit" class="btn btn-success">Apply</button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h5 class="card-title text-primary">Payment</h5>
-                    <form method="post">
+            <div class="card shadow-lg border-0 mt-4">
+                <div class="card-body p-4">
+                    <h5 class="card-title text-primary fw-bold mb-3">Payment</h5>
+                    <form method="post" class="needs-validation" novalidate>
                         {% csrf_token %}
                         <div class="mb-3">
-                            <label for="saved_cards" class="form-label">Saved Cards</label>
-                            <select id="saved_cards" name="saved_card" class="form-select">
-                                <option value="">-- Select a card --</option>
+                            <label for="saved_cards" class="form-label fw-semibold">Saved Cards</label>
+                            <select id="saved_cards" name="saved_card" class="form-select border-2 rounded-2" aria-label="Select a saved card">
+                                <option value="" disabled selected>-- Select a card --</option>
                             </select>
-                            <a href="{% url 'add_payment_method_checkout' screening_id=screening.screening_id %}"
-                                class="btn btn-primary">Add Payment Method</a>
+                            <a href="{% url 'add_payment_method_checkout' screening_id=screening.screening_id %}" 
+                                class="btn btn-outline-primary mt-3 d-block text-center fw-semibold">
+                                + Add Payment Method
+                            </a>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100" id="confirm-booking-btn">Confirm Booking</button>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2" id="confirm-booking-btn" disabled>
+                            Confirm Booking
+                        </button>
                     </form>
                 </div>
             </div>
