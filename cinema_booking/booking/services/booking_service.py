@@ -3,9 +3,9 @@ from . import BookingRepository, TicketRepository, ValidationError
 
 class BookingService:
     @staticmethod
-    def create_booking_for_customer(customer, show_time):
+    def create_booking_for_customer(customer, show_time, showroom):
         # Call repository to create the booking
-        booking = BookingRepository.create_booking(customer, show_time)
+        booking = BookingRepository.create_booking(customer, show_time, showroom)
         if not booking:
             raise ValidationError("Failed to create booking.")
         return booking

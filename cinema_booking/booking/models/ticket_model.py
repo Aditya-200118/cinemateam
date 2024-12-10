@@ -2,6 +2,7 @@
 
 from . import *
 from movie.models import Movie, Screening
+from movie.models.showroom_models import Showroom
 class Ticket(models.Model):
     ticket_id = models.AutoField(primary_key=True)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, null=True)
@@ -11,7 +12,7 @@ class Ticket(models.Model):
     price = models.DecimalField(max_digits=6, decimal_places=2, default=0)
     ticket_type = models.ForeignKey('TicketType', on_delete=models.CASCADE, default=1)  
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE, related_name="tickets")  
-
+    showroom = models.ForeignKey(Showroom, on_delete=models.CASCADE)  # Add this line
     def save(self, *args, **kwargs):
         self.clean()  # Call clean to enforce additional validation
         super().save(*args, **kwargs)

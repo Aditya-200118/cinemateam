@@ -6,7 +6,7 @@ from django.db import IntegrityError
 
 class TicketRepository:
     @staticmethod
-    def create_ticket(movie, show_time, screening, seat_number, price, ticket_type, booking):
+    def create_ticket(movie, show_time, screening, seat_number, price, ticket_type, booking, showroom):
         try:
             ticket = Ticket.objects.create(
                 movie=movie,
@@ -16,6 +16,7 @@ class TicketRepository:
                 price = price,
                 ticket_type=ticket_type,
                 booking=booking,
+                showroom=showroom,  # New field
             )
             return ticket
         except IntegrityError:

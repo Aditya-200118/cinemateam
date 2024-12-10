@@ -4,8 +4,8 @@ from . import TicketRepository, ValidationError, MovieTicketTypeDiscountReposito
 
 class TicketService:
     @staticmethod
-    def create_ticket_for_booking(movie, show_time, screening, seat_number, price, ticket_type, booking):
-        ticket = TicketRepository.create_ticket(movie, show_time, screening, seat_number, price, ticket_type, booking)
+    def create_ticket_for_booking(movie, show_time, screening, seat_number, price, ticket_type, booking, showroom):
+        ticket = TicketRepository.create_ticket(movie, show_time, screening, seat_number, price, ticket_type, booking, showroom)
         if not ticket:
             raise ValidationError("Failed to create ticket.")
         return ticket

@@ -73,7 +73,8 @@ def checkout(request, screening_id):
                         'screening': screening,
                         'seat_number': seat_number,
                         'price': price,
-                        'ticket_type': ticket_type
+                        'ticket_type': ticket_type,
+                        'showroom': screening.showroom  # Added this line
                     })
 
                 # Retrieve selected card ID from session
@@ -93,7 +94,8 @@ def checkout(request, screening_id):
                     customer=customer,
                     screening=screening,
                     tickets=tickets,
-                    promo_code=promotion.promo_code if promotion else None
+                    promo_code=promotion.promo_code if promotion else None,
+                    showroom=screening.showroom  # Added this line
                 )
 
                 # Record the transaction

@@ -5,12 +5,13 @@ from django.db import IntegrityError
 
 class BookingRepository:
     @staticmethod
-    def create_booking(customer, show_time):
+    def create_booking(customer, show_time, showroom):
         try:
-            booking = Booking.objects.create(customer=customer, show_time=show_time)
+            booking = Booking.objects.create(customer=customer, show_time=show_time, showroom=showroom)
             return booking
         except IntegrityError:
             return None  # In case of an integrity error, such as a foreign key issue
+
     
     @staticmethod
     def get_booking_by_id(booking_id):
