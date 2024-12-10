@@ -121,7 +121,7 @@
                             <a href="{% url 'add_payment_method_checkout' screening_id=screening.screening_id %}"
                                 class="btn btn-primary">Add Payment Method</a>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100">Confirm Booking</button>
+                        <button type="submit" class="btn btn-primary w-100" id="confirm-booking-btn">Confirm Booking</button>
                     </form>
                 </div>
             </div>
@@ -132,37 +132,56 @@
 <script>
     // Function to load saved cards via AJAX
     document.addEventListener('DOMContentLoaded', function () {
-        // Load saved cards via AJAX
+        // Reference to the saved cards dropdown and "Confirm Booking" button
+        const savedCardsDropdown = document.getElementById('saved_cards');
+        const confirmBookingButton = document.getElementById('confirm-booking-btn'); // Use ID for the button
+
+        // Function to toggle the disabled state of the "Confirm Booking" button
+        function toggleConfirmBookingButton() {
+            confirmBookingButton.disabled = savedCardsDropdown.value === '';
+        }
+
+        // Initially disable the button until a card is selected
+        toggleConfirmBookingButton();
+
+        // Attach event listener to the saved cards dropdown
+        savedCardsDropdown.addEventListener('change', toggleConfirmBookingButton);
+
+        // Load saved cards via AJAX and populate the dropdown
         fetch("{% url 'get_saved_cards' %}")
             .then(response => response.json())
             .then(data => {
-                const select = document.getElementById('saved_cards');
-                select.innerHTML = '';
+                savedCardsDropdown.innerHTML = ''; // Clear existing options
                 const defaultOption = document.createElement('option');
                 defaultOption.value = '';
                 defaultOption.textContent = '-- Select a card --';
-                select.appendChild(defaultOption);
+                savedCardsDropdown.appendChild(defaultOption);
 
                 if (data.cards && data.cards.length > 0) {
                     data.cards.forEach(card => {
                         const option = document.createElement('option');
                         option.value = card.id;
                         option.textContent = `${card.card_name} - ${card.decrypted_card_number}`;
-                        select.appendChild(option);
+                        savedCardsDropdown.appendChild(option);
                     });
                 } else {
                     const noCardsOption = document.createElement('option');
                     noCardsOption.value = '';
                     noCardsOption.textContent = 'No saved cards available';
-                    select.appendChild(noCardsOption);
+                    savedCardsDropdown.appendChild(noCardsOption);
                 }
+
+                // Reapply the toggle function to ensure button state updates after loading cards
+                toggleConfirmBookingButton();
+            })
+            .catch(error => {
+                console.error('Error loading saved cards:', error);
             });
 
-        // Listen for changes in the card dropdown
-        document.getElementById('saved_cards').addEventListener('change', function (event) {
+        // Attach event listener to send selected card ID to the server
+        savedCardsDropdown.addEventListener('change', function (event) {
             const selectedCardId = event.target.value;
 
-            // Send the selected card ID to the server
             fetch("{% url 'select_saved_cards' %}", {
                 method: 'POST',
                 headers: {
@@ -170,11 +189,15 @@
                     'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
                 },
                 body: JSON.stringify({ card_id: selectedCardId }),
-            }).then(response => response.json())
+            })
+                .then(response => response.json())
                 .then(data => {
                     if (!data.success) {
                         alert(data.error);
                     }
+                })
+                .catch(error => {
+                    console.error('Error sending selected card:', error);
                 });
         });
     });
