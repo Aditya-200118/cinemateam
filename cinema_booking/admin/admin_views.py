@@ -12,6 +12,7 @@ from accounts.services.user_service import UserService
 from accounts.services.email_proxy import EmailProxy, DjangoEmailService
 from accounts.services.user_profile_facade import UserProfileFacade
 from booking.services.promotion_service import PromotionService
+from booking.services.ticket_service import MovieTicketTypeDiscountService
 from . import Theatre, Showroom, Movie, Screening, get_object_or_404, JsonResponse, transaction
 from .admin_forms import TheatreForm, ShowroomForm, MovieForm, ScreeningForm, PromotionForm, EditMovieForm, MovieTicketTypeDiscountForm
 from django import forms
@@ -95,6 +96,7 @@ class MyAdminSite(AdminSite):
             path('add-movie/', self.admin_view(self.add_movie), name='add_movie'),
             path('edit-movie/<int:movie_id>', self.admin_view(self.edit_movie), name='edit_movie'),
             path('movie-data/', self.admin_view(self.movie_data_view), name='movie_data'),
+            path('fetch-ticket-details/<int:movie_id>/', self.admin_view(self.fetch_ticket_details), name="fetch_ticket_details"),
             path('theatre-data/', self.admin_view(self.theatre_data_view), name='theatre_data'),
             path('showroom-schedule/<int:showroom_id>/', self.admin_view(self.showroom_schedule_view), name='showroom_schedule'),
             path('get-showrooms/<int:theatre_id>/', self.admin_view(self.get_showrooms), name='get_showrooms'),
@@ -261,6 +263,26 @@ class MyAdminSite(AdminSite):
     def movie_data_view(self, request):
         movie = Movie.objects.all()
         return render(request, 'admin/movie_data.html', {'movies': movie})
+
+    def fetch_ticket_details(self, request, movie_id):
+        try:
+            movie = Movie.objects.get(movie_id=movie_id)
+            price = movie.price  # Get movie price directly from the model
+
+            # Use the service to fetch discounts
+            discounts = {
+                'child_discount': str(MovieTicketTypeDiscountService.get_discount(movie, 'Child')),
+                'adult_discount': str(MovieTicketTypeDiscountService.get_discount(movie, 'Adult')),
+                'senior_discount': str(MovieTicketTypeDiscountService.get_discount(movie, 'Senior')),
+            }
+
+            return JsonResponse({
+                'price': str(price),
+                **discounts
+            })
+
+        except Movie.DoesNotExist:
+            return JsonResponse({'error': 'Movie not found'}, status=404)
 
     def showroom_schedule_view(self, request, showroom_id):
         # Retrieve the showroom by showroom_id

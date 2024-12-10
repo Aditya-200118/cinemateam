@@ -42,6 +42,7 @@ urlpatterns = [
     path('admin/add-movie/', admin_site.admin_view(admin_site.add_movie), name='add_movie'),
     path('admin/edit-movie/<int:movie_id>', admin_site.admin_view(admin_site.edit_movie), name='edit_movie'),
     path('admin/movie-data', admin_site.admin_view(admin_site.movie_data_view), name='movie_data'),
+    path('admin/fetch-ticket-details/<int:movie_id>', admin_site.admin_view(admin_site.fetch_ticket_details), name="fetch_ticket_details"),
     path('admin/theatre-data', admin_site.admin_view(admin_site.theatre_data_view), name='theatre_data'),
     path('admin/showroom-schedule/<int:showroom_id>/', admin_site.admin_view(admin_site.showroom_schedule_view), name='showroom_schedule'),
     path('admin/manage_screenings/', admin_site.admin_view(admin_site.manage_screenings), name='manage_screenings'),

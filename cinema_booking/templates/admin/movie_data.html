@@ -42,7 +42,12 @@
                             <td>{{ movie.get_rating_display }}</td>
                             <td>{{ movie.release_date|date:"M d, Y" }}</td>
                             <td>{{ movie.duration }} mins</td>
-                            <td>${{ movie.price }}</td>
+                            <td>
+                                <a href="#" class="price-link" data-bs-toggle="modal" data-bs-target="#priceModal" 
+                                   data-movie-id="{{ movie.movie_id }}">
+                                   ${{ movie.price }}
+                                </a>
+                            </td>
                             <td>
                                 <a href="{% url 'edit_movie' movie.movie_id %}" class="btn btn-sm btn-warning">Edit</a>
                             </td>
@@ -57,4 +62,71 @@
         </div>
     </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="priceModal" tabindex="-1" aria-labelledby="priceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="priceModalLabel">Ticket Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Ticket Price:</strong> $<span id="ticketPrice">Loading...</span></p>
+                <p><strong>Discounts:</strong></p>
+                <ul>
+                    <li><strong>Child:</strong> $<span id="childDiscount">Loading...</span></li>
+                    <li><strong>Adult:</strong> $<span id="adultDiscount">Loading...</span></li>
+                    <li><strong>Senior:</strong> $<span id="seniorDiscount">Loading...</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const modal = document.getElementById('priceModal');
+        const ticketPriceElement = document.getElementById('ticketPrice');
+        const childDiscountElement = document.getElementById('childDiscount');
+        const adultDiscountElement = document.getElementById('adultDiscount');
+        const seniorDiscountElement = document.getElementById('seniorDiscount');
+
+        document.querySelectorAll('.price-link').forEach(link => {
+            link.addEventListener('click', () => {
+                const movieId = link.getAttribute('data-movie-id');
+
+                // Reset the modal fields to "Loading..."
+                ticketPriceElement.textContent = "Loading...";
+                childDiscountElement.textContent = "Loading...";
+                adultDiscountElement.textContent = "Loading...";
+                seniorDiscountElement.textContent = "Loading...";
+
+                // Fetch ticket price and discounts via AJAX
+                fetch(`/admin/fetch-ticket-details/${movieId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            ticketPriceElement.textContent = "Error fetching data";
+                            childDiscountElement.textContent = "N/A";
+                            adultDiscountElement.textContent = "N/A";
+                            seniorDiscountElement.textContent = "N/A";
+                        } else {
+                            ticketPriceElement.textContent = data.price;
+                            childDiscountElement.textContent = data.child_discount;
+                            adultDiscountElement.textContent = data.adult_discount;
+                            seniorDiscountElement.textContent = data.senior_discount;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        ticketPriceElement.textContent = "Error fetching data";
+                        childDiscountElement.textContent = "N/A";
+                        adultDiscountElement.textContent = "N/A";
+                        seniorDiscountElement.textContent = "N/A";
+                    });
+            });
+        });
+    });
+</script>
 {% endblock %}
