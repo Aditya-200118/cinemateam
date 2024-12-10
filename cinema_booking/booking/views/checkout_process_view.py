@@ -59,13 +59,13 @@ def checkout(request, screening_id):
                 for i, seat_number in enumerate(selected_seats):
                     if i < adult_count:
                         ticket_type = TicketType.objects.get(type=TicketType.ADULT)
-                        price = movie.price
+                        price = movie.price * Decimal(1.15)
                     elif i < adult_count + senior_count:
                         ticket_type = TicketType.objects.get(type=TicketType.SENIOR)
-                        price = senior_price
+                        price = senior_price * Decimal(1.15)
                     else:
                         ticket_type = TicketType.objects.get(type=TicketType.CHILD)
-                        price = child_price
+                        price = child_price * Decimal(1.15)
 
                     tickets.append({
                         'movie': movie,
