@@ -26,6 +26,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from movie.services.movie_service import MovieService
 import logging
 logger = logging.getLogger(__name__)
+from decimal import Decimal
 from django.contrib.auth.decorators import user_passes_test
 class AdminLoginForm(AuthenticationForm):
     def __init__(self, request=None, *args, **kwargs):
@@ -313,15 +314,23 @@ class MyAdminSite(AdminSite):
                     # Save the movie object
                     movie = movie_form.save()
 
-                    # Define default discounts for each ticket type
-                    default_discounts = {
-                        1: 15,  # Ticket type 1
-                        2: 30,  # Ticket type 2
-                        3: 0,   # Ticket type 3
+                    # Get the movie price from the form
+                    movie_price = Decimal(movie.price)
+
+                    # Define ticket type IDs for reference
+                    TICKET_TYPE_CHILD = 1
+                    TICKET_TYPE_SENIOR = 2
+                    TICKET_TYPE_ADULT = 3
+
+                    # Calculate discounts based on movie price
+                    calculated_discounts = {
+                        TICKET_TYPE_CHILD: min(movie_price * Decimal('0.25'), movie_price * Decimal('0.5')),  # 25%, capped at 50%
+                        TICKET_TYPE_SENIOR: min(movie_price * Decimal('0.50'), movie_price * Decimal('0.5')),  # 50%, capped at 50%
+                        TICKET_TYPE_ADULT: Decimal('0'),  # 0% discount
                     }
 
                     # Create MovieTicketTypeDiscount objects
-                    for ticket_type_id, discount in default_discounts.items():
+                    for ticket_type_id, discount in calculated_discounts.items():
                         MovieTicketTypeDiscount.objects.create(
                             movie=movie,
                             ticket_type_id=ticket_type_id,

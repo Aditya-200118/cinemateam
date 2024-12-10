@@ -7,7 +7,8 @@ from django.contrib.auth import get_user_model
 from accounts.models import Customer, Address, Card
 from booking.models import Booking, Ticket, TicketType, Promotion, MovieTicketTypeDiscount
 from movie.models import Theatre, Showroom, Movie, Screening
-
+from decimal import Decimal
+from math import floor
 class Command(BaseCommand):
     help = "Populate the database with dummy data for development and testing purposes."
 
@@ -383,108 +384,128 @@ class Command(BaseCommand):
                 release_date=release_date,
                 poster=poster,
                 duration=duration,
-                price=random.uniform(50.0, 70.0),
+                price=Decimal(random.uniform(50.0, 70.0)),  # Ensure price is Decimal
             )
-            # Movie-specific ticket type discounts
+
+            # Define dynamic discounts as a percentage of the movie price
+            child_discount = movie.price * Decimal('0.25')  # 25% of the movie price
+            senior_discount = movie.price * Decimal('0.50')  # 50% of the movie price
+            adult_discount = movie.price * Decimal('0.00')  # 0% of the movie price
+
+            # Ensure no discount exceeds 50% of the movie price
+            child_discount = floor(min(child_discount, movie.price * Decimal('0.50')))
+            senior_discount = floor(min(senior_discount, movie.price * Decimal('0.50')))
+            adult_discount = floor(min(adult_discount, movie.price * Decimal('0.50')))
+
+            # Create MovieTicketTypeDiscount objects with floored discounts
             MovieTicketTypeDiscount.objects.create(
-                movie=movie, ticket_type=ticket_types[0], discount=15.0
-            )  # Child discount
+                movie=movie, ticket_type=ticket_types[0], discount=child_discount
+            )
             MovieTicketTypeDiscount.objects.create(
-                movie=movie, ticket_type=ticket_types[1], discount=30.0
-            )  # Senior discount
+                movie=movie, ticket_type=ticket_types[1], discount=senior_discount
+            )
             MovieTicketTypeDiscount.objects.create(
-                movie=movie, ticket_type=ticket_types[2], discount=0.0
-            )  # Adult discount
+                movie=movie, ticket_type=ticket_types[2], discount=adult_discount
+            )
             # Create screenings for each showroom
             for showroom in Showroom.objects.filter(theatre__in=theatres):
                 for _ in range(3):
-                    show_time = today + timedelta(
-                        days=random.randint(-10, 10), hours=random.randint(8, 22)
-                    )
+                        # Generate a random number of days and hours within the desired range
+                    random_days = random.randint(-10, 10)
+                    random_hour = random.randint(8, 23)  # Range is 8:00 to 23:00
+                    
+                    # Generate minutes as a multiple of 5
+                    random_minutes = random.randint(0, 11) * 5  # 0, 5, 10, ..., 55
+                    
+                    # Combine to create the show time
+                    show_time = today + timedelta(days=random_days, hours=random_hour, minutes=random_minutes)
+                    
                     Screening.objects.create(
                         movie=movie, showroom=showroom, show_time=show_time
                     )
         # Create promotions with title and description
         promotions = [
+            # Currently active promotions (start date set to yesterday)
             Promotion.objects.create(
-                promo_code="SAVE10",
-                title="Save 10%",
-                description="Get 10% off on your purchase.",
+                promo_code="MOVIE10",
+                title="Movie Discount",
+                description="Enjoy 10% off on any movie ticket.",
                 discount=10,
-                valid_from=today.date(),
+                valid_from=(today - timedelta(days=1)).date(),
                 valid_to=(today + timedelta(days=30)).date(),
             ),
             Promotion.objects.create(
-                promo_code="SUMMER20",
-                title="Summer Sale",
-                description="Enjoy 20% off this summer.",
+                promo_code="CINEMA20",
+                title="Cinema Sale",
+                description="Get 20% off on tickets this month.",
                 discount=20,
-                valid_from=today.date(),
+                valid_from=(today - timedelta(days=1)).date(),
                 valid_to=(today + timedelta(days=60)).date(),
             ),
             Promotion.objects.create(
-                promo_code="WELCOME5",
-                title="Welcome Discount",
-                description="Get 5% off on your first purchase.",
-                discount=5,
-                valid_from=today.date(),
+                promo_code="WELCOME15",
+                title="Welcome Offer",
+                description="New customers get 15% off on their first ticket.",
+                discount=15,
+                valid_from=(today - timedelta(days=1)).date(),
                 valid_to=(today + timedelta(days=15)).date(),
             ),
-            # Additional promotions
             Promotion.objects.create(
-                promo_code="FESTIVE25",
-                title="Festive Offer",
-                description="Celebrate with 25% off during the festive season.",
+                promo_code="FAMILY25",
+                title="Family Discount",
+                description="Save 25% when booking tickets for your family.",
                 discount=25,
-                valid_from=today.date(),
+                valid_from=(today - timedelta(days=1)).date(),
                 valid_to=(today + timedelta(days=45)).date(),
             ),
             Promotion.objects.create(
-                promo_code="BUNDLE30",
-                title="Bundle Discount",
-                description="Save 30% when you buy 2 or more items.",
-                discount=30,
-                valid_from=today.date(),
-                valid_to=(today + timedelta(days=20)).date(),
+                promo_code="EVENING10",
+                title="Evening Special",
+                description="Get 10% off on evening shows after 6 PM.",
+                discount=10,
+                valid_from=(today - timedelta(days=1)).date(),
+                valid_to=(today + timedelta(days=30)).date(),
             ),
+
+            # Future promotions (start date is 5 days or 1 month from today)
             Promotion.objects.create(
-                promo_code="WINTER15",
-                title="Winter Special",
-                description="Stay cozy with 15% off on all winter wear.",
+                promo_code="WEEKDAY15",
+                title="Weekday Special",
+                description="Save 15% on tickets for shows Monday to Thursday.",
                 discount=15,
-                valid_from=today.date(),
-                valid_to=(today + timedelta(days=90)).date(),
+                valid_from=(today + timedelta(days=5)).date(),  # Starts in 5 days
+                valid_to=(today + timedelta(days=95)).date(),
             ),
             Promotion.objects.create(
-                promo_code="FLASH50",
+                promo_code="FLASH40",
                 title="Flash Sale",
-                description="Hurry! Enjoy 50% off for the next 48 hours.",
-                discount=50,
-                valid_from=today.date(),
-                valid_to=(today + timedelta(days=2)).date(),
+                description="Enjoy 40% off on tickets for the next 24 hours.",
+                discount=40,
+                valid_from=(today + timedelta(days=30)).date(),  # Starts in 1 month
+                valid_to=(today + timedelta(days=31)).date(),
             ),
             Promotion.objects.create(
                 promo_code="LOYALTY10",
                 title="Loyalty Reward",
-                description="Loyal customers get 10% off on all purchases.",
+                description="Regular customers get 10% off on all bookings.",
                 discount=10,
-                valid_from=today.date(),
-                valid_to=(today + timedelta(days=120)).date(),
+                valid_from=(today + timedelta(days=5)).date(),  # Starts in 5 days
+                valid_to=(today + timedelta(days=125)).date(),
             ),
             Promotion.objects.create(
-                promo_code="FREESHIP",
-                title="Free Shipping",
-                description="Enjoy free shipping on orders above $50.",
-                discount=0,
-                valid_from=today.date(),
-                valid_to=(today + timedelta(days=60)).date(),
+                promo_code="WEEKEND20",
+                title="Weekend Special",
+                description="Enjoy 20% off on weekend movie tickets.",
+                discount=20,
+                valid_from=(today + timedelta(days=30)).date(),  # Starts in 1 month
+                valid_to=(today + timedelta(days=90)).date(),
             ),
             Promotion.objects.create(
-                promo_code="BOGO50",
-                title="Buy One, Get One 50% Off",
-                description="Buy one item and get 50% off on the second item.",
-                discount=50,
-                valid_from=today.date(),
-                valid_to=(today + timedelta(days=30)).date(),
+                promo_code="SUMMER15",
+                title="Summer Blockbuster",
+                description="Get 15% off on tickets for this summer’s hits.",
+                discount=15,
+                valid_from=(today + timedelta(days=5)).date(),  # Starts in 5 days
+                valid_to=(today + timedelta(days=95)).date(),
             ),
         ]
