@@ -21,6 +21,10 @@
                 <li class="list-group-item">
                     <strong>Total Price:</strong> ${{ booking.total_price }}
                 </li>
+                <!-- Note for the Tax -->
+                <li class="list-group-item text-muted">
+                    <small><em>15% sales tax has been added to the total price.</em></small>
+                </li>
             </ul>
             <a href="{% url 'home' %}" class="btn btn-primary w-100 py-2">Go to Home</a>
         </div>
