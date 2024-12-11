@@ -82,7 +82,7 @@ def activate_account(request, uidb64, token):
 
 
 def register(request):
-    request.session.flush()
+    
     email_service = EmailProxy(DjangoEmailService())
 
     if request.method == "POST": # this is a post request meaning that user is pressing the register button to submit his details he filled in form
