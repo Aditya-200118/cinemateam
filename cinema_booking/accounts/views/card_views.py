@@ -79,15 +79,15 @@ def modify_payment_method(request, card_id=None):
         if form.is_valid():
             if form.cleaned_data.get('delete'):  # Handle deletion of card
                 facade.delete_card(card)  # Call facade to delete card securely
-                messages.success(request, "Payment method deleted successfully.")
+                messages.success(request, "Payment method deleted successfully.", extra_tags='delete_card')
                 return redirect('show_payment_methods')
             else:
                 form.save()  # Save updated card details using facade
                 facade.update_card(card, form.cleaned_data)  # Encrypt card number and save
-                messages.success(request, "Payment method updated successfully.")
+                messages.success(request, "Payment method updated successfully.", extra_tags='update_card')
                 return redirect('show_payment_methods')
         else:
-            messages.error(request, "Please correct the errors below.")
+            messages.error(request, "Please correct the errors below.", extra_tags='modify_card_error')
     else:
         # Set initial data for the form, including decrypted card data
         initial = {}
@@ -115,7 +115,7 @@ def show_payment_methods(request):
             card.card_number_safe = facade.decrypt_card_number_safe(card.card_number)  # Decrypt and mask card number
             card.cvv_safe = facade.decrypt_cvv_safe(card.cvv)  # Decrypt and mask CVV
         except Exception:
-            messages.error(request, "Failed to decrypt card information. Please contact support.")
+            messages.error(request, "Failed to decrypt card information. Please contact support.", extra_tags='decrypt_error')
             card.card_number_safe = "Invalid"  # Set to Invalid if decryption fails
             card.cvv_safe = "****"  # Mask CVV if decryption fails
 
@@ -136,5 +136,5 @@ def delete_payment_method(request, card_id):
 
     # Delete the card securely using the CardFacade
     facade.delete_card(card)
-    messages.success(request, "Payment method deleted successfully.")
+    messages.success(request, "Payment method deleted successfully.", extra_tags='delete_card')
     return redirect('show_payment_methods')

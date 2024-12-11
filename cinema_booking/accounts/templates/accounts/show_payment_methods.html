@@ -3,14 +3,21 @@
 
 {% block content %}
 <section class="p-3 p-md-4 p-xl-5">
-    {% for message in messages %}
-    <div class="alert {{ message.tags }} alert-dismissible shadow fade show" role="alert">
-        <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-        {{ message | safe }}
+    {% if messages %}
+    <div class="message-container">
+        {% for message in messages %}
+            <div 
+                class="alert 
+                {% if 'success' in message.tags %}alert-success{% elif 'error' in message.tags %}alert-danger{% elif 'warning' in message.tags %}alert-warning{% else %}alert-info{% endif %} 
+                alert-dismissible fade show" 
+                role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
     </div>
-    {% endfor %}
+{% endif %}
+
     <div class="container" style="min-height: 100vh; padding-top: 5%; padding-bottom: 5%; overflow: hidden;">
         <div class="card border-light-subtle shadow-sm" style="margin: auto;">
             <div class="row g-0">

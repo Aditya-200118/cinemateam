@@ -1,5 +1,6 @@
 from . import *
 from accounts.forms import CardForm
+from django.contrib.messages import get_messages
 
 @login_required
 def profile_view(request):
@@ -13,7 +14,6 @@ def profile_view(request):
         'card_form': card_form,
     }
     return render(request, 'accounts/profile.html', context)
-
 
 
 @login_required
@@ -32,7 +32,10 @@ def edit_profile(request):
 
             try:
                 facade.update_user_profile(customer, profile_data, address_data)
-                messages.success(request, "Your profile has been updated successfully.")
+                messages.add_message(request, messages.SUCCESS, "Your profile has been updated successfully.", extra_tags='profile_update')
+                storage = get_messages(request)  # Consumes all messages
+                for _ in storage:  # Clears them explicitly
+                    pass
                 return redirect("profile")
             except Exception:
                 messages.error(request, "An error occurred while updating your profile. Please try again.")

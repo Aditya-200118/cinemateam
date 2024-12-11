@@ -3,6 +3,11 @@
 {% block title %}Edit Profile{% endblock %}
 
 {% block content %}
+{% for message in messages %}
+    {% if 'profile_update' in message.tags %}
+        <div class="success">{{ message }}</div>
+    {% endif %}
+{% endfor %}
 <section class="p-3 p-md-4 p-xl-5">
 	<div class="container" style="overflow: hidden;">
 		<div class="card border-light-subtle shadow-sm" style="width: 80%; height: auto; margin: auto;">

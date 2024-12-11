@@ -371,7 +371,7 @@ class MyAdminSite(AdminSite):
             show_time = request.POST.get('show_time')
 
             if not all([showroom_id, movie_id, show_time]):
-                messages.error(request, "Missing required fields.")
+                # messages.error(request, "Missing required fields.")
                 return redirect('manage_screenings')  # Redirect to the same page on error
 
             try:
@@ -400,17 +400,17 @@ class MyAdminSite(AdminSite):
                     messages.success(request, f"Screening added successfully: {screening}")
                     return redirect('manage_screenings')  # Redirect on success
                 else:
-                    messages.error(request, "Form is invalid.")
+                    # messages.error(request, "Form is invalid.")
                     return redirect('manage_screenings')
 
             except Showroom.DoesNotExist:
-                messages.error(request, "Showroom does not exist.")
+                # messages.error(request, "Showroom does not exist.")
                 return redirect('manage_screenings')
             except Movie.DoesNotExist:
-                messages.error(request, "Movie does not exist.")
+                # messages.error(request, "Movie does not exist.")
                 return redirect('manage_screenings')
             except Exception as e:
-                messages.error(request, f"Error: {e}")
+                # messages.error(request, f"Error: {e}")
                 return redirect('manage_screenings')
 
         # For GET request
@@ -508,12 +508,14 @@ class MyAdminSite(AdminSite):
 
                     email_proxy.send_email(subject, message, recipient_list)
 
-                    messages.success(request, "Promotion created and emails sent successfully!")
+                    # messages.success(request, "Promotion created and emails sent successfully!")
                     return redirect('admin:create_promotion')
                 except Exception as e:
-                    messages.error(request, f"Failed to create promotion or send emails: {e}")
+                    # messages.error(request, f"Failed to create promotion or send emails: {e}")
+                    pass
             else:
                 messages.error(request, "Invalid form submission. Please correct the errors.")
+                pass
         else:
             form = PromotionForm()
 

@@ -25,9 +25,10 @@ def checkout(request, screening_id):
     movie = screening.movie
     customer = get_object_or_404(Customer, pk=request.user.pk)
     selected_seats = request.session.get('selected_seats', [])
+    # Redirect back to seat selection with a warning
+    
     if not selected_seats:
-        # Redirect back to seat selection with a warning
-        # messages.warning(request, "You must select at least one seat to proceed to checkout.")
+        messages.warning(request, "You must select at least one seat to proceed to checkout.", extra_tags='checkout_warning')
         return redirect('seat_selection', screening_id=screening_id)
     selected_seats = request.session.get('selected_seats', [])
     adult_count = int(request.session.get('adult_count', 0))
@@ -46,15 +47,10 @@ def checkout(request, screening_id):
 
     if request.method == 'POST':
         try:
-            # Use a database transaction to ensure atomicity
             with transaction.atomic():
-                # Instantiate the ConcreteBuilder
                 concrete_builder = ConcreteBookingBuilder(customer, screening)
-
-                # Instantiate the Controller and pass the builder to it
                 controller = BookingController(concrete_builder)
 
-                # Prepare ticket details
                 tickets = []
                 for i, seat_number in enumerate(selected_seats):
                     if i < adult_count:
@@ -80,13 +76,13 @@ def checkout(request, screening_id):
                 # Retrieve selected card ID from session
                 card_id = request.session.get('selected_card_id', None)
                 if not card_id:
-                    messages.error(request, "Please select a saved card to proceed with the payment.")
+                    messages.error(request, "Please select a saved card to proceed with the payment.", extra_tags='checkout_error_card_missing')
                     return redirect('checkout_process', screening_id=screening_id)
 
                 # Fetch the card object using the card ID
                 card = Card.objects.filter(id=card_id, customer=customer).first()
                 if not card:
-                    messages.error(request, "Invalid card selected.")
+                    messages.error(request, "Invalid card selected.", extra_tags='checkout_error_invalid_card')
                     return redirect('checkout_process', screening_id=screening_id)
 
                 # Construct the booking using the controller
@@ -95,7 +91,7 @@ def checkout(request, screening_id):
                     screening=screening,
                     tickets=tickets,
                     promo_code=promotion.promo_code if promotion else None,
-                    showroom=screening.showroom  # Added this line
+                    showroom=screening.showroom,
                 )
 
                 # Record the transaction
@@ -108,15 +104,15 @@ def checkout(request, screening_id):
                 request.session.pop('discount_amount', None)
                 request.session.pop('new_total', None)
                 SeatLock.objects.filter(customer=customer, screening=screening).delete()
-
             # Redirect after the transaction is successfully committed
+            messages.success(request, "Your booking was successful!", extra_tags='checkout_success')
             return redirect('booking_confirmation', booking_id=booking.booking_id)
 
         except ValidationError as e:
-            messages.error(request, str(e))
+            messages.error(request, str(e), extra_tags='checkout_error_validation')
             return redirect('checkout_process', screening_id=screening_id)
         except Exception as e:
-            messages.error(request, f"An unexpected error occurred: {str(e)}")
+            messages.error(request, f"An unexpected error occurred: {str(e)}", extra_tags='checkout_error_unexpected')
             return redirect('checkout_process', screening_id=screening_id)
 
     total_cost = float(request.session.get('total_cost', 0.0))
@@ -265,7 +261,7 @@ def add_payment_method_checkout(request, screening_id):
     facade = CardFacade()  # Initialize the facade for card operations
 
     if request.method == "POST":
-        # Only handle the addition of a new card
+        # Handle the addition of a new card
         new_card_form = CardForm(request.POST, prefix='new_card', customer=customer, is_registration=False)
 
         if new_card_form.is_valid():
@@ -274,12 +270,12 @@ def add_payment_method_checkout(request, screening_id):
                     new_card = new_card_form.save(commit=False)
                     new_card.customer = customer  # Associate the new card with the customer
                     facade.add_card(customer, new_card_form.cleaned_data)  # Securely encrypt and save the card
-                    messages.success(request, "Payment method added successfully.")
+                    messages.success(request, "Payment method added successfully.", extra_tags='add_card_success')
                     return redirect("checkout_process", screening_id=screening_id)  # Redirect back to checkout
             except Exception as e:
-                messages.error(request, f"An error occurred while adding your payment method: {str(e)}. Please try again.")
+                messages.error(request, f"An error occurred while adding your payment method: {str(e)}. Please try again.", extra_tags='add_card_error')
         else:
-            messages.error(request, "Please correct the errors below.")
+            messages.error(request, "Please correct the errors below.", extra_tags='add_card_form_error')
     else:
         # Display the new card form for GET requests
         new_card_form = CardForm(prefix='new_card', customer=customer, is_registration=False)
