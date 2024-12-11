@@ -6,14 +6,15 @@ from django.db import transaction
 from accounts.services.user_service import UserService
 import logging
 from django.http import JsonResponse
+from accounts.services.email_proxy import DjangoEmailService, EmailProxy
 
 logger = logging.getLogger(__name__)
 
 class UserProfileFacade:
-    def __init__(self, user_service=None):
+    def __init__(self, user_service=None, email_service = None):
         """By default this will use the UserServices defined in accounts/services/user_service.py"""
         self.user_service = user_service or UserService()
-    
+        self.email_service = email_service or EmailProxy(DjangoEmailService())
     def create_customer(self, email, password, first_name, last_name, profile_data, address_data):
 
         if not address_data:
@@ -47,12 +48,10 @@ class UserProfileFacade:
                     self.user_service.update_customer_address(customer.address, **address_data)
 
                 # Optional: Send email notification
-                send_mail(
-                    "Profile Updated",
-                    "Your profile information has been updated.",
-                    settings.DEFAULT_FROM_EMAIL,
-                    [customer.email],
-                    fail_silently=False,
+                self.email_service.send_email(
+                    subject="Profile Updated",
+                    message="Your profile information has been updated.",
+                    recipient_list=[customer.email],
                 )
         except Exception as e:
             logger.exception("Error updating user profile: %s", str(e))

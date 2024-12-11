@@ -34,8 +34,8 @@ def edit_profile(request):
                 facade.update_user_profile(customer, profile_data, address_data)
                 messages.add_message(request, messages.SUCCESS, "Your profile has been updated successfully.", extra_tags='profile_update')
                 storage = get_messages(request)  # Consumes all messages
-                for _ in storage:  # Clears them explicitly
-                    pass
+                # for _ in storage:  # Clears them explicitly
+                #     pass
                 return redirect("profile")
             except Exception:
                 messages.error(request, "An error occurred while updating your profile. Please try again.")

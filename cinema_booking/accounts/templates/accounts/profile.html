@@ -5,6 +5,26 @@
 {% block content %}
 <section class="p-3 p-md-4 p-xl-5">
 	<div class="container" style="overflow: hidden;">
+		{% if messages %}
+        {% for message in messages %}
+            {% if 'profile_update' in message.tags %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% elif 'profile_error' in message.tags %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% else %}
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endif %}
+        {% endfor %}
+	{% endif %}
 		<div class="card border-light-subtle shadow-sm" style="width: 80%; height: auto; margin: auto;">
 			<div class="row g-0">
 				<div class="col-12 col-md-6 text-bg-primary">
